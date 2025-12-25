@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+  <script src="server-url.js"></script>
+  <script>
+    async function verifyAuthToken() {
+      const authToken = localStorage.getItem('authToken');
+      
+      if (!authToken) {
+        console.log('No authToken found in localStorage');
+        //alert('Authentication failed: No token found');
+        // Redirect to login page if no token found
+        return;
+      }
+
+      try {
+        console.log('Attempting to verify authToken...');
+        
+        const response = await fetch(SERVER_URL+'/verify-token', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`
+          }
+        });
+
+        // Handle HTTP errors (404, 500, etc.)
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('API Response:', data);
+
+        if (data.success) {
+          console.log('Token verification successful for user:', data.user.name);
+          localStorage.setItem('currentUser', JSON.stringify(data.user));
+          // Make sure this path matches your actual file location
+          window.location.href = 'dashboard.html'; // Updated path
+        } else {
+          console.log('Token verification failed:', data.message || 'No error message provided');
+          //alert('Authentication failed: ' + (data.message || 'Invalid token'));
+          // Redirect to login page on failure
+          //window.location.href = 'login.html';
+        }
+      } catch (error) {
+        console.error('Error during token verification:', error);
+        //alert('Authentication failed: ' + error.message);
+        // Redirect to login page on error
+        //window.location.href = 'login.html';
+      }
+    }
+
+    // Call the function when the page loads
+    document.addEventListener('DOMContentLoaded', verifyAuthToken);
+  </script>
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="logo.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign In</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: rgb(136, 28, 28);
+      --secondary: #8c2f2f;
+      --accent: #4caf50;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+      scrollbar-width: thin;
+      scroll-behavior: smooth;
+      scrollbar-color: rgb(138, 119, 119) transparent;
+      user-select: none;
+      -webkit-overflow-scrolling: touch; /* smooth scroll on mobile */
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'Inter', sans-serif;
+      background: white;
+    }
+
+    body {
+      display: flex;
+      flex-direction: row;
+      overflow: hidden;
+      overflow-x: hidden;
+    }
+
+    .auth-left {
+      height: 100vh;
+      width: 60vw;
+    }
+
+     .auth-right {
+      height: 100vh;
+      width: 40vw;
+    }
+
+    .auth-left {
+      background: url("wave.svg") center center / cover no-repeat;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+      padding-right: 9vw;
+    }
+
+    .auth-left::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.1), transparent 40%),
+                  radial-gradient(circle at 70% 70%, rgba(255,255,255,0.08), transparent 50%);
+      pointer-events: none;
+    }
+
+    .logo-circle {
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 5px solid rgba(255, 255, 255, 0.9);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+      animation: floatLogo 6s ease-in-out infinite;
+    }
+
+    @keyframes floatLogo {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-15px); }
+    }
+
+    .auth-left h1 {
+      font-size: 3rem;
+      margin: 30px 0 10px;
+      font-weight: 700;
+      text-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .auth-left p {
+      font-size: 1.2rem;
+      max-width: 500px;
+      line-height: 1.6;
+      padding: 0 20px;
+    }
+
+    .auth-right {
+      background: #ffffff;
+      backdrop-filter: blur(16px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 0 80px;
+      position: relative;
+    }
+
+    .auth-right h2 {
+      color: var(--primary);
+      font-size: 2.4rem;
+      margin-bottom: 30px;
+      font-weight: 700;
+    }
+
+    .input-floating {
+      position: relative;
+      margin-bottom: 28px;
+    }
+
+    .input-floating input {
+      width: 90%;
+      padding: 16px;
+      font-size: 16px;
+      border: 1px solid #ddd;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.7);
+      color: #333;
+      outline: none;
+    }
+
+    .input-floating label {
+      position: absolute;
+      left: 16px;
+      top: 16px;
+      font-size: 16px;
+      color: #777;
+      pointer-events: none;
+      transition: 0.3s ease;
+    }
+
+    .input-floating input:focus,
+    .input-floating input:valid {
+      padding-top: 30px;
+      padding-bottom: 6px;
+    }
+
+    .input-floating input:focus + label,
+    .input-floating input:valid + label {
+      top: 6px;
+      font-size: 13px;
+      color: var(--primary);
+    }
+
+    .show-forgot {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      margin-bottom: 28px;
+      align-items: center;
+      width: 90%;
+    }
+
+    .show-me {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #555;
+    }
+
+
+    button {
+      width: 90%;
+      padding: 16px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 14px;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      position: relative;
+    }
+
+    button:hover {
+      background: var(--secondary);
+    }
+
+    input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+      accent-color: var(--primary);
+    }
+
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 900px) {
+      body {
+        flex-direction: column;
+        overflow-y: auto;
+      }
+
+      .auth-left, .auth-right {
+        width: 100%;
+        height: auto;
+        min-height: 100vh;
+        padding: 50px 30px;
+        margin-right: 0px;
+      }
+
+      .auth-left h1 {
+        font-size: 2.3rem;
+      }
+
+      .auth-left p {
+        font-size: 1rem;
+      }
+
+      .auth-right {
+        background-color: #ffffff;
+      }
+
+      .logo-circle {
+        width: 140px;
+        height: 140px;
+      }
+
+      .auth-right {
+        padding: auto;
+        margin-bottom: 20vh;
+        padding-left: 13vw;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .auth-left {
+        background: var(--primary);
+      }
+
+      .auth-left::before {
+        display: none;
+      }
+    }
+
+
+    @media (max-height: 700px) {
+      .auth-left, .auth-right {
+        justify-content: flex-start;
+        padding-top: 60px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-left">
+    <img src="logo.jpg" alt="Logo" class="logo-circle" />
+    <h1>MES CMS</h1>
+    <p>Built to Support Public Institutions, Designed to Deliver Clarity, Efficiency, and Trust.</p>
+  </div>
+
+  <div class="auth-right">
+    <h2>Sign In</h2>
+    <form id="loginForm">
+      <div class="input-floating">
+        <input type="text" id="username" name="username" required autocomplete="off" />
+        <label for="username">Username</label>
+      </div>
+      <div class="input-floating">
+        <input type="password" id="password" name="password" required autocomplete="off" />
+        <label for="password">Password</label>
+      </div>
+      <div class="show-forgot">
+        <div class="show-me">
+          <input type="checkbox" id="show" name="show" />
+          <label for="show">Show password</label>
+        </div>
+      </div>
+      <button type="submit">Log In</button>
+    </form>
+  </div>
+
+<script>
+  document.getElementById('loginForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const id = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value.trim();
+
+    if (!id || !password) {
+      alert("Please fill in both fields.");
+      return;
+    }
+
+    try {
+      const response = await fetch(SERVER_URL+'/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ id, password })
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        alert(result.error || "Login failed.");
+        return;
+      }
+
+      // Store token in local storage
+      localStorage.setItem('authToken', result.token);
+
+      //alert("✅ Login successful!");
+      console.log("Saved token:", result.token);
+
+      // Optional: Redirect or update UI
+      window.location.href = 'dashboard.html';
+
+    } catch (error) {
+      console.error("Login error:", error);
+      alert("An error occurred while logging in.");
+    }
+  });
+
+  // Show/hide password toggle
+  document.getElementById('show').addEventListener('change', function () {
+    const pwInput = document.getElementById('password');
+    pwInput.type = this.checked ? 'text' : 'password';
+  });
+</script>
+
+</body>
+</html>

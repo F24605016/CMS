@@ -1,0 +1,3961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script src="server-url.js"></script>
+  <script>
+    const page = 'all-complaints';
+  </script>
+  <script src="verification.js"></script>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="logo.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="icon" type="image/png" href="logo.png">
+  <title>MES CMS - All Complaints</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    
+    /* Notification Styles */
+    .notification-area {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1100;
+      max-width: 350px;
+      width: 100%;
+    }
+
+    .notification {
+      padding: 15px 20px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+      animation: slideIn 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+    }
+
+    .notification::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 4px;
+      width: 100%;
+      background: rgba(255,255,255,0.5);
+      animation: progress 3s linear;
+    }
+
+    .notification.success {
+      background: #4CAF50;
+    }
+
+    .notification.error {
+      background: #F44336;
+    }
+
+    .notification.warning {
+      background: #FF9800;
+    }
+
+    .notification.info {
+      background: #2196F3;
+    }
+
+    @keyframes progress {
+      from { width: 100%; }
+      to { width: 0%; }
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    /* Complaints Section */
+    .complaints-section-container {
+      display: grid;
+      grid-template-columns: 250px 1fr;
+      gap: 30px;
+      min-height: 600px;
+    }
+    
+    .complaints-sidebar {
+      background: var(--card-bg);
+      border-radius: 18px;
+      padding: 25px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+    
+    .complaints-option {
+      padding: 18px 20px;
+      margin-bottom: 15px;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(248, 249, 250, 0.7);
+    }
+    
+    .complaints-option:hover {
+      background: var(--nav-hover);
+    }
+    
+    .complaints-option.active {
+      background: var(--nav-active);
+      color: var(--primary);
+      box-shadow: 0 5px 15px rgba(136, 28, 28, 0.1);
+    }
+    
+    .complaints-option i {
+      font-size: 20px;
+    }
+    
+    .complaints-content {
+      background: var(--card-bg);
+      border-radius: 18px;
+      padding: 30px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .complaints-panel {
+      display: none;
+    }
+    
+    .complaints-panel.active {
+      display: block;
+      animation: fadeIn 0.4s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .panel-header {
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .panel-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    
+    .form-control {
+      width: 100%;
+      padding: 14px 18px;
+      border-radius: 12px;
+      border: 1px solid rgba(0,0,0,0.1);
+      background: rgba(248, 249, 250, 0.5);
+      font-size: 16px;
+      transition: all 0.3s;
+    }
+    
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(136, 28, 28, 0.2);
+    }
+    
+    .btn {
+      padding: 14px 28px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 6px 18px rgba(136, 28, 28, 0.2);
+    }
+    
+    .btn-primary:hover {
+      background: #a33a3a;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 22px rgba(136, 28, 28, 0.3);
+    }
+    
+    .search-box {
+      display: flex;
+      margin-bottom: 30px;
+      height: 45px; /*Changes made later*/
+    }
+    
+    .search-box input {
+      flex: 1;
+      border-radius: 8px 0 0 8px;
+    }
+    
+    .search-box button {
+      border-radius: 0 8px 8px 0;
+    }
+    
+    /* Table-specific styles */
+    .complaints-history-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      border-radius: 5px;
+      overflow: hidden;
+      background: white;
+      font-size: 13px;
+      overflow-x: auto;
+      border: 1px solid #ffc4c4; /* Add outer border instead of individual cell borders */
+    }
+
+    
+    .complaints-history-table th {
+      background: rgba(136, 28, 28, 0.1);
+      color: var(--primary);
+      font-weight: 700;
+      padding: 10px 12px;
+      text-align: center;
+      font-size: 14px;
+      border: 1px solid #ffc4c4; /* vertical line color */
+    }
+    
+    .complaints-history-table td {
+      padding: 8px 12px;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      vertical-align: middle;
+      border: 1px solid #ffc4c4; /* vertical line color */
+      cursor: default;
+      vertical-align: top;
+      height: 60px;
+    }
+    
+    .complaints-history-table tr:hover:not(tfoot tr) {
+      background: rgba(136, 28, 28, 0.05);
+    }
+
+    th:nth-last-child(-n+2),
+    td:nth-last-child(-n+2) {
+      width: 120px; /* Fixed size */
+    }
+    
+    tfoot {
+      height: 120px;
+      font-size: 18px;
+    }
+
+    #pagination-info {
+      text-align: left;
+      padding: 0px;
+      color: var(--gray);
+      cursor: default;
+    }
+    
+    .status-badge {
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-block;
+    }
+    
+    .status-in-progress {
+      background: #2196F3;
+      color: white;
+    }
+    
+    .status-completed {
+      background: #4CAF50;
+      color: white;
+    }
+    
+    .status-deferred {
+      background: #0f0f0f;
+      color: white;
+    }
+    
+    .status-un-assigned {
+      background: #F44336;
+      color: white;
+    }
+
+    .status-sna {
+      background: #FFA500;
+      color: white;
+    }
+    
+    .editable-cell {
+      position: relative;
+    }
+    
+    .editable-cell .static-value {
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.2s;
+      font-size: 13px;
+    }
+    
+    .editable-cell .static-value:hover {
+      background: rgba(136, 28, 28, 0.1);
+    } 
+    
+    .action-cell {
+      gap: 5px;
+    }
+    
+    .action-btn {
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+      background: rgba(136, 28, 28, 0.1);
+      color: var(--primary);
+      font-size: 12px;
+    }
+    
+    .action-btn:hover {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .action-btn.delete {
+      background: rgba(244, 67, 54, 0.1);
+      color: var(--danger);
+    }
+    
+    .action-btn.delete:hover {
+      background: var(--danger);
+      color: white;
+    }
+    
+    .pagination-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
+    }
+    
+    .pagination-controls {
+      display: flex;
+      gap: 5px;
+    }
+    
+    .page-btn {
+      padding: 8px 12px;
+      border-radius: 6px;
+      background: rgba(136, 28, 28, 0.1);
+      border: 1px solid rgba(136, 28, 28, 0.3);
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .page-btn:hover {
+      background: rgba(136, 28, 28, 0.2);
+    }
+    
+    .page-btn.active {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .page-btn.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .entries-per-page {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .entries-per-page select {
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid rgba(0,0,0,0.1);
+    }
+
+    #launch-complaints,#natures, #delay-complaints {
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .action-dropdown {
+      position: relative;
+      display: inline-block;
+    }
+    
+    .action-dropdown-btn {
+      padding: 6px 12px;
+      background: rgba(136, 28, 28, 0.1);
+      color: var(--primary);
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    
+.action-dropdown-content {
+  position: absolute;
+  left: 0;
+  top: 100%;
+  display: none;
+  background-color: white;
+  min-width: 160px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  z-index: 1000;
+  border-radius: 4px;
+  overflow: visible;
+  border: 1px solid #ddd;
+  left: -75px;
+}
+    
+    .action-dropdown-content a {
+      color: var(--dark);
+      padding: 8px 12px;
+      text-decoration: none;
+      display: block;
+      font-size: 14px;
+    }
+    
+    .action-dropdown-content a:hover {
+      background-color: rgba(136, 28, 28, 0.1);
+    }
+    
+/*    .action-dropdown:hover .action-dropdown-content {
+      display: block;
+    }*/
+
+    
+/* Add these styles to ensure proper positioning */
+.action-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.action-dropdown-content {
+  position: absolute;
+  left: -75px; /* Matches your existing offset */
+  top: 100%;
+  display: none;
+  background-color: white;
+  min-width: 160px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  z-index: 1000;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  margin-top: -15px;
+  
+}
+
+/* Show class for JavaScript toggling */
+.action-dropdown-content.show {
+  display: block;
+}
+
+/* Changed from 1200 to 1495 */
+    @media (max-width: 1495px) {
+      .complaints-history-table {
+        display: block;
+        overflow-x: auto;
+      }
+    }
+
+    @media (max-width: 992px) {
+      .complaints-section-container {
+        grid-template-columns: 1fr;
+      }
+      
+      .complaints-sidebar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      
+      .complaints-option {
+        margin-bottom: 0;
+        flex: 1;
+        min-width: 150px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .nav-bar {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      
+      .nav-item {
+        padding: 15px;
+        font-size: 15px;
+      }
+      
+      .search-box {
+        flex-direction: column;
+      }
+      
+      .search-box input {
+        border-radius: 12px;
+        margin-bottom: 10px;
+      }
+      
+      .search-box button {
+        border-radius: 6px;
+        width: 100%;
+      }
+    }
+    
+    @media (max-width: 576px) {
+      .nav-container {
+        margin-left: 0;
+        justify-content: center;
+      }
+      
+      .action-dropdown-content {
+        min-width: 140px;
+      }
+      
+      .action-dropdown-content a {
+        padding: 6px 10px;
+        font-size: 13px;
+      }
+    }
+
+
+    /* CSS for Skillman Modal*/
+    /* ===== Skillman Modal Styles ===== */
+.skillman-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.skillman-modal-backdrop.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.skillman-modal-container {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+  width: 95%;
+  max-width: 600px;
+  height: 700px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform: translateY(-20px);
+  transition: transform 0.3s ease;
+}
+
+.skillman-modal-backdrop.active .skillman-modal-container {
+  transform: translateY(0);
+}
+
+/* Modal Header */
+.skillman-modal-header {
+  padding: 16px 20px;
+  background-color: var(--primary);
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.skillman-modal-header h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 22px;
+  cursor: pointer;
+  padding: 2px;
+  line-height: 1;
+}
+
+/* Modal Body */
+.skillman-modal-body {
+  padding: 20px;
+  overflow-y: visible;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Priority Section */
+.priority-section {
+  margin-bottom: 24px;
+}
+
+.priority-section label {
+  display: block;
+  margin-bottom: 3px;
+  font-weight: 600;
+  color: var(--dark);
+  font-size: 14px;
+}
+
+.priority-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+  margin-top: 15px;
+}
+
+.priority-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.priority-option input[type="radio"] {
+  accent-color: var(--primary);
+}
+
+#priority-label {
+  font-size: 15px;
+  font-weight: bold;
+  color: var(--primary);
+}
+
+/* Dropdown Styles */
+.dropdown {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.dropdown-toggle {
+  width: 100%;
+  padding: 12px 15px;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: border-color 0.2s;
+}
+
+.dropdown-toggle:hover {
+  border-color: var(--primary);
+}
+
+.dropdown-toggle i {
+  transition: transform 0.2s;
+}
+
+.dropdown-toggle.active i {
+  transform: rotate(180deg);
+}
+
+.dropdown-menu {
+  position: relative;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  max-height: 300px;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 0 0 6px 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  display: none;
+  margin-top: -1px;
+  overflow: hidden;
+}
+
+.dropdown-menu.active {
+  display: block;
+}
+
+.dropdown-search {
+  padding: 10px 15px;
+  border-bottom: 1px solid #eee;
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 11;
+}
+
+.dropdown-search input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.dropdown-search input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.dropdown-items {
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.dropdown-item {
+  padding: 10px 15px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.dropdown-item:hover {
+  background-color: rgba(136, 28, 28, 0.1);
+}
+
+.dropdown-item.selected {
+  background-color: rgba(136, 28, 28, 0.1);
+}
+
+.skillman-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.skillman-name {
+  font-weight: 600;
+}
+
+.skillman-details {
+  display: flex;
+  gap: 15px;
+  font-size: 13px;
+  color: var(--secondary);
+}
+
+/* Helper Skillman Section */
+.helper-section {
+  margin-top: 30px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.helper-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.helper-header label {
+  font-weight: 600;
+  color: var(--dark);
+}
+
+
+/* Modal Footer */
+.modal-footer {
+  padding: 16px 20px;
+  background-color: #f8f9fa;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  border-top: 1px solid #ddd;
+  flex-shrink: 0;
+}
+
+/* Buttons */
+.btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+}
+
+.btn-outline {
+  background-color: transparent;
+  border: 1px solid var(--secondary);
+  color: var(--secondary);
+}
+
+.btn-outline:hover {
+  background-color: #f0f0f0;
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  color: white;
+  border: 1px solid var(--primary);
+}
+
+.btn-primary:hover {
+  background-color: #9e1e1e;
+}
+
+/* Mark Complaint Modal Styles */
+.mark-complaint-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.mark-complaint-modal-backdrop.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.mark-complaint-modal-container {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+  width: 95%;
+  max-width: 450px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform: translateY(-20px);
+  transition: transform 0.3s ease;
+}
+
+.mark-complaint-modal-backdrop.active .mark-complaint-modal-container {
+  transform: translateY(0);
+}
+
+.mark-complaint-modal-header {
+  padding: 16px 20px;
+  background-color: var(--primary);
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.mark-complaint-modal-header h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.mark-complaint-modal-body {
+  padding: 25px 20px;
+  text-align: center;
+}
+
+.complaint-id-display {
+  font-weight: bold;
+  color: var(--primary);
+}
+
+.mark-complaint-modal-footer {
+  padding: 16px 20px;
+  background-color: #f8f9fa;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  border-top: 1px solid #ddd;
+}
+
+.mark-complaint-option {
+  flex: 1;
+  padding: 10px;
+  text-align: center;
+}
+
+@media (max-width: 480px) {
+  .mark-complaint-modal-footer {
+    flex-direction: column;
+  }
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .priority-options {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .skillman-modal-body {
+    padding: 16px;
+  }
+  
+  .skillman-details {
+    flex-direction: column;
+    gap: 2px;
+  }
+  
+  .skillman-modal-container {
+    height: 90vh;
+  }
+}
+
+/* Simplified modal styles */
+.skillman-modal-container {
+  width: 95%;
+  max-width: 500px; /* Smaller width for simpler modal */
+  height: auto; /* Auto height */
+  padding-bottom: 20px;
+}
+
+.skillman-modal-body {
+  padding: 30px;
+  overflow-y: visible;
+}
+
+.dropdown {
+  margin-bottom: 20px;
+}
+
+.current-skillman-section {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 20px;
+  border: 1px solid #eee;
+}
+
+.current-skillman-section h4 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: var(--primary);
+}
+
+.current-skillman-info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.current-skillman-info .skillman-name {
+  font-weight: 600;
+}
+
+.current-skillman-info .skillman-details {
+  display: flex;
+  gap: 15px;
+  font-size: 14px;
+  color: var(--secondary);
+}
+.current-skillman-section {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 20px;
+  border: 1px solid #eee;
+}
+
+.current-skillman-section h4 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: var(--primary);
+}
+
+.current-skillman-info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.current-skillman-info .skillman-name {
+  font-weight: 600;
+}
+
+.current-skillman-info .skillman-details {
+  display: flex;
+  gap: 15px;
+  font-size: 14px;
+  color: var(--secondary);
+}
+
+.current-skillman-info .skillman-details i {
+  margin-right: 5px;
+  color: var(--primary);
+}
+
+.previous-skillman {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 12px 15px;
+  border: 1px solid #eee;
+  color: var(--primary);
+  font-size: 15px;
+}
+
+
+/* Mark Complaint Modal Footer Buttons */
+/* Mark Complaint Modal Styles */
+.mark-complaint-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.mark-complaint-modal-backdrop.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.mark-complaint-modal-container {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+  width: 95%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform: translateY(-20px);
+  transition: transform 0.3s ease;
+}
+
+.mark-complaint-modal-backdrop.active .mark-complaint-modal-container {
+  transform: translateY(0);
+}
+
+.mark-complaint-modal-header {
+  padding: 16px 20px;
+  background-color: var(--primary);
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.mark-complaint-modal-header h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.mark-complaint-modal-body {
+  padding: 25px 20px;
+  text-align: center;
+}
+
+.complaint-id-display {
+  font-weight: bold;
+  color: var(--primary);
+}
+
+.mark-complaint-modal-footer {
+  padding: 16px 20px;
+  background-color: #f8f9fa;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  border-top: 1px solid #ddd;
+}
+
+.mark-complaint-option {
+  padding: 12px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: none;
+}
+
+/* Deferred button - Black */
+.mark-complaint-option[data-status="Deferred"] {
+  background-color: #000000;
+  color: white;
+  border: 1px solid #000000;
+}
+
+.mark-complaint-option[data-status="Deferred"]:hover {
+  background-color: #333333;
+  border-color: #333333;
+}
+
+/* SNA button - Yellowish orange */
+.mark-complaint-option[data-status="SNA"] {
+  background-color: #FFA500;
+  color: #FFF;
+  border: 1px solid #FFA500;
+}
+
+.mark-complaint-option[data-status="SNA"]:hover {
+  background-color: #FF8C00;
+  border-color: #FF8C00;
+}
+
+/* In-Progress button - Blue */
+.mark-complaint-option[data-status="In-Progress"] {
+  background-color: #2196F3;
+  color: white;
+  border: 1px solid #2196F3;
+}
+
+.mark-complaint-option[data-status="In-Progress"]:hover {
+  background-color: #0b7dda;
+  border-color: #0b7dda;
+}
+
+/* Completed button - Green */
+.mark-complaint-option[data-status="Completed"] {
+  background-color: #4CAF50;
+  color: white;
+  border: 1px solid #4CAF50;
+}
+
+.mark-complaint-option[data-status="Completed"]:hover {
+  background-color: #45a049;
+  border-color: #45a049;
+}
+
+/* Add SNA status badge style */
+.status-sna {
+  background: #FFA500;
+  color: #FFF;
+}
+
+@media (max-width: 480px) {
+  .mark-complaint-modal-footer {
+    grid-template-columns: 1fr;
+  }
+  
+  .mark-complaint-modal-container {
+    width: 90%;
+  }
+}
+
+
+.priority-filters {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 28px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.priority-box {
+  flex: 1 1 0;
+  min-width: 160px;
+  max-width: 220px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 18px rgba(136,28,28,0.08);
+  border: 2px solid transparent;
+  text-align: center;
+  padding: 22px 10px 18px 10px;
+  cursor: pointer;
+  transition: 
+    box-shadow 0.4s,
+    border-color 0.4s,
+    background 0.4s,
+    color 0.4s,
+    transform 0.3s;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--primary);
+}
+
+.priority-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px; /* spacing between boxes */
+  justify-content: center;
+}
+
+.priority-box .priority-icon {
+  font-size: 2.2rem;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.priority-box .priority-label {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+  color: var(--primary);
+  letter-spacing: 0.5px;
+}
+
+.priority-box .priority-desc {
+  font-size: 0.95rem;
+  color: #888;
+  margin-bottom: 0;
+}
+
+.priority-box.immediate .priority-icon,
+.priority-icon.immediate { color: #e53935; }
+.priority-box.urgent .priority-icon,
+.priority-icon.urgent { color: #ff9800; }
+.priority-box.routine .priority-icon,
+.priority-icon.routine { color: #2196f3; }
+.priority-box.deferred .priority-icon,
+.priority-icon.deferred { color: #757575; }
+
+.priority-box.active,
+.priority-box:hover {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+  box-shadow: 0 8px 28px rgba(136,28,28,0.18);
+  transform: translateY(-3px) scale(1.03);
+}
+.priority-box.active .priority-label,
+.priority-box:hover .priority-label {
+  color: #fff;
+}
+.priority-box.active .priority-desc,
+.priority-box:hover .priority-desc {
+  color: #f8f9fa;
+}
+.priority-box.active .priority-icon.immediate,
+.priority-box:hover .priority-icon.immediate { color: #fff; }
+.priority-box.active .priority-icon.urgent,
+.priority-box:hover .priority-icon.urgent { color: #fff; }
+.priority-box.active .priority-icon.routine,
+.priority-box:hover .priority-icon.routine { color: #fff; }
+.priority-box.active .priority-icon.deferred,
+.priority-box:hover .priority-icon.deferred { color: #fff; }
+
+  .priority-count {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 5px 0;
+    color: var(--primary);
+    transition: color 0.4s;
+  }
+  
+  .priority-box.active .priority-count,
+  .priority-box:hover .priority-count {
+    color: #fff;
+  }
+
+/* Filter Controls*/
+.filter-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 20px;
+  align-items: flex-end;
+}
+
+.filter-group {
+  flex: 1;
+  min-width: 180px;
+}
+
+.filter-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.filter-select {
+  width: 100%;
+  padding: 10px 12px;
+  height: 45px;
+  border-radius: 7px;
+}
+
+
+#apply-filters {
+  height: 45px;
+  align-self: flex-end;
+  margin-bottom: 1px;
+  border-radius: 7px;
+}
+
+@media (max-width: 768px) {
+  .filter-group {
+    min-width: 100%;
+  }
+
+  .complaints-history-table {
+    border-radius: 0px;
+  }
+}
+
+
+    .hamburger {
+      display: none;
+    }
+    
+    @media (max-width: 768px) {
+      
+      .complaints-option {
+        padding: 12px 15px;
+        font-size: 14px;
+      }
+      
+      .radio-group {
+        flex-direction: column;
+        gap: 10px;
+      }
+      
+      .radio-item {
+        width: 100%;
+      }
+      
+      .btn {
+        width: 100%;
+        margin-bottom: 10px;
+      }
+      
+      .content {
+        padding: 0px;
+        width: 100%;
+      }
+      
+      .summary-action-bar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .year-selection {
+        width: 100%;
+        justify-content: space-between;
+      }
+      
+      .report-buttons {
+        width: 100%;
+        justify-content: space-between;
+      }
+    }
+
+    /* Another Responsive designing*/
+    @media (max-width: 768px) {
+  /* Search box responsiveness */
+  .search-box {
+    flex-direction: column;
+    height: auto;
+    margin-bottom: 15px;
+  }
+  
+  .search-box input {
+    width: 100%;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    height: 45px;
+  }
+  
+  .search-box button {
+    width: 100%;
+    border-radius: 8px;
+    height: 45px;
+  }
+  
+  /* Pagination responsiveness */
+  .pagination-container {
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    margin-top: 15px;
+  }
+  
+  .entries-per-page {
+    order: 2; /* Move to bottom on mobile */
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .pagination-controls {
+    order: 1; /* Move to top on mobile */
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .page-btn {
+    padding: 8px 12px;
+    font-size: 14px;
+    min-width: 40px;
+  }
+  
+  .page-btn.prev-btn, 
+  .page-btn.next-btn {
+    min-width: 70px;
+  }
+  
+  /* Filter controls responsiveness */
+  .filter-controls {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .filter-group {
+    min-width: 100%;
+    margin-bottom: 5px;
+  }
+  
+  #apply-filters {
+    width: 100%;
+    margin-bottom: 15px;
+    align-self: center;
+  }
+  
+  /* Table responsiveness */
+  .complaints-history-table {
+    font-size: 12px;
+    overflow-x: auto;
+    display: block;
+    border-radius: 2%;
+  }
+
+  .complaints-history-table th {
+    padding: 1rem;
+    font-size: 0.85rem;
+    height: auto;
+  }
+
+  .complaints-history-table td {
+    padding: 0.5rem;
+    height: auto;
+  }
+
+  
+  /* Action button adjustments */
+  .action-dropdown-btn {
+    font-size: 12px;
+    padding: 5px 8px;
+  }
+  
+  .action-dropdown-content {
+    left: -100px;
+    min-width: 140px;
+  }
+  
+  /* Priority filters responsiveness */
+  .priority-filters {
+    flex-direction: column;
+    gap: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .complaints-history-table {
+    border-radius: 0px;
+  }
+
+  h2 {
+    size: 5px;
+  }
+
+  .logo {
+    flex-direction: column;
+  }
+
+  .hamburger {
+    height: 30px;
+    width: 30px;
+    padding: 6px;
+  }
+
+
+  .logo .logo-image {
+    width: 50px;
+    height: auto;
+    margin-bottom: 0px;
+    padding: 2px;
+    margin-bottom: 0px;
+  }
+
+  /* Further adjustments for very small screens */
+  .complaints-history-table {
+    font-size: 11px;
+  }
+  
+  .complaints-history-table th,
+  .complaints-history-table td {
+    padding: 4px 6px;
+  }
+  
+  .page-btn {
+    padding: 6px 8px;
+    font-size: 12px;
+    min-width: 35px;
+  }
+  
+  .pagination-info {
+    font-size: 10px;
+    text-align: center;
+  }
+  
+  .panel-title {
+    font-size: 20px;
+  }
+  
+  /* Make sure content doesn't overflow */
+  .content {
+    padding: 0px;
+  }
+  
+  .complaints-content {
+    padding: 15px;
+  }
+
+}
+
+
+/* Mobile Responsiveness for Priority Filters */
+@media (max-width: 768px) {
+  .priority-filters {
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .priority-box {
+    max-width: 100%;
+    min-width: 100%;
+    padding: 18px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: left;
+    border-radius: 6px;
+  }
+  
+  .priority-icon {
+    font-size: 1.8rem;
+    margin-bottom: 0;
+    margin-right: 15px;
+    min-width: 40px;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .priority-label {
+    font-size: 1.1rem;
+    margin-bottom: 2px;
+  }
+  
+  .priority-count {
+    margin-left: auto;
+    font-size: 1.4rem;
+    min-width: 40px;
+    text-align: right;
+  }
+  
+  .priority-desc {
+    display: none; /* Hide description on mobile to save space */
+  }
+  
+  /* Adjust hover/active states for mobile */
+  .priority-box.active,
+  .priority-box:hover {
+    transform: translateX(5px) scale(1.02);
+  }
+
+  .complaints-history-table {
+    border-radius: 0px;
+  }
+}
+
+@media (max-width: 768px) {
+  
+  .priority-icon {
+    font-size: 2rem;
+    margin-right: 12px;
+  }
+
+  .priority-icon i {
+    margin-top: 0.6rem;
+    font-size: 2rem;
+  }
+  
+  .priority-box .priority-label {
+    font-size: 0.99rem;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .priority-count {
+    font-size: 0.99rem;
+  }
+  
+  .priority-box {
+    padding: 30px 10px;
+    height: 50px;
+  }
+}
+
+
+@media print {
+  * {
+    visibility: hidden;
+  }
+  .complaints-history-table, .complaints-history-table * {
+    visibility: visible;
+  }
+  .complaints-history-table {
+    position: relative;
+    left: 0;
+    top: 0;
+    font-size: 8pt;
+    width: 100%;
+    margin-top: 0;    
+    page-break-inside: avoid;
+  }
+  .complaints-history-table th, .complaints-history-table td {
+    padding: 2px;
+  }
+  .complaints-history-table thead {
+    display: table-header-group;
+  }
+  .complaints-history-table tfoot {
+    display: none;
+  }
+  .complaints-history-table th:last-child, .complaints-history-table td:last-child {
+    display: none;
+  }
+  .complaints-history-table th:nth-last-child(2), .complaints-history-table td:nth-last-child(2) {
+    width: 10%;
+  }
+    .complaints-history-table {
+    /* ... */
+    page-break-inside: avoid;
+  }
+  .complaints-history-table thead {
+    display: table-header-group;
+  }
+}
+
+
+ 
+
+  </style>
+  
+  <link rel="stylesheet" href="common-styles.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Notification Container (place this in your HTML) -->
+  <div class="notification-area" id="notification-area"></div>
+
+
+<!-- Mark Complaint Modal -->
+<div class="mark-complaint-modal-backdrop" id="markComplaintModalBackdrop">
+  <div class="mark-complaint-modal-container">
+    <!-- Modal Header -->
+    <div class="mark-complaint-modal-header">
+      <h3><i class="fas fa-check-circle"></i> Mark Complaint</h3>
+      <button class="close-btn" id="closeMarkComplaintBtn">&times;</button>
+    </div>
+    
+    <!-- Modal Body -->
+    <div class="mark-complaint-modal-body">
+      <p>Select the status for complaint <span id="markComplaintId" class="complaint-id-display"></span>:</p>
+    </div>
+    
+    <!-- Modal Footer -->
+    <div class="mark-complaint-modal-footer">
+      <button class="mark-complaint-option" data-status="Deferred">
+        <i class="fas fa-calendar-alt"></i> Deferred
+      </button>
+      <button class="mark-complaint-option" data-status="SNA">
+        <i class="fas fa-times-circle"></i> SNA
+      </button>
+      <button class="mark-complaint-option" data-status="In-Progress">
+        <i class="fas fa-spinner"></i> In-Progress
+      </button>
+      <button class="mark-complaint-option" data-status="Completed">
+        <i class="fas fa-check"></i> Completed
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Skillman Assignment Modal -->
+<!-- Skillman Assignment Modal -->
+<div class="skillman-modal-backdrop" id="modalBackdrop">
+  <div class="skillman-modal-container">
+    <!-- Modal Header -->
+    <div class="skillman-modal-header">
+      <h3><i class="fas fa-user-cog"></i> <span id="modalTitle">Change Skillman</span></h3>
+      <button class="close-btn" id="closeBtn">&times;</button>
+    </div>
+    
+    <!-- Modal Body -->
+    <div class="skillman-modal-body">
+      <h4 style="margin-bottom: 5px;">Previous Skillman</h4>
+      <div id="previousSkillman" class="previous-skillman" style="margin-bottom: 18px;"></div>
+      <!-- Current Skillman Section (only shown when changing) -->
+      <div class="current-skillman-section" id="currentSkillmanSection" style="display: none;">
+        <h4>Current Skillman</h4>
+        <div class="current-skillman-info" id="currentSkillmanInfo"></div>
+      </div>
+      
+      <!-- Primary Skillman Selection -->
+      <div class="dropdown" id="primarySkillmanDropdown">
+        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: black">Skillman</label>
+        <button class="dropdown-toggle" id="primarySkillmanToggle">
+          <span id="primarySkillmanText">Select a skillman</span>
+          <i class="fas fa-chevron-down"></i>
+        </button>
+        <div class="dropdown-menu" id="primarySkillmanMenu">
+          <div class="dropdown-search">
+            <input type="text" placeholder="Search skillman..." id="primarySkillmanSearch">
+          </div>
+          <div class="dropdown-items" id="primarySkillmanItems">
+            <!-- Items will be populated by JavaScript -->
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Modal Footer -->
+    <div class="modal-footer">
+      <button class="btn btn-outline" id="cancelBtn">Cancel</button>
+      <button class="btn btn-primary" id="assignBtn">Confirm</button>
+    </div>
+  </div>
+</div>
+
+
+
+  <header>
+    <div class="logo">
+      <div class="logo-image">
+        <img src="logo.jpg" alt="logo image">
+      </div>
+      <h2>MES CMS</h2>
+    </div>
+
+    <div class="user">
+      <h2 id="user-id">Unknown</h2>
+      <button class="logout-btn" id="logout-btn">Logout</button>
+      <div class="hamburger">
+        <i class="fas fa-bars" id="hamburger-btn"></i>
+        <div class="navigation-block">
+          <a href="dashboard" class="navi-block-items">Dashboard</a>
+          <div class="navi-block-items active">Complaints</div>
+          <a href="users" class="navi-block-items">Users</a>
+          <a href="reporting" class="navi-block-items">Reporting</a>
+          <a href="admin" class="navi-block-items"">Admin</a>
+        </div>
+        </div>
+      </div>
+  </header>
+
+  <div class="nav-bar">
+    <div class="nav-container">
+      <a href="dashboard" class="nav-item">
+        <i class="fas fa-chart-line"></i>
+        Dashboard
+      </a>
+      <div class="nav-item active">
+        <i class="fas fa-ticket-alt"></i>
+        Complaints
+      </div>
+      <a href="users" class="nav-item">
+        <i class="fas fa-users"></i>
+        Users
+      </a>
+      <a href="reporting" class="nav-item">
+        <i class="fas fa-file-alt"></i>
+        Reporting
+      </a>
+      <a href="admin" class="nav-item">
+        <i class="fas fa-user-tie"></i>
+        Admin
+      </a>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="complaints-section-container">
+      <div class="complaints-sidebar">
+        <a href="launch-complaints.html" class="complaints-option" id="launch-complaints">
+          <i class="fas fa-rocket"></i>
+          Launch Complaints
+        </a>
+        <div class="complaints-option active" data-panel="all-complaints" >
+          <i class="fas fa-list"></i>
+          All Complaints
+        </div>
+        <a href="delay-complaints.html" class="complaints-option" id="delay-complaints">
+          <i class="fas fa-hourglass-half"></i>
+          Delay Complaints
+        </a>
+        <a href="natures.html" class="complaints-option" id="natures">
+          <i class="fas fa-chart-pie"></i>
+          Natures
+        </a>
+      </div>
+      
+      <div class="complaints-content">
+        <div id="all-complaints" class="complaints-panel active">
+          <div class="panel-header">
+            <h2 class="panel-title">All Complaints</h2>
+          </div>
+
+          <!-- Modify the priority-filters section to include counters -->
+          <div class="priority-filters">
+            <div class="priority-box" data-priority="immediate" id="box-immediate">
+              <div class="priority-icon immediate"><i class="fas fa-bolt"></i></div>
+              <div class="priority-label">Immediate</div>
+              <div class="priority-count" id="immediate-count">N/A</div>
+              <div class="priority-desc">Critical action</div>
+            </div>
+            <div class="priority-box" data-priority="urgent" id="box-urgent">
+              <div class="priority-icon urgent"><i class="fas fa-exclamation-triangle"></i></div>
+              <div class="priority-label">Urgent</div>
+              <div class="priority-count" id="urgent-count">N/A</div>
+              <div class="priority-desc">Needs quick response</div>
+            </div>
+            <div class="priority-box" data-priority="routine" id="box-routine">
+              <div class="priority-icon routine"><i class="fas fa-clock"></i></div>
+              <div class="priority-label">Routine</div>
+              <div class="priority-count" id="routine-count">N/A</div>
+              <div class="priority-desc">Standard workflow</div>
+            </div>
+            <div class="priority-box" data-priority="deferred" id="box-deferred">
+              <div class="priority-icon deferred"><i class="fas fa-calendar-alt"></i></div>
+              <div class="priority-label">Deferred</div>
+              <div class="priority-count" id="deferred-count">N/A</div>
+              <div class="priority-desc">Can be scheduled</div>
+            </div>
+          </div>
+
+          <!-- Filter Controls-->
+          <div class="filter-controls">
+            <div class="filter-group">
+              <label for="receiver-filter">Receiver:</label>
+              <select id="receiver-filter" class="form-control filter-select">
+                <option value="" selected>All Receivers</option>
+              </select>
+            </div>
+            
+            <div class="filter-group">
+              <label for="colony-filter">Colony:</label>
+              <select id="colony-filter" class="form-control filter-select">
+                <option value="" selected>All Colonies</option>
+              </select>
+            </div>
+            
+            <div class="filter-group">
+              <label for="category-filter">Category:</label>
+              <select id="category-filter" class="form-control filter-select">
+                <option value="" selected>All Categories</option>
+                <option value="B&R-I">B&R-I</option>
+                <option value="B&R-II">B&R-II</option>
+                <option value="B&R-III">B&R-III</option>
+                <option value="E&M-I">E&M-I</option>
+                <option value="E&M-II">E&M-II</option>
+                <!--option value="F&S-I">F&S-I</option-->
+                <option value="-">-</option>
+              </select>
+            </div>
+            
+            <div class="filter-group">
+              <label for="status-filter">Status:</label>
+              <select id="status-filter" class="form-control filter-select">
+                <option value="" selected>All Complaints</option>
+                <option value="In-Progress">In-Progress</option>
+                <option value="Completed">Completed</option>
+                <option value="Un-Assigned">Un-Assigned</option>
+                <option value="Deferred">Deferred</option>
+              </select>
+            </div>
+
+            <button id="apply-filters" class="btn btn-primary">
+              <i class="fas fa-search"></i> Find
+            </button>
+          </div>
+          
+          <div class="search-box">
+            <input type="text" id="complaint-search" class="form-control" placeholder="Search here..." />
+            <button class="btn btn-primary" id="search-complaints-btn">
+              <i class="fas fa-search"></i>
+              Search
+            </button>
+          </div>
+
+          
+          <div class="pagination-container">
+            
+            <div class="entries-per-page">
+              <span>Show</span>
+              <select id="per-page-select">
+                <option value="10">10</option>
+                <option value="30">30</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+              <span>entries</span>
+            </div>
+
+            <div class="pagination-controls" id="complaints-pagination">
+              <button class="page-btn prev-btn disabled">
+                <i class="fas fa-chevron-left"></i> Prev
+              </button>
+              <button class="page-btn active">1</button>
+              <button class="page-btn next-btn disabled">Next
+                <i class="fas fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+          
+          <table class="complaints-history-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Date/Time</th>
+                <th>Complaint ID</th>
+                <th>Type</th>
+                <th>Category</th>
+                <th>Colony</th>
+                <th>Building</th>
+                <th>Complaint By</th>
+                <th>Skillman</th>
+                <th>Customer</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="complaints-table-body">
+              <!-- Data will be populated by JavaScript -->
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="12">
+                  <div id="pagination-info">Loading data...</div>
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const hamburgerBtn = document.getElementById("hamburger-btn");
+  const navBlock = document.querySelector(".navigation-block");
+
+  // Toggle navigation on hamburger click
+  hamburgerBtn.addEventListener("click", (e) => {
+    e.stopPropagation(); // Prevent click from bubbling to document
+    navBlock.classList.toggle("active");
+  });
+
+  // Close navigation when clicking outside
+  document.addEventListener("click", (e) => {
+    // Check if click is outside the navigation block and hamburger button
+    if (!navBlock.contains(e.target) && e.target !== hamburgerBtn) {
+      navBlock.classList.remove("active");
+    }
+  });
+
+  // Optional: Prevent clicks inside navigation from closing it
+  navBlock.addEventListener("click", (e) => {
+    e.stopPropagation();
+  });
+</script>
+
+
+<script>
+// Add this script to control navigation visibility based on backend permissions
+document.addEventListener('DOMContentLoaded', async function() {
+    try {
+        const authToken = localStorage.getItem('authToken');
+        if (!authToken) {
+            console.error('No authentication token found');
+            return;
+        }
+
+        // Fetch allowed pages from backend
+        const response = await fetch(`${SERVER_URL}/api/allowed-pages`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${authToken}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch allowed pages');
+        }
+
+        const data = await response.json();
+        
+        if (data.success) {
+            // Process navigation items based on allowed pages
+            processNavigationItems(data.allowedPages, data.navigationItems);
+        }
+    } catch (error) {
+        console.error('Error fetching allowed pages:', error);
+        // In case of error, you might want to show a default set of navigation items
+        // or handle it according to your application's requirements
+    }
+});
+
+function processNavigationItems(allowedPages, navigationItems) {
+    // Process header navigation items
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+        const href = item.getAttribute('href');
+        if (href) {
+            const pageName = href; // Get the page name without extension
+            
+            // Check if this category has an accessible page
+            if (navigationItems[pageName]) {
+                // Set the href to the first accessible page in this category
+                item.setAttribute('href', `${navigationItems[pageName]}.html`);
+                item.style.display = 'flex';
+            } else {
+                item.style.display = 'none';
+            }
+        }
+    });
+    
+    // Process hamburger menu navigation items
+    const hamburgerItems = document.querySelectorAll('.navi-block-items');
+    hamburgerItems.forEach(item => {
+        const href = item.getAttribute('href');
+        if (href) {
+            const pageName = href; // Get the page name without extension
+            
+            // Check if this category has an accessible page
+            if (navigationItems[pageName]) {
+                // Set the href to the first accessible page in this category
+                item.setAttribute('href', `${navigationItems[pageName]}.html`);
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        }
+    });
+    
+    // Process sidebar navigation items (use the allowedPages array)
+    const sidebarItems = document.querySelectorAll('.complaints-option');
+    sidebarItems.forEach(item => {
+        const href = item.getAttribute('href');
+        if (href) {
+            const pageName = getPageNameFromHref(href);
+            if (allowedPages.includes(pageName) || item.classList.contains('active')) {
+                item.style.display = 'flex';
+            } else {
+                item.style.display = 'none';
+            }
+        }
+    });
+}
+
+function getPageNameFromHref(href) {
+    if (!href) return '';
+    
+    // Extract page name from href (e.g., "dashboard.html" -> "dashboard")
+    const pageWithExtension = href.split('/').pop();
+    return pageWithExtension.split('.')[0];
+}
+</script>
+
+
+  <script>
+
+    let USER_ID = localStorage.getItem('UserId');
+    
+  document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById("user-id").textContent = USER_ID;
+    localStorage.removeItem('UserId');
+  });
+    
+
+    function showNotification(message, type = 'success', duration = 3000) {
+      const notificationArea = document.getElementById('notification-area');
+      
+      // Create notification element
+      const notification = document.createElement('div');
+      notification.className = `notification ${type}`;
+      
+      // Set icon based on type
+      let icon;
+      switch(type) {
+        case 'success': icon = 'fa-check-circle'; break;
+        case 'error': icon = 'fa-exclamation-circle'; break;
+        case 'warning': icon = 'fa-exclamation-triangle'; break;
+        default: icon = 'fa-info-circle';
+      }
+      
+      notification.innerHTML = `
+        <i class="fas ${icon}"></i>
+        ${message}
+      `;
+      
+      // Add to notification area
+      notificationArea.appendChild(notification);
+      
+      // Auto-remove after duration
+      setTimeout(() => {
+        notification.style.opacity = '0';
+        setTimeout(() => notification.remove(), 300);
+      }, duration);
+    }
+
+  // Add this global variable at the top of your script to store current filters
+  let currentFilters = {
+    receiver: '',
+    colony: '',
+    category: '',
+    status: '',
+    search: ''
+  };
+    
+  document.addEventListener('DOMContentLoaded', function() {
+
+    // DOM Elements
+    const logoutBtn = document.getElementById('logout-btn');
+    
+    logoutBtn.addEventListener('click', async () => {
+      try {
+        const authToken = localStorage.getItem('authToken');
+        const response = await fetch(SERVER_URL+'/logout', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${authToken}`,'Content-Type': 'application/json' }
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          document.getElementById("user-id").textContent = 'Unknown';
+          console.log('Logout success:', data);
+          alert('Logged out successfully!');
+          
+          // 👇 you can add more procedural lines here
+          // e.g., redirect:
+          setTimeout(() => {
+            window.location.href = 'login.html';
+          }, 1000); // 1000 ms = 1 sec
+
+        } else {
+          console.error('Logout failed:', data);
+          alert('Logout failed!');
+        }
+
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Something went wrong!');
+      }
+    });
+    
+  });
+
+
+    // Add this global variable at the top of your script
+    let allSkillmen = [];
+
+
+
+// Add this function to handle the complaint details click
+async function handleComplaintDetailsClick(complaintId) {
+  try {
+    const authToken = localStorage.getItem('authToken');
+    
+    // Show loading state if needed
+    showNotification('Loading complaint details...', 'info', 2000);
+    
+    // Send complaint ID to encryption API
+    const response = await fetch(`${SERVER_URL}/api/encrypt-id`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${authToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ complaint_id: complaintId })
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to encrypt complaint ID');
+    }
+    
+    const data = await response.json();
+    
+    if (data.success && data.encrypted_id) {
+      // Redirect to complaint details page with encrypted ID
+      showNotification('Navigating to complaint details...', 'success', 2000);
+      window.location.href = `complaint-details.html?${data.encrypted_id}`;
+      console.log(`Redirecting to complaint-details?${data.encrypted_id}`);
+
+    } else {
+      throw new Error(data.message || 'Failed to encrypt ID');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    showNotification('Failed to open complaint details: ' + error.message, 'error', 3000);
+  }
+}
+
+
+    function markComplaintCompleted(complaintId, row) {
+      // Show loading state
+      const statusCell = row.querySelector('td:nth-child(11)'); // Status is in the 11th column
+      const statusBadge = statusCell.querySelector('.status-badge');
+      
+      // Store original status for potential rollback
+      const originalStatus = statusBadge.textContent;
+      const originalStatusClass = statusBadge.className;
+      
+      statusBadge.textContent = 'Updating...';
+      statusBadge.className = 'status-badge status-in-progress';
+
+      const authToken = localStorage.getItem('authToken');
+      // Make API call to update status
+      fetch(SERVER_URL+'/api/complaints/update-status', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${authToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          complaint_id: complaintId,
+          status: 'Completed'
+        })
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+          showNotification('Network response was not ok','error');
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.success) {
+          // Update UI to show completed status
+          statusBadge.textContent = 'Completed';
+          statusBadge.className = 'status-badge status-completed';
+          
+          // Update the status dropdown value
+          const statusSelect = statusCell.querySelector('.editable-select');
+          if (statusSelect) {
+            statusSelect.value = 'Completed';
+          }
+          
+          // Refresh the action dropdown options
+          const actionDropdown = row.querySelector('.action-dropdown-content');
+          if (actionDropdown) {
+            actionDropdown.innerHTML = `
+              <a href="#" class="complaint-details-btn"><i class="fas fa-info-circle"></i> Complaint Details</a>
+              <!--a href="#" class="print-complaint-btn"><i class="fas fa-print"></i> Print Complaint</a-->
+            `;
+            
+            // Re-attach event listeners to the new buttons
+            initializeActionButtonListeners(row);
+          }
+          
+          // Show success message
+          //alert('Complaint marked as completed successfully!');
+          showNotification('Complaint marked as completed successfully!', 'success', 3000);
+        } else {
+          throw new Error(data.message || 'Failed to update complaint status');
+          showNotification('Failed to update complaint status: ' + (data.message || 'Unknown error'), 'error', 3000);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        // Revert to original status
+        statusBadge.textContent = originalStatus;
+        statusBadge.className = originalStatusClass;
+        //alert('Failed to update complaint status: ' + error.message);
+        showNotification('Failed to update complaint status: ' + error.message, 'error', 3000);
+      });
+    }
+
+
+// Also update the initializeActionButtonListeners function
+function initializeActionButtonListeners(row) {
+  const complaintId = row.dataset.complaintId;
+  
+  // Complaint details button
+  row.querySelector('.complaint-details-btn')?.addEventListener('click', function(e) {
+    e.preventDefault();
+    handleComplaintDetailsClick(complaintId);
+  });
+
+  // Print complaint button
+  row.querySelector('.print-complaint-btn')?.addEventListener('click', function(e) {
+    e.preventDefault();
+    console.log(`Printing complaint #${complaintId}`);
+    // Implement print functionality
+  });
+}
+
+
+  // Initialize event listeners for table rows
+  function initializeRowEventListeners() {
+    document.querySelectorAll('tr[data-complaint-id]').forEach(row => {
+      const complaintId = row.dataset.complaintId;
+
+      // Complaint details button - new implementation
+      row.querySelector('.complaint-details-btn')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        handleComplaintDetailsClick(complaintId);
+      });
+      /*/ Complaint details button
+      row.querySelector('.complaint-details-btn')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        console.log(`Viewing details for complaint #${complaintId}`);
+      });*/
+      
+      // Assign Skillman button
+      row.querySelector('.assign-skillman-btn')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        openSkillmanModal(complaintId);
+      });
+      
+      // Change Skillman button
+      row.querySelector('.change-skillman-btn')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        openSkillmanModal(complaintId);
+      });
+      
+      
+      // Print complaint button
+      row.querySelector('.print-complaint-btn')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        console.log(`Printing complaint #${complaintId}`);
+      });
+      
+    });
+  }
+
+
+// JS for Skillman Modal
+// Skillman Assignment Modal Functionality
+document.addEventListener('DOMContentLoaded', function() {
+  
+  // ========== Main Complaints Table Functionality ==========
+  let currentPage = 1;
+  let itemsPerPage = 10;
+  let totalItems = 0;
+  let allComplaints = [];
+  
+  // DOM elements
+  const tableBody = document.getElementById('complaints-table-body');
+  const perPageSelect = document.getElementById('per-page-select');
+  const paginationInfo = document.getElementById('pagination-info');
+  const paginationControls = document.getElementById('complaints-pagination');
+  const searchInput = document.getElementById('complaint-search');
+  const searchButton = document.getElementById('search-complaints-btn');
+
+  //Filter elements
+  const receiverFilter = document.getElementById('receiver-filter');
+  const colonyFilter = document.getElementById('colony-filter');
+  const categoryFilter = document.getElementById('category-filter');
+  const statusFilter = document.getElementById('status-filter');
+  const applyFiltersButton = document.getElementById('apply-filters');
+
+  //below line will add action to find button
+  applyFiltersButton.addEventListener('click', function() {
+    let receiver = receiverFilter.value;
+    let colony = colonyFilter.value;
+    let category = categoryFilter.value;
+    let status = statusFilter.value;
+
+    searchInput.value = ''; // Clear search input
+    currentFilters = {
+      receiver: receiver || '',
+      colony: colony || '',
+      category: category || '',
+      status: status || '',
+      search: searchInput.value.trim() || ''
+    }
+    currentPage = 1; // Reset to first page on filter change
+    fetchComplaints();
+  });
+      
+  // Initialize the table
+  fetchComplaints(null);
+      
+  // Event listeners
+  perPageSelect.addEventListener('change', function() {
+    itemsPerPage = parseInt(this.value);
+    currentPage = 1;
+    fetchComplaints();
+  });
+      
+  // Add this to your existing JavaScript code
+  document.getElementById('complaint-search').addEventListener('keyup', function(e) {
+      if (e.key === 'Enter') {
+          // Trigger the same action as the search button click
+          document.getElementById('search-complaints-btn').click();
+      }
+  });
+
+  searchButton.addEventListener('click', function() {
+    // Update currentFilters with the current values
+    currentFilters.receiver = receiverFilter.value;
+    currentFilters.colony = colonyFilter.value;
+    currentFilters.category = categoryFilter.value;
+    currentFilters.status = statusFilter.value;
+    currentFilters.search = searchInput.value.trim();
+
+    currentPage = 1; // Reset to first page on filter change
+    fetchComplaints();
+  });
+      
+  // Handle Enter key in search input
+  searchInput.addEventListener('keyup', function(e) {
+      if (e.key === 'Enter') {
+      let receiver = receiverFilter.value;
+      let colony = colonyFilter.value;
+      let category = categoryFilter.value;
+      let status = statusFilter.value;
+
+      currentFilters = {
+        receiver: receiver || '',
+        colony: colony || '',
+        category: category || '',
+        status: status || '',
+        search: searchInput.value.trim() || ''
+      }
+
+      currentPage = 1; // Reset to first page on filter change
+      fetchComplaints(filter);
+
+      currentPage = 1;
+      fetchComplaints();
+    }
+  });
+
+  // Store last applied filters
+  let lastAppliedFilters = null;
+
+
+  // Fetch complaints from API
+  // Modify the fetchComplaints function to always use currentFilters
+function fetchComplaints() {
+  const authToken = localStorage.getItem('authToken');
+
+  // Build query parameters
+  const params = new URLSearchParams({
+    page: currentPage,
+    pageSize: itemsPerPage,
+    ...(currentFilters.search && { search: currentFilters.search }),
+    ...(currentFilters.receiver && { receiver: currentFilters.receiver }),
+    ...(currentFilters.colony && { colony: currentFilters.colony }),
+    ...(currentFilters.category && { category: currentFilters.category }),
+    ...(currentFilters.status && { status: currentFilters.status })
+  });
+
+  // Combine endpoint and query string
+  const endpoint = SERVER_URL + '/api/complaints' + '?' + params.toString();
+
+  paginationInfo.textContent = 'Loading data...';
+  tableBody.innerHTML = '';
+
+  fetch(endpoint, {
+    headers: {
+      'Authorization': `Bearer ${authToken}`,
+      'Content-Type': 'application/json'
+    }
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      allComplaints = data.data;
+      totalItems = data.pagination.total;
+      renderTable();
+      updatePagination();
+      showNotification('Successfully fetch complaints', 'success', 1000);
+    } else {
+      throw new Error(data.message || 'Failed to fetch complaints');
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    tableBody.innerHTML = `<tr><td colspan="12" style="text-align: center; color: red;">Error loading data: ${error.message}</td></tr>`;
+    paginationInfo.textContent = 'Error loading data';
+    showNotification('Error loading data', 'error');
+  });
+}
+
+
+/*
+  document.addEventListener('click', function(e) {
+      // Handle pagination buttons
+      if (e.target.classList.contains('page-btn')) {
+          if (e.target.classList.contains('prev-btn')) {
+              if (currentPage > 1) {
+                  currentPage--;
+                  fetchComplaints(lastAppliedFilters); // Use lastAppliedFilters
+              }
+          } else if (e.target.classList.contains('next-btn')) {
+              if (currentPage < Math.ceil(totalItems / itemsPerPage)) {
+                  currentPage++;
+                  fetchComplaints(lastAppliedFilters); // Use lastAppliedFilters
+              }
+          } else if (!isNaN(parseInt(e.target.textContent))) {
+              currentPage = parseInt(e.target.textContent);
+              fetchComplaints(lastAppliedFilters); // Use lastAppliedFilters
+          }
+      }
+  });
+*/
+  
+  // Render the table with complaint data
+  function renderTable() {
+    tableBody.innerHTML = '';
+    
+    if (allComplaints.length === 0) {
+      tableBody.innerHTML = `<tr><td colspan="12" style="text-align: center;">No complaints found</td></tr>`;
+      return;
+    }
+    
+    allComplaints.forEach((complaint, index) => {
+      const row = document.createElement('tr');
+      row.dataset.complaintId = complaint.complaint_id;
+      
+      // Format date/time
+      const launchedAt = new Date(complaint.launched_at);
+      const dateStr = launchedAt.toISOString().split('T')[0];
+      const timeStr = launchedAt.toTimeString().split(' ')[0].substring(0, 5);
+      
+      // Determine status class and action options
+      let statusClass = '';
+      let actionOptions = '';
+      const status = complaint.status.toLowerCase();
+      
+      switch(status) {
+        case 'deferred':
+          statusClass = 'status-deferred';
+          actionOptions = `
+            <a href="#" class="complaint-details-btn"><i class="fas fa-info-circle"></i> Complaint Details</a>
+            <a href="#" class="change-skillman-btn"><i class="fas fa-user-edit"></i> Change Skillman</a>
+            <a href="#" class="mark-complaint-btn"><i class="fas fa-check"></i> Mark Complaint</a>
+            <!--a href="#" class="print-complaint-btn"><i class="fas fa-print"></i> Print Complaint</a-->
+          `;
+          break;
+        case 'completed':
+          statusClass = 'status-completed';
+          actionOptions = `
+            <a href="#" class="complaint-details-btn"><i class="fas fa-info-circle"></i> Complaint Details</a>
+            <!--a href="#" class="print-complaint-btn"><i class="fas fa-print"></i> Print Complaint</a-->
+          `;
+          break;
+        case 'un-assigned':
+          statusClass = 'status-un-assigned';
+          actionOptions = `
+            <a href="#" class="complaint-details-btn"><i class="fas fa-info-circle"></i> Complaint Details</a>
+            <a href="#" class="assign-skillman-btn"><i class="fas fa-user-plus"></i> Assign Skillman</a>
+          `;
+          break;
+        case 'in-progress':
+          statusClass = 'status-in-progress';
+          actionOptions = `
+            <a href="#" class="complaint-details-btn"><i class="fas fa-info-circle"></i> Complaint Details</a>
+            <a href="#" class="change-skillman-btn"><i class="fas fa-user-edit"></i> Change Skillman</a>
+            <a href="#" class="mark-complaint-btn"><i class="fas fa-check"></i> Mark Complaint</a>
+            <!--a href="#" class="print-complaint-btn"><i class="fas fa-print"></i> Print Complaint</a-->
+          `;
+          break;
+        case 'sna':
+          statusClass = 'status-sna';
+          actionOptions = `
+            <a href="#" class="complaint-details-btn"><i class="fas fa-info-circle"></i> Complaint Details</a>
+            <a href="#" class="change-skillman-btn"><i class="fas fa-user-edit"></i> Change Skillman</a>
+            <a href="#" class="mark-complaint-btn"><i class="fas fa-check"></i> Mark Complaint</a>
+            <!--a href="#" class="print-complaint-btn"><i class="fas fa-print"></i> Print Complaint</a-->
+          `;
+          break;
+      }
+      
+      // Create category by combining nature and type
+      const category = complaint.nature && complaint.type 
+        ? `${complaint.nature} / ${complaint.type}`
+        : 'N/A';
+      
+      row.innerHTML = `
+        <td>${index + 1}</td>
+        <td>${dateStr}<br>${timeStr}</td>
+        <td>${complaint.complaint_id}</td>
+        <td>${complaint.category || 'N/A'}</td>
+        <td>${category}</td>
+        <td>${complaint.location_colony_name || 'N/A'}</td>
+        <td>${complaint.location_building_number || 'N/A'}</td>
+        <td>${complaint.receiver_name || 'N/A'}</td>
+        <td>
+          <div class="static-value" data-field="skillman">${complaint.skillman_name || 'Unassigned'}</div> 
+        </td>
+        <td>${complaint.customer_name || 'N/A'}</td>
+        <td>
+          <span class="status-badge ${statusClass}">${complaint.status}</span> 
+        </td>
+        <td class="action-cell">
+          <div class="action-dropdown">
+            <button class="action-dropdown-btn">Actions <i class="fas fa-caret-down"></i></button>
+            <div class="action-dropdown-content">
+              ${actionOptions}
+            </div>
+          </div>
+        </td>
+      `;
+      
+      tableBody.appendChild(row);
+    });
+    
+    // Add event listeners to the new rows
+    initializeRowEventListeners();
+
+    initializeActionDropdowns();
+  }
+
+      
+    function initializeActionDropdowns() {
+      // Close all dropdowns when clicking outside
+      document.addEventListener('click', function(e) {
+        if (!e.target.closest('.action-dropdown')) {
+          document.querySelectorAll('.action-dropdown-content').forEach(dropdown => {
+            dropdown.style.display = 'none';
+          });
+        }
+      });
+
+      // Toggle dropdown on button click
+      document.querySelectorAll('.action-dropdown-btn').forEach(button => {
+        button.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const dropdownContent = this.nextElementSibling;
+          
+          // Hide all others
+          document.querySelectorAll('.action-dropdown-content').forEach(dc => {
+            if (dc !== dropdownContent) dc.style.display = 'none';
+          });
+
+          // Toggle this one
+          dropdownContent.style.display = 
+            dropdownContent.style.display === 'block' ? 'none' : 'block';
+        });
+      });
+    }
+
+    // Update pagination controls
+// Update the updatePagination function with proper ellipsis handling
+function updatePagination() {
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const startItem = (currentPage - 1) * itemsPerPage + 1;
+  const endItem = Math.min(currentPage * itemsPerPage, totalItems);
+  
+  paginationInfo.textContent = `Showing ${startItem} to ${endItem} of ${totalItems} entries`;
+  
+  // Clear existing pagination buttons
+  paginationControls.innerHTML = '';
+  
+  // Previous button
+  const prevBtn = document.createElement('button');
+  prevBtn.className = `page-btn prev-btn ${currentPage === 1 ? 'disabled' : ''}`;
+  prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i> Prev';
+  prevBtn.addEventListener('click', () => {
+    if (currentPage > 1) {
+      currentPage--;
+      fetchComplaints();
+    }
+  });
+  paginationControls.appendChild(prevBtn);
+  
+  // Page buttons with ellipsis logic
+  const maxVisiblePages = 7;
+  const ellipsisThreshold = 3; // Show ellipsis after this many pages
+  
+  let startPage, endPage;
+  
+  if (totalPages <= maxVisiblePages) {
+    // Show all pages if total pages is less than max visible
+    startPage = 1;
+    endPage = totalPages;
+  } else {
+    // Calculate start and end pages
+    if (currentPage <= ellipsisThreshold + 1) {
+      // Near the beginning
+      startPage = 1;
+      endPage = maxVisiblePages - 2; // Reserve space for ellipsis and last page
+    } else if (currentPage >= totalPages - ellipsisThreshold) {
+      // Near the end
+      startPage = totalPages - maxVisiblePages + 3; // Reserve space for first page and ellipsis
+      endPage = totalPages;
+    } else {
+      // In the middle
+      startPage = currentPage - Math.floor((maxVisiblePages - 4) / 2);
+      endPage = currentPage + Math.floor((maxVisiblePages - 4) / 2);
+    }
+    
+    // Ensure boundaries
+    startPage = Math.max(1, startPage);
+    endPage = Math.min(totalPages, endPage);
+  }
+  
+  // Add first page and ellipsis if needed
+  if (startPage > 1) {
+    addPageButton(1);
+    if (startPage > 2) {
+      addEllipsis();
+    }
+  }
+  
+  // Add page buttons
+  for (let i = startPage; i <= endPage; i++) {
+    addPageButton(i);
+  }
+  
+  // Add last page and ellipsis if needed
+  if (endPage < totalPages) {
+    if (endPage < totalPages - 1) {
+      addEllipsis();
+    }
+    addPageButton(totalPages);
+  }
+  
+  // Next button
+  const nextBtn = document.createElement('button');
+  nextBtn.className = `page-btn next-btn ${currentPage === totalPages ? 'disabled' : ''}`;
+  nextBtn.innerHTML = 'Next <i class="fas fa-chevron-right"></i>';
+  nextBtn.addEventListener('click', () => {
+    if (currentPage < totalPages) {
+      currentPage++;
+      fetchComplaints();
+    }
+  });
+  paginationControls.appendChild(nextBtn);
+  
+  // Helper functions
+  function addPageButton(pageNumber) {
+    // Skip if this page button would be an ellipsis
+    if (document.querySelector(`.page-btn[data-page="${pageNumber}"]`)) return;
+    
+    const pageBtn = document.createElement('button');
+    pageBtn.className = `page-btn ${pageNumber === currentPage ? 'active' : ''}`;
+    pageBtn.textContent = pageNumber;
+    pageBtn.dataset.page = pageNumber;
+    pageBtn.addEventListener('click', () => {
+      currentPage = pageNumber;
+      fetchComplaints();
+    });
+    paginationControls.appendChild(pageBtn);
+  }
+  
+  function addEllipsis() {
+    // Check if ellipsis already exists to prevent duplicates
+    if (document.querySelector('.pagination-ellipsis')) return;
+    
+    const ellipsis = document.createElement('span');
+    ellipsis.textContent = '...';
+    ellipsis.className = 'pagination-ellipsis';
+    ellipsis.style.padding = '8px 12px';
+    ellipsis.style.color = '#6c757d';
+    ellipsis.style.cursor = 'default';
+    paginationControls.appendChild(ellipsis);
+  }
+}
+  
+  // Initialize event listeners for table rows
+  function initializeRowEventListeners() {
+    document.querySelectorAll('tr[data-complaint-id]').forEach(row => {
+      const complaintId = row.dataset.complaintId;
+      
+      // Complaint details button - new implementation
+      row.querySelector('.complaint-details-btn')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        handleComplaintDetailsClick(complaintId);
+      });
+      /*/ Complaint details button
+      row.querySelector('.complaint-details-btn')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        console.log(`Viewing details for complaint #${complaintId}`);
+      });*/
+      
+      // Assign Skillman button
+      row.querySelector('.assign-skillman-btn')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        openSkillmanModal(complaintId);
+      });
+      
+      // Change Skillman button
+      row.querySelector('.change-skillman-btn')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        openSkillmanModal(complaintId);
+      });
+      
+      
+      // Print complaint button
+      row.querySelector('.print-complaint-btn')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        console.log(`Printing complaint #${complaintId}`);
+      });
+      
+      // Mark complaint button
+      // Mark complaint button
+      row.querySelector('.mark-complaint-btn')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        openMarkComplaintModal(complaintId);
+      });
+    });
+  }
+  
+  // Function to mark complaint as completed
+  function markComplaintCompleted(complaintId, row) {
+    const authToken = localStorage.getItem('authToken');
+    const statusCell = row.querySelector('td:nth-child(11)');
+    const statusBadge = statusCell.querySelector('.status-badge');
+    
+    const originalStatus = statusBadge.textContent;
+    const originalStatusClass = statusBadge.className;
+    
+    statusBadge.textContent = 'Updating...';
+    statusBadge.className = 'status-badge status-in-progress';
+
+    fetch(`${SERVER_URL}/api/complaints/update-status`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${authToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        complaint_id: complaintId,
+        status: 'Completed'
+      })
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+        showNotification('Network response was not ok', 'error');
+      }
+      return response.json();
+    })
+    .then(data => {
+      if (data.success) {
+        statusBadge.textContent = 'Completed';
+        statusBadge.className = 'status-badge status-completed';
+        
+        const statusSelect = statusCell.querySelector('.editable-select');
+        if (statusSelect) {
+          statusSelect.value = 'Completed';
+        }
+        
+        const actionDropdown = row.querySelector('.action-dropdown-content');
+        if (actionDropdown) {
+          actionDropdown.innerHTML = `
+            <a href="#" class="complaint-details-btn"><i class="fas fa-info-circle"></i> Complaint Details</a>
+            <!--a href="#" class="print-complaint-btn"><i class="fas fa-print"></i> Print Complaint</a-->
+          `;
+        }
+        
+        //alert('Complaint marked as completed successfully!');
+        showNotification('Complaint marked as completed successfully!', 'success', 3000);
+      } else {
+        throw new Error(data.message || 'Failed to update complaint status');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      statusBadge.textContent = originalStatus;
+      statusBadge.className = originalStatusClass;
+      //alert('Failed to update complaint status: ' + error.message);
+      showNotification('Failed to update complaint status: ' + error.message, 'error', 3000);
+    });
+  }
+  
+  // ========== Skillman Modal Functionality ==========
+  const modalBackdrop = document.getElementById('modalBackdrop');
+  const closeBtn = document.getElementById('closeBtn');
+  const cancelBtn = document.getElementById('cancelBtn');
+  const assignBtn = document.getElementById('assignBtn');
+  
+  // Dropdown Elements
+  const primaryDropdown = {
+    toggle: document.getElementById('primarySkillmanToggle'),
+    menu: document.getElementById('primarySkillmanMenu'),
+    search: document.getElementById('primarySkillmanSearch'),
+    items: document.getElementById('primarySkillmanItems'),
+    text: document.getElementById('primarySkillmanText')
+  };
+  
+  const helperDropdown = {
+    toggle: document.getElementById('helperSkillmanToggle'),
+    menu: document.getElementById('helperSkillmanMenu'),
+    search: document.getElementById('helperSkillmanSearch'),
+    items: document.getElementById('helperSkillmanItems'),
+    text: document.getElementById('helperSkillmanText')
+  };
+  
+  const helperTags = document.getElementById('helperTags');
+  
+  // Data
+  let allSkillmen = [];
+  let selectedPrimary = null;
+  let selectedHelpers = [];
+  let currentComplaintId = null;
+  let currentComplaintData = null;
+  
+  // Initialize modal
+  function initModal() {
+    setupModalEventListeners();
+  }
+  
+  // Fetch skillmen from backend API
+// Update the fetchSkillmenForModal function
+async function fetchSkillmenForModal() {
+  try {
+    const authToken = localStorage.getItem('authToken');
+    document.getElementById('primarySkillmanItems').innerHTML = '<div class="dropdown-item">Loading skillmen...</div>';
+    
+    const response = await fetch(SERVER_URL+'/api/skillmen', {
+                headers: {
+                    'Authorization': `Bearer ${authToken}`,
+                    'Content-Type': 'application/json'
+                }});
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch skillmen');
+      showNotification('Failed to fetch skillmen', 'error');
+    }
+    
+    if(response.ok) {
+      showNotification('Successfully loaded Complaints', 'success');
+    }
+    const data = await response.json();
+    
+    allSkillmen = data.map(skillman => ({
+      id: skillman.id || skillman._id,
+      name: skillman.name,
+      phone: skillman.phoneNumber || 'N/A',
+      location: skillman.area || 'N/A',
+      skill: skillman.designation || 'N/A'
+    }));
+    
+    renderPrimaryDropdown();
+  } catch (error) {
+    console.error('Error fetching skillmen:', error);
+    showNotification('Error fetching skillmen:'+ error, 'error')
+    document.getElementById('primarySkillmanItems').innerHTML = '<div class="dropdown-item error">Error loading skillmen</div>';
+    allSkillmen = [];
+  }
+}
+  
+  // Fetch complaint data to pre-populate modal
+  async function fetchComplaintData(complaintId) {
+    const authToken = localStorage.getItem('authToken');
+    try {
+      const response = await fetch(`${SERVER_URL}/api/complaints/${complaintId}`, {
+                headers: {
+                    'Authorization': `Bearer ${authToken}`,
+                    'Content-Type': 'application/json'
+                }});
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch complaint data');
+        showNotification('Failed to fetch complaint data', 'error')
+      }
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        currentComplaintData = data.data;
+        
+        if (currentComplaintData.priority) {
+          const priorityRadio = document.querySelector(`input[name="priority"][value="${currentComplaintData.priority.toLowerCase()}"]`);
+          if (priorityRadio) priorityRadio.checked = true;
+        }
+        
+        if (currentComplaintData.primarySkillmanId) {
+          const primarySkillman = allSkillmen.find(s => s.id === currentComplaintData.primarySkillmanId);
+          if (primarySkillman) {
+            selectPrimarySkillman(primarySkillman);
+          }
+        }
+        
+        if (currentComplaintData.helperSkillmenIds && currentComplaintData.helperSkillmenIds.length > 0) {
+          currentComplaintData.helperSkillmenIds.forEach(skillmanId => {
+            const helper = allSkillmen.find(s => s.id === skillmanId);
+            if (helper) {
+              addHelperSkillman(helper);
+            }
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching complaint data:', error);
+      showNotification('Error fetching complaint data:'+ error, 'error');
+    }
+  }
+  
+  // Render dropdown items
+  function renderDropdowns() {
+    renderPrimaryDropdown();
+    //renderHelperDropdown();
+  }
+  
+  function renderPrimaryDropdown(searchTerm = '') {
+    primaryDropdown.items.innerHTML = '';
+    
+    const filtered = filterSkillmen(searchTerm);
+    
+    if (filtered.length === 0) {
+      primaryDropdown.items.innerHTML = '<div class="dropdown-item">No skillmen found</div>';
+    } else {
+      filtered.forEach(skillman => {
+        const item = document.createElement('div');
+        item.className = 'dropdown-item' + 
+          (selectedPrimary && selectedPrimary.id === skillman.id ? ' selected' : '');
+        
+        item.innerHTML = `
+          <div class="skillman-info">
+            <div class="skillman-name">${skillman.name}</div>
+            <div class="skillman-details">
+              <span>${skillman.phone}</span>
+              <span>${skillman.location}</span>
+              <span>${skillman.skill}</span>
+            </div>
+          </div>
+        `;
+        
+        item.addEventListener('click', () => {
+          selectPrimarySkillman(skillman);
+          toggleDropdown(primaryDropdown);
+        });
+        primaryDropdown.items.appendChild(item);
+      });
+    }
+  }
+  
+  function filterSkillmen(searchTerm) {
+    if (!searchTerm) return allSkillmen;
+    const term = searchTerm.toLowerCase();
+    return allSkillmen.filter(skillman => 
+      skillman.name.toLowerCase().includes(term) ||
+      (skillman.phone && skillman.phone.toLowerCase().includes(term)) ||
+      (skillman.location && skillman.location.toLowerCase().includes(term)) ||
+      (skillman.skill && skillman.skill.toLowerCase().includes(term))
+    );
+  }
+  
+  // Selection functions
+  function selectPrimarySkillman(skillman) {
+    selectedPrimary = skillman;
+    primaryDropdown.text.textContent = `${skillman.name} (${skillman.phone}), ${skillman.location}, ${skillman.skill}`;
+    renderHelperDropdown();
+  }
+  
+  
+  // Dropdown toggle function
+  function toggleDropdown(dropdown) {
+    const isActive = dropdown.menu.classList.contains('active');
+    
+    // Close all dropdowns first
+    document.querySelectorAll('.dropdown-menu').forEach(menu => {
+      menu.classList.remove('active');
+    });
+    document.querySelectorAll('.dropdown-toggle').forEach(toggle => {
+      toggle.classList.remove('active');
+    });
+    
+    // Toggle this dropdown if it wasn't active
+    if (!isActive) {
+      dropdown.menu.classList.add('active');
+      dropdown.toggle.classList.add('active');
+      
+      // Focus search input when opening
+      if (dropdown.search) {
+        setTimeout(() => dropdown.search.focus(), 10);
+      }
+    }
+  }
+  
+  // Close dropdowns when clicking outside
+  function closeAllDropdowns() {
+    document.querySelectorAll('.dropdown-menu').forEach(menu => {
+      menu.classList.remove('active');
+    });
+    document.querySelectorAll('.dropdown-toggle').forEach(toggle => {
+      toggle.classList.remove('active');
+    });
+  }
+  
+  // Setup modal event listeners
+  function setupModalEventListeners() {
+    // Dropdown toggles
+    if(primaryDropdown.toggle) primaryDropdown.toggle.addEventListener('click', () => toggleDropdown(primaryDropdown));
+    //if(helperDropdown.toggle) helperDropdown.toggle.addEventListener('click', () => toggleDropdown(helperDropdown));
+    
+    // Search inputs
+    if(primaryDropdown.search) primaryDropdown.search.addEventListener('input', (e) => {
+      renderPrimaryDropdown(e.target.value);
+    });
+    
+    // Close dropdowns when clicking outside
+    if (document) document.addEventListener('click', (e) => {
+      if (!e.target.closest('.dropdown')) {
+        closeAllDropdowns();
+      }
+    });
+    
+    // Modal controls
+if (closeBtn) closeBtn.addEventListener('click', closeModal);
+if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+    
+    // Assign button
+    if (assignBtn) assignBtn.addEventListener('click', async () => {
+      const priority = document.querySelector('input[name="priority"]:checked').value;
+      
+      if (!selectedPrimary && selectedHelpers.length === 0) {
+        //alert('Please select at least one skillman (primary or helper)');
+        showNotification('Please select a skillman (primary)', 'error', 3000);
+        return;
+      }
+      
+      try {
+        const authToken = localStorage.getItem('authToken');
+        assignBtn.disabled = true;
+        assignBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Assigning...';
+        
+        const assignmentData = {
+          complaintId: currentComplaintId,
+          priority,
+          primarySkillmanId: selectedPrimary?.id || null,
+          helperSkillmenIds: selectedHelpers.map(h => h.id)
+        };
+        const response = await fetch(`${SERVER_URL}/api/complaints/assign-skillman`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${authToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(assignmentData)
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to assign skillman');
+          showNotification('Failed to assign skillman','error');
+        }
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          const row = document.querySelector(`tr[data-complaint-id="${currentComplaintId}"]`);
+          if (row) {
+            const skillmanCell = row.querySelector('td:nth-child(9)');
+            if (skillmanCell) {
+              const staticValue = skillmanCell.querySelector('.static-value');
+              if (staticValue) {
+                staticValue.textContent = selectedPrimary ? 
+                  `${selectedPrimary.name} (${selectedPrimary.phone})` : 
+                  selectedHelpers.map(h => h.name).join(', ');
+              }
+            }
+            
+            const statusBadge = row.querySelector('.status-badge');
+            if (statusBadge && statusBadge.textContent === 'Un-Assigned') {
+              statusBadge.textContent = 'In-Progress';
+              statusBadge.className = 'status-badge status-in-progress';
+              
+              const statusSelect = row.querySelector('.editable-select[data-field="status"]');
+              if (statusSelect) {
+                statusSelect.value = 'In-Progress';
+                statusSelect.dispatchEvent(new Event('change'));
+              }
+              
+              const actionDropdown = row.querySelector('.action-dropdown-content');
+              if (actionDropdown) {
+                actionDropdown.innerHTML = `
+                  <a href="#" class="complaint-details-btn"><i class="fas fa-info-circle"></i> Complaint Details</a>
+                  <a href="#" class="change-skillman-btn"><i class="fas fa-user-edit"></i> Change Skillman</a>
+                  <a href="#" class="mark-complaint-btn"><i class="fas fa-check"></i> Mark Complaint</a>
+                  <!--a href="#" class="print-complaint-btn"><i class="fas fa-print"></i> Print Complaint</a-->
+                `;
+              }
+            }
+          }
+          
+          closeModal();
+          //alert('Skillman assigned successfully!');
+          showNotification('Skillman assigned successfully!', 'success', 3000);
+          fetchComplaints();
+        } else {
+          throw new Error(result.message || 'Failed to assign skillman');
+          showNotification(result.message || 'Failed to assign skillman', 'error');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        //alert('Error assigning skillman: ' + error.message);
+        showNotification('Error assigning skillman: ' + error.message, 'error', 3000);
+      } finally {
+        assignBtn.disabled = false;
+        assignBtn.textContent = 'Assign Skillman';
+      }
+    });
+  }
+  
+  // Modal functions
+  function openModal(complaintId) {
+    currentComplaintId = complaintId;
+    modalBackdrop.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    
+    resetModalForm();
+    
+    Promise.all([
+      fetchSkillmenForModal(),
+      fetchComplaintData(complaintId)
+    ]).catch(error => {
+      console.error('Error loading modal data:', error);
+      showNotification('Error loading modal data:'+ error, 'error')
+    });
+  }
+  
+  function closeModal() {
+    modalBackdrop.classList.remove('active');
+    document.body.style.overflow = '';
+    resetModalForm();
+  }
+  
+// Reset modal form
+function resetModalForm() {
+  selectedPrimary = null;
+  document.getElementById('primarySkillmanText').textContent = 'Select a skillman';
+  document.getElementById('primarySkillmanSearch').value = '';
+  closeAllDropdowns();
+}
+  
+  // Function to open modal from action buttons
+// Modify the openSkillmanModal function
+function openSkillmanModal(complaintId, changeMode = false) {
+  currentComplaintId = complaintId;
+  isChangeMode = changeMode;
+
+  // Update modal title
+  document.getElementById('modalTitle').textContent =
+    changeMode ? 'Change Skillman' : 'Assign Skillman';
+
+  // Show/hide current skillman section based on mode
+  const currentSection = document.getElementById('currentSkillmanSection');
+  currentSection.style.display = changeMode ? 'block' : 'none';
+
+  // Show modal
+  document.getElementById('modalBackdrop').classList.add('active');
+  document.body.style.overflow = 'hidden';
+
+  // Reset form and fetch data
+  resetModalForm();
+
+  // Fetch previous skillman and display
+  fetchPreviousSkillman(complaintId);
+
+  fetchSkillmenForModal().then(() => {
+    if (changeMode) {
+      fetchCurrentSkillman(complaintId);
+    }
+  });
+}
+
+
+async function fetchPreviousSkillman(complaintId) {
+  const previousDiv = document.getElementById('previousSkillman');
+  previousDiv.innerHTML = 'Loading previous skillman...';
+
+  try {
+    const authToken = localStorage.getItem('authToken');
+    const response = await fetch(SERVER_URL+`/api/complaints/${complaintId}/previous-skillman`, {
+      headers: {
+          'Authorization': `Bearer ${authToken}`,
+          'Content-Type': 'application/json'
+      }});
+    const data = await response.json();
+
+    if (data.success) {
+      if (Array.isArray(data.skillman) && data.skillman.length > 0) {
+        // Show all previous skillmen with subdivision and designation
+        previousDiv.innerHTML = data.skillman.map(skillman => `
+          <div class="skillman-info">
+            <div class="skillman-name">${skillman.name}</div>
+            <div class="skillman-details">
+              <span> ${skillman.phone || ''}</span>
+              <span> ${skillman.area || ''}</span>
+              <span> ${skillman.designation || ''}</span>
+            </div>
+          </div>
+        `).join('');
+      } else {
+        previousDiv.textContent = 'No Skillman Assigned';
+      }
+    } else {
+      previousDiv.textContent = 'No Skillman Assigned';
+    }
+  } catch (error) {
+    previousDiv.textContent = 'Failed to load previous skillman';
+    showNotification('Failed to load previous skillman', 'error')
+  }
+}
+
+
+// New function to fetch current skillman
+// Update the fetchCurrentSkillman function
+function fetchCurrentSkillman(complaintId) {
+  const authToken = localStorage.getItem('authToken');
+  fetch(SERVER_URL+`/api/complaints/${complaintId}`, {
+                headers: {
+                    'Authorization': `Bearer ${authToken}`,
+                    'Content-Type': 'application/json'
+                }})
+    .then(response => response.json())
+    .then(data => {
+      if (data.success && data.data.skillman_id) {
+        const skillman = allSkillmen.find(s => s.id === data.data.skillman_id);
+        if (skillman) {
+          // Display current skillman info
+          const currentInfo = document.getElementById('currentSkillmanInfo');
+          currentInfo.innerHTML = `
+            <div class="skillman-name">${skillman.name}</div>
+            <div class="skillman-details">
+              <span><i class="fas fa-phone"></i> ${skillman.phone}</span>
+              <span><i class="fas fa-map-marker-alt"></i> ${skillman.location}</span>
+              <span><i class="fas fa-briefcase"></i> ${skillman.skill}</span>
+            </div>
+          `;
+          
+          // Select the current skillman in dropdown
+          selectPrimarySkillman(skillman);
+        }
+      }
+    })
+    .catch(error => console.error('Error fetching current skillman:', error));
+}
+
+// Simplified selectPrimarySkillman function
+function selectPrimarySkillman(skillman) {
+  selectedPrimary = skillman;
+  document.getElementById('primarySkillmanText').textContent = 
+    `${skillman.name} (${skillman.phone}), ${skillman.location}, ${skillman.skill}`;
+}
+
+
+document.getElementById('assignBtn').addEventListener('click', async () => {
+  if (!selectedPrimary) {
+    //alert('Please select a skillman');
+    showNotification('Please select a skillman', 'error', 3000);
+    return;
+  }
+
+  try {
+    const authToken = localStorage.getItem('authToken');
+    const response = await fetch(SERVER_URL+'/api/complaints/assign-skillman', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${authToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        complaintId: currentComplaintId,
+        skillmanId: selectedPrimary.id,
+        isChange: isChangeMode
+      })
+    });
+
+    const data = await response.json();
+    
+    if (data.success) {
+      // Update the table row
+      const row = document.querySelector(`tr[data-complaint-id="${currentComplaintId}"]`);
+      if (row) {
+        const skillmanCell = row.querySelector('td:nth-child(9)');
+        if (skillmanCell) {
+          const staticValue = skillmanCell.querySelector('.static-value');
+          if (staticValue) {
+            staticValue.textContent = `${selectedPrimary.name}`;
+          }
+        }
+        
+        // Update status if it was unassigned
+        const statusBadge = row.querySelector('.status-badge');
+        if (statusBadge && statusBadge.textContent === 'Un-Assigned') {
+          statusBadge.textContent = 'In-Progress';
+          statusBadge.className = 'status-badge status-in-progress';
+        }
+      }
+      
+      closeModal();
+      //alert('Skillman assigned successfully!');
+      showNotification('Skillman assigned successfully!', 'success', 3000);
+    } else {
+      throw new Error(data.message || 'Failed to assign skillman');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    //alert('Error assigning skillman: ' + error.message);
+    showNotification('Error assigning skillman: ' + error.message, 'error', 3000);
+  }
+});
+
+// Close modal function
+function closeModal() {
+  document.getElementById('modalBackdrop').classList.remove('active');
+  document.body.style.overflow = '';
+  resetModalForm();
+}
+
+// Initialize modal event listeners
+document.getElementById('closeBtn').addEventListener('click', closeModal);
+document.getElementById('cancelBtn').addEventListener('click', closeModal);
+
+  
+  // Initialize the modal
+  initModal();
+  
+  // Expose to global scope for button click handlers
+  window.openSkillmanModal = openSkillmanModal;
+
+
+      fetchFilterOptions();
+  
+});
+
+// Update the initializeRowEventListeners function to use the modal
+function initializeRowEventListeners() {
+  document.querySelectorAll('tr[data-complaint-id]').forEach(row => {
+    const complaintId = row.dataset.complaintId;
+    
+    // Assign Skillman button - simple mode
+    row.querySelector('.assign-skillman-btn')?.addEventListener('click', function(e) {
+      e.preventDefault();
+      openSkillmanModal(complaintId, false);
+    });
+    
+    // Change Skillman button - shows current skillman
+    row.querySelector('.change-skillman-btn')?.addEventListener('click', function(e) {
+      e.preventDefault();
+      openSkillmanModal(complaintId, true);
+    });
+    
+    // Other existing event listeners...
+    initializeActionButtonListeners(row);
+  });
+}
+// End of Skillman Modal JS
+
+
+function initializeActionButtonListeners(row) {
+  const dropdownBtn = row.querySelector('.action-dropdown-btn');
+  const dropdownContent = row.querySelector('.action-dropdown-content');
+
+  if (dropdownBtn && dropdownContent) {
+    dropdownBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+
+      // Hide all other dropdowns
+      document.querySelectorAll('.action-dropdown-content').forEach(dc => {
+        if (dc !== dropdownContent) dc.style.display = 'none';
+      });
+
+      // Toggle this dropdown
+      dropdownContent.style.display = dropdownContent.style.display === 'block' ? 'none' : 'block';
+    });
+  }
+}
+
+
+// Hide dropdown when clicking outside
+document.addEventListener('click', function() {
+  document.querySelectorAll('.action-dropdown-content').forEach(dc => {
+    dc.style.display = 'none';
+  });
+});
+
+
+document.querySelectorAll('.priority-box').forEach(box => {
+  box.addEventListener('click', function() {
+    const priority = this.dataset.priority;
+    switch (priority) {
+      case 'immediate':
+        window.location.href = 'immediate-complaints.html';
+        break;
+      case 'urgent':
+        window.location.href = 'urgent-complaints.html';
+        break;
+      case 'routine':
+        window.location.href = 'routine-complaints.html';
+        break;
+      case 'deferred':
+        window.location.href = 'deferred-complaints.html';
+        break;
+      default:
+        // Optionally handle unknown
+        break;
+    }
+  });
+});
+
+
+// Add a negative offset (e.g., -20px) to move it a little left
+if (typeof globalDropdown !== 'undefined' && globalDropdown) {
+  globalDropdown.style.left = `${rect.left - 20}px`;
+  globalDropdown.style.top = `${rect.top - 40}px`;
+}
+
+
+// Function to initialize click-based action dropdowns
+function initializeActionDropdowns() {
+  // Close all dropdowns when clicking anywhere on the page
+  document.addEventListener('click', function(e) {
+    // If click is outside any dropdown
+    if (!e.target.closest('.action-dropdown')) {
+      document.querySelectorAll('.action-dropdown-content').forEach(dropdown => {
+        dropdown.style.display = 'none';
+      });
+    }
+  });
+
+  // Set up click handlers for each dropdown button
+  document.querySelectorAll('.action-dropdown-btn').forEach(button => {
+    button.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const dropdown = this.closest('.action-dropdown');
+      const content = dropdown.querySelector('.action-dropdown-content');
+      
+      // Hide all other dropdowns first
+      document.querySelectorAll('.action-dropdown-content').forEach(dc => {
+        if (dc !== content) dc.style.display = 'none';
+      });
+
+      // Toggle this dropdown
+      content.style.display = content.style.display === 'block' ? 'none' : 'block';
+    });
+  });
+
+  // Close dropdown when clicking on a dropdown item
+  document.querySelectorAll('.action-dropdown-content a').forEach(item => {
+    item.addEventListener('click', function() {
+      this.closest('.action-dropdown-content').style.display = 'none';
+    });
+  });
+}
+
+// Call this function after rendering your table
+initializeActionDropdowns();
+
+
+// Add this after your fetchComplaints() function
+async function fetchFilterOptions() {
+  try {
+    const authToken = localStorage.getItem('authToken');
+    // Fetch receivers
+    const receiversResponse = await fetch(SERVER_URL+'/api/receivers', {
+                headers: {
+                    'Authorization': `Bearer ${authToken}`,
+                    'Content-Type': 'application/json'
+                }});
+    if (!receiversResponse.ok) throw new Error('Failed to fetch receivers');
+    receivers = await receiversResponse.json();
+    populateDropdown('receiver-filter', receivers);
+    
+    // Fetch colonies
+    const coloniesResponse = await fetch(SERVER_URL+'/api/get-colonies-for-all-complaints', {
+                headers: {
+                    'Authorization': `Bearer ${authToken}`,
+                    'Content-Type': 'application/json'
+                }});
+    if (!coloniesResponse.ok) throw new Error('Failed to fetch colonies');
+    colonies = await coloniesResponse.json();
+    populateDropdown('colony-filter', colonies);
+    
+  } catch (error) {
+    console.error('Error fetching filter options:', error);
+    //alert('Failed to load filter options. Please try again later.');
+    showNotification('Failed to load filter options. Please try again later.', 'error', 3000);
+    // You might want to show a user-friendly error message here
+  }
+}
+
+function populateDropdown(dropdownId, options) {
+  const dropdown = document.getElementById(dropdownId);
+  if (!dropdown) {
+    console.error(`Dropdown element with ID '${dropdownId}' not found`);
+    showNotification(`Dropdown element with ID '${dropdownId}' not found`, 'error');
+    return;
+  }
+
+  // Save the first option (usually "All" or "Select")
+  const firstOption = dropdown.options.length > 0 ? dropdown.options[0] : null;
+  
+  // Clear all options
+  dropdown.innerHTML = '';
+  
+  // Restore first option if it existed
+  if (firstOption) {
+    dropdown.appendChild(firstOption);
+  } else {
+    // Add default option if none existed
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = 'All Colonies';
+    dropdown.appendChild(defaultOption);
+  }
+  
+  // Add new options
+  options.forEach(option => {
+    const opt = document.createElement('option');
+    // Handle both object {id, name} and string cases
+    opt.value = option.id || option;
+    opt.textContent = option.name || option;
+    dropdown.appendChild(opt);
+  });
+}
+
+
+// Mark Complaint Modal Functions
+function openMarkComplaintModal(complaintId) {
+  const modal = document.getElementById('markComplaintModalBackdrop');
+  const complaintIdSpan = document.getElementById('markComplaintId');
+  
+  // Set the complaint ID in the modal
+  complaintIdSpan.textContent = complaintId;
+  
+  // Store the complaint ID in the modal for later use
+  modal.dataset.complaintId = complaintId;
+  
+  // Show the modal
+  modal.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeMarkComplaintModal() {
+  const modal = document.getElementById('markComplaintModalBackdrop');
+  modal.classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+function updateComplaintStatus(status) {
+  const modal = document.getElementById('markComplaintModalBackdrop');
+  const complaintId = modal.dataset.complaintId;
+  const authToken = localStorage.getItem('authToken');
+  
+  // Show loading state
+  const buttons = document.querySelectorAll('.mark-complaint-option');
+  buttons.forEach(btn => btn.disabled = true);
+  
+  // Find the row for this complaint
+  const row = document.querySelector(`tr[data-complaint-id="${complaintId}"]`);
+  const statusCell = row.querySelector('td:nth-child(11)');
+  const statusBadge = statusCell.querySelector('.status-badge');
+  
+  // Store original status for potential rollback
+  const originalStatus = statusBadge.textContent;
+  const originalStatusClass = statusBadge.className;
+  
+  // Update UI immediately for better UX
+  statusBadge.textContent = status;
+  
+  // Set appropriate status class
+  let statusClass = '';
+  switch(status.toLowerCase()) {
+    case 'completed':
+      statusClass = 'status-completed';
+      break;
+    case 'deferred':
+      statusClass = 'status-deferred';
+      break;
+    case 'sna':
+      statusClass = 'status-sna';
+      break;
+    case 'in-progress':
+      statusClass = 'status-in-progress';
+      break;
+    default:
+      statusClass = 'status-in-progress';
+  }
+  statusBadge.className = `status-badge ${statusClass}`;
+  
+  // Make API call to update status
+  fetch(`${SERVER_URL}/api/complaints/update-status`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${authToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      complaint_id: complaintId,
+      status: status
+    })
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    return response.json();
+  })
+  .then(data => {
+    if (data.success) {
+      // Update action dropdown based on new status
+      const actionDropdown = row.querySelector('.action-dropdown-content');
+      if (actionDropdown) {
+        if (status === 'Completed') {
+          actionDropdown.innerHTML = `
+            <a href="#" class="complaint-details-btn"><i class="fas fa-info-circle"></i> Complaint Details</a>
+            <!--a href="#" class="print-complaint-btn"><i class="fas fa-print"></i> Print Complaint</a-->
+          `;
+        } else {
+          // Update for other statuses if needed
+          actionDropdown.innerHTML = `
+            <a href="#" class="complaint-details-btn"><i class="fas fa-info-circle"></i> Complaint Details</a>
+            <a href="#" class="change-skillman-btn"><i class="fas fa-user-edit"></i> Change Skillman</a>
+            <a href="#" class="mark-complaint-btn"><i class="fas fa-check"></i> Mark Complaint</a>
+            <!--a href="#" class="print-complaint-btn"><i class="fas fa-print"></i> Print Complaint</a-->
+          `;
+        }
+        
+        // Re-attach event listeners to the updated dropdown
+        initializeRowEventListenersForRow(row);
+      }
+      
+      showNotification(`Complaint marked as ${status} successfully!`, 'success', 3000);
+      closeMarkComplaintModal();
+    } else {
+      throw new Error(data.message || 'Failed to update complaint status');
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    // Revert to original status
+    statusBadge.textContent = originalStatus;
+    statusBadge.className = originalStatusClass;
+    showNotification('Failed to update complaint status: ' + error.message, 'error', 3000);
+  })
+  .finally(() => {
+    // Re-enable buttons
+    buttons.forEach(btn => btn.disabled = false);
+  });
+}
+
+// Add this helper function to initialize event listeners for a specific row
+function initializeRowEventListenersForRow(row) {
+  const complaintId = row.dataset.complaintId;
+  
+  // Complaint details button
+  row.querySelector('.complaint-details-btn')?.addEventListener('click', function(e) {
+    e.preventDefault();
+    handleComplaintDetailsClick(complaintId);
+  });
+  
+  // Print complaint button
+  row.querySelector('.print-complaint-btn')?.addEventListener('click', function(e) {
+    e.preventDefault();
+    console.log(`Printing complaint #${complaintId}`);
+  });
+  
+  // Reinitialize the dropdown functionality
+  const dropdownBtn = row.querySelector('.action-dropdown-btn');
+  const dropdownContent = row.querySelector('.action-dropdown-content');
+  
+  if (dropdownBtn && dropdownContent) {
+    // Remove any existing event listeners
+    dropdownBtn.replaceWith(dropdownBtn.cloneNode(true));
+    const newDropdownBtn = row.querySelector('.action-dropdown-btn');
+    
+    // Add new event listener
+    newDropdownBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      
+      // Hide all other dropdowns first
+      document.querySelectorAll('.action-dropdown-content').forEach(dc => {
+        if (dc !== dropdownContent) dc.style.display = 'none';
+      });
+
+      // Toggle this dropdown
+      dropdownContent.style.display = dropdownContent.style.display === 'block' ? 'none' : 'block';
+    });
+  }
+}
+
+// Initialize Mark Complaint Modal
+function initMarkComplaintModal() {
+  const modalBackdrop = document.getElementById('markComplaintModalBackdrop');
+  const closeBtn = document.getElementById('closeMarkComplaintBtn');
+  const optionButtons = document.querySelectorAll('.mark-complaint-option');
+  
+  // Close modal events
+  if (closeBtn) {
+    closeBtn.addEventListener('click', closeMarkComplaintModal);
+  }
+  
+  // Close when clicking outside modal
+  if (modalBackdrop) {
+    modalBackdrop.addEventListener('click', (e) => {
+      if (e.target === modalBackdrop) {
+        closeMarkComplaintModal();
+      }
+    });
+  }
+  
+  // Option button events
+  optionButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const status = button.dataset.status;
+      updateComplaintStatus(status);
+    });
+  });
+}
+
+// Call this function when the DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+  initMarkComplaintModal();
+});
+  </script>
+
+
+
+
+  
+  <script>
+// Add this function to handle the modal button clicks
+function setupMarkComplaintModalListeners() {
+  const modalBackdrop = document.getElementById('markComplaintModalBackdrop');
+  const closeBtn = document.getElementById('closeMarkComplaintBtn');
+  const optionButtons = document.querySelectorAll('.mark-complaint-option');
+  
+  // Close modal events
+  if (closeBtn) {
+    closeBtn.addEventListener('click', closeMarkComplaintModal);
+  }
+  
+  // Close when clicking outside modal
+  if (modalBackdrop) {
+    modalBackdrop.addEventListener('click', (e) => {
+      if (e.target === modalBackdrop) {
+        closeMarkComplaintModal();
+      }
+    });
+  }
+  
+  // Option button events - connect to updateComplaintStatus
+  optionButtons.forEach(button => {
+    button.addEventListener('click', (e) => {
+      e.preventDefault();
+      const status = button.getAttribute('data-status');
+      updateComplaintStatus(status);
+    });
+  });
+}
+
+/*/ Call this function when the DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+  setupMarkComplaintModalListeners();
+});*/
+
+// Make sure the openMarkComplaintModal function stores the complaint ID correctly
+function openMarkComplaintModal(complaintId) {
+  const modal = document.getElementById('markComplaintModalBackdrop');
+  const complaintIdSpan = document.getElementById('markComplaintId');
+  
+  // Set the complaint ID in the modal
+  complaintIdSpan.textContent = complaintId;
+  
+  // Store the complaint ID in the modal for later use
+  modal.dataset.complaintId = complaintId;
+  
+  // Show the modal
+  modal.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+</script>
+
+<script>
+// Add this function to fetch priority counts
+async function fetchPriorityCounts() {
+  try {
+    const authToken = localStorage.getItem('authToken');
+    const response = await fetch(`${SERVER_URL}/api/count-based-on-priority`, {
+      headers: {
+        'Authorization': `Bearer ${authToken}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch priority counts');
+    }
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      // Update the counts for each priority
+      document.getElementById('immediate-count').textContent = data.counts.immediate || 0;
+      document.getElementById('urgent-count').textContent = data.counts.urgent || 0;
+      document.getElementById('routine-count').textContent = data.counts.routine || 0;
+      document.getElementById('deferred-count').textContent = data.counts.deferred || 0;
+    } else {
+      throw new Error(data.message || 'Failed to fetch priority counts');
+    }
+  } catch (error) {
+    console.error('Error fetching priority counts:', error);
+    // Don't show an error notification as this is a background process
+  }
+}
+
+// Call this function when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+  fetchPriorityCounts();
+  
+  // Also fetch counts after certain actions that might change the counts
+  // For example, after assigning a skillman or marking a complaint
+  // You can call fetchPriorityCounts() in those functions too
+});
+
+// You might also want to refresh counts after certain operations
+// For example, after assigning a skillman or updating a complaint status
+// Add fetchPriorityCounts() calls in those success handlers
+</script>
+
+  <script src="chat-bot.js"></script>
+</body>
+</html>

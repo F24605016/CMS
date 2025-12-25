@@ -1,0 +1,2637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script src="server-url.js"></script>
+  <script>
+    const page = 'complaints-report';
+  </script>
+  <script src="verification.js"></script>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="logo.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MES CMS - Complaints Reporting</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+      scrollbar-width: thin;
+      scroll-behavior: smooth;
+      scrollbar-color: rgb(138, 119, 119) transparent;
+      user-select: none;
+      -webkit-overflow-scrolling: touch; /* smooth scroll on mobile */
+    }
+
+    body {
+      display: none;
+      background-color: #f5f7fa;
+      padding-bottom: 40px;
+      overflow-x: hidden;
+    }
+
+    /* Header Styles */
+    header {
+      width: 100vw;
+      height: 60px;
+      background-color: rgb(136, 28, 28);
+      margin-top: 36px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 25px;
+      margin-bottom: 30px;
+      position: relative;
+      z-index: 10;
+    }
+
+
+    .nav-bar {
+      width: 100vw;
+      background-color: rgb(136, 28, 28);
+      display: flex;
+      justify-content: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      position: relative;
+      z-index: 1;
+      margin-top: 40px;
+    }
+
+    .nav-container {
+      width: 100%;
+      max-width: 1500px;
+      display: flex;
+      margin-left: 90px;
+    }
+
+    .nav-item {
+      padding: 12px 25px;
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      position: relative;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-item:hover {
+      background-color: rgba(0,0,0,0.1);
+      text-decoration: none;
+      color: white;
+    }
+
+    .nav-item.active {
+      background-color: rgba(0,0,0,0.2);
+    }
+
+    .nav-item.active::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60%;
+      height: 3px;
+      background-color: white;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 2;
+    }
+
+    .logo .logo-image {
+      width: 130px;
+      height: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 5px;
+      background-color: #f4f4f4;
+      border-radius: 50%;
+    }
+
+    .logo .logo-image img {
+      border-radius: 50%;
+      width: 100%;
+      height: auto;
+    }
+
+    .logo h2 {
+      color: white;
+      font-size: 20px;
+      white-space: nowrap;
+      margin-bottom: auto;
+      margin-top: auto;
+      font-weight: bold;
+    }
+
+    .user {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      color: white;
+    }
+
+    .user h2 {
+      font-size: 16px;
+      white-space: nowrap;
+      margin-top: auto;
+      margin-bottom: auto;
+      text-decoration: bold;
+      font-weight: bold;
+    }
+
+    .logout-btn {
+      background-color: white;
+      color: rgb(136, 28, 28);
+      border: none;
+      padding: auto;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.3s;
+      border: 1px solid white;
+      height: 29px;
+      width: 72px;
+      font-size: 14px;
+    }
+
+    .logout-btn:hover {
+      background-color: #ddd;
+    }
+
+    .logout-btn:active {
+      border: 1px solid white;
+      background-color: rgb(136, 28, 28);
+      color: white;
+    }
+
+    /* Notification Styles */
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 15px 25px;
+      border-radius: 8px;
+      color: white;
+      font-weight: 600;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transform: translateX(110%);
+      transition: transform 0.3s ease;
+    }
+    
+    .notification.show {
+      transform: translateX(0);
+    }
+    
+    .notification.success {
+      background: #4caf50;
+    }
+    
+    .notification.error {
+      background: #f44336;
+    }
+    
+    .notification.warning {
+      background: #ff9800;
+    }
+    
+    .notification i {
+      font-size: 20px;
+    }
+
+    /* Reporting Section Styles */
+    .content {
+      width: 95%;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+
+    /* Variables */
+    :root {
+      --primary: rgb(136, 28, 28);
+      --primary-light: rgba(136, 28, 28, 0.1);
+      --primary-light-2: rgba(136, 28, 28, 0.05);
+      --secondary: #8c2f2f;
+      --accent: #4caf50;
+      --warning: #ff9800;
+      --danger: #f44336;
+      --light: #f8f9fa;
+      --dark: #212529;
+      --gray: #6c757d;
+      --card-bg: rgba(255, 255, 255, 0.95);
+      --nav-bg: rgba(255, 255, 255, 0.85);
+      --nav-active: rgba(136, 28, 28, 0.15);
+      --nav-hover: rgba(136, 28, 28, 0.08);
+      --success: #4caf50;
+      --border-radius: 5px;
+    }
+
+    /* Complaints Section */
+    .complaints-section-container {
+      display: grid;
+      grid-template-columns: 250px 1fr;
+      gap: 30px;
+      min-height: 600px;
+    }
+    
+    .complaints-sidebar {
+      background: white;
+      border-radius: 8px;
+      padding: 25px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .complaints-option {
+      padding: 18px 20px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #f8f9fa;
+      color: black;
+    }
+    
+    .complaints-option:hover {
+      background: rgba(0,0,0,0.05);
+      text-decoration: none;
+      color: inherit;
+    }
+    
+    .complaints-option.active {
+      background: rgba(0,0,0,0.1);
+      color: rgb(136, 28, 28);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .complaints-option i {
+      font-size: 20px;
+    }
+    
+    .complaints-content {
+      background: white;
+      border-radius: 8px;
+      padding: 30px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    /* Report Section */
+    .report-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    
+    .report-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--primary);
+      position: relative;
+      padding-left: 15px;
+    }
+    
+    .report-title::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      height: 80%;
+      width: 5px;
+      background: var(--primary);
+      border-radius: 3px;
+    }
+    
+    .hidden {
+      display: none;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--dark);
+    }
+    
+    .form-control {
+      width: 100%;
+      
+      border-radius: var(--border-radius);
+      border: 1px solid rgba(0,0,0,0.1);
+      background: rgba(248, 249, 250, 0.5);
+      font-size: 16px;
+      transition: all 0.3s;
+    }
+    
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(136, 28, 28, 0.2);
+    }
+    
+    .btn {
+      padding: 14px 28px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 6px 18px rgba(136, 28, 28, 0.2);
+    }
+    
+    .btn-primary:hover {
+      background: #a33a3a;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 22px rgba(136, 28, 28, 0.3);
+    }
+    /*not working*/
+    .btn-primary:active {
+      background: #701c1c; /* Even darker maroon for pressed state */
+      transform: translateY(0); /* Remove the lift effect when pressed */
+      box-shadow: 0 4px 8px rgba(136, 28, 28); /* Smaller shadow when pressed */
+    }
+    
+    .btn-secondary {
+      background: var(--gray);
+      color: white;
+      box-shadow: 0 6px 18px rgba(108, 117, 125, 0.3);
+    }
+    
+    .btn-secondary:hover {
+      background: #5a6268;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 22px rgba(108, 117, 125, 0.4);
+    }
+    
+    /* Radio Button Styles */
+    .report-type {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .report-option {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 15px 25px;
+      border: 2px solid #ccc;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      color: #555;
+      transition: all 0.3s ease;
+      user-select: none;
+      min-width: 160px;
+      text-align: center;
+    }
+
+    .report-option:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .report-option.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+
+
+    
+    /* Report Form Styles */
+    .report-form {
+      background: white;
+      border-radius: var(--border-radius);
+      padding: 25px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      border: 1px solid rgba(0,0,0,0.05);
+      margin-bottom: 25px;
+    }
+    
+    /* Summary Report Section */
+    .summary-report-section {
+      background: linear-gradient(to bottom, #ffffff, #f9f9f9);
+      border-radius: var(--border-radius);
+      padding: 25px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+    
+    .summary-header {
+      text-align: center;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid rgba(0,0,0,0.1);
+    }
+    
+    .summary-title {
+      font-size: 24px;
+      color: var(--primary);
+      font-weight: 700;
+    }
+    
+    .summary-subtitle {
+      color: var(--gray);
+      font-size: 16px;
+    }
+    
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 25px;
+      margin-top: 20px;
+    }
+    
+    .summary-card {
+      background: white;
+      border-radius: var(--border-radius);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      padding: 20px;
+      border: 1px solid rgba(0,0,0,0.05);
+      transition: transform 0.3s;
+    }
+    
+    .summary-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+    }
+    
+    .card-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+    
+    .card-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--primary-light);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 15px;
+    }
+    
+    .card-icon i {
+      color: var(--primary);
+      font-size: 18px;
+    }
+    
+    .card-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--dark);
+    }
+    
+    .summary-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+    }
+    
+    .stat-item {
+      text-align: center;
+      padding: 15px;
+      background: var(--primary-light-2);
+      border-radius: var(--border-radius);
+    }
+    
+    .stat-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 5px;
+    }
+    
+    .stat-label {
+      font-size: 14px;
+      color: var(--gray);
+    }
+    
+    .summary-table-container {
+      margin-top: 20px;
+      overflow-x: auto;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      /*border-radius: var(--border-radius);*/
+      overflow: hidden;
+      background: white;
+    }
+    
+    th {
+      background: rgba(136, 28, 28, 0.1);
+      color: var(--primary);
+      font-weight: 700;
+      padding: 12px;
+      text-align: left;
+      border: 1px solid #ffc4c4; /* vertical line color */
+    }
+    
+    td {
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(0,0,0,0.1);
+      height: 40px;
+      border: 1px solid #f3f3f3; /* vertical line color */
+    }
+    tr:hover {
+      background: rgba(136, 28, 28, 0.05);
+    }
+    /*
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+      */
+    
+    /* Chart container */
+    .chart-container {
+      margin-top: 30px;
+      height: 300px;
+      background: white;
+      border-radius: var(--border-radius);
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    
+    /* Report Visualization */
+    .report-visualization {
+      background: white;
+      border-radius: var(--border-radius);
+      padding: 25px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      border: 1px solid rgba(0,0,0,0.05);
+      margin-top: 25px;
+    }
+    
+    .visual-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .visual-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .visual-header .visual-title {
+      margin-top: 30px;
+    }
+    
+    /* New styles for summary report */
+    .summary-action-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+    
+    .year-selection {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .year-label {
+      font-weight: 600;
+      color: var(--dark);
+      width: 100%;
+      text-align: center;
+    }
+    
+    .report-buttons {
+      display: flex;
+      gap: 15px;
+    }
+    
+    .data-tables {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      margin-top: 20px;
+    }
+    
+    .data-table {
+      background: white;
+      border-radius: var(--border-radius);
+      overflow: hidden;
+    }
+    
+    .table-title {
+      background: rgba(136, 28, 28, 0.1);
+      color: var(--primary);
+      font-weight: 700;
+      padding: 16px;
+      text-align: center;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+    
+    .progress-bar {
+      height: 8px;
+      background-color: #e9ecef;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+    
+    .progress-value {
+      height: 100%;
+      background-color: var(--primary);
+      border-radius: 4px;
+    }
+
+    .hamburger {
+      display: none;
+    }
+
+    @media (max-width: 450px) {
+      .logo {
+        flex-direction: column;
+      }
+
+      .content {
+        padding: 5px;
+      }
+
+      .complaints-content {
+        padding: 6px 10px;
+      }
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 992px) {
+      .nav-container {
+        margin-left: 30px;
+      }
+      
+      .complaints-section-container {
+        grid-template-columns: 1fr;
+      }
+      
+      .complaints-sidebar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+      }
+      
+      .complaints-option {
+        margin-bottom: 0;
+        flex: 1;
+        min-width: 150px;
+      }
+      
+      .summary-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .data-tables {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      
+      .complaints-option {
+        padding: 12px 15px;
+        font-size: 14px;
+      }
+      
+      .radio-group {
+        flex-direction: column;
+        gap: 10px;
+      }
+      
+      .radio-item {
+        width: 100%;
+      }
+      
+      .btn {
+        width: 100%;
+        margin-bottom: 10px;
+      }
+      
+      .content {
+        padding: 15px;
+      }
+      
+      .summary-action-bar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .year-selection {
+        width: 100%;
+        justify-content: space-between;
+      }
+      
+      .report-buttons {
+        width: 100%;
+        justify-content: space-between;
+      }
+    }
+
+    /* Responsive header */
+    @media (max-width: 768px) {
+      .report-type .report-option {
+        padding: 10px 20px;
+        font-size: 15px;
+      }
+
+      label {
+        font-size: 15px;
+      }
+
+      select {
+        font-size: 15px;
+        height: 20px;
+      }
+
+      .btn {
+        font-size: 15px;
+      }
+
+      .report-header h1 {
+        font-size: 20px;
+      }
+      
+      .logo h2 {
+        font-size: 16px;
+      }
+
+      .nav-container {
+        margin-left: 0;
+        justify-content: center;
+        display: none;
+      }
+      
+      .nav-item {
+        padding: 12px 15px;
+        font-size: 14px;
+      }
+
+      .content {
+        margin-top: 0px;
+        width: 100vw;
+      }
+      
+      header {
+        /*flex-direction: column;*/
+        height: auto;
+        padding: 5px;
+        gap: 15px;
+        margin-top: 0px;
+      }
+      
+      .logo {
+        margin-bottom: 0px;
+      }
+
+      .logo .logo-image {
+        width: 60px;
+        height: auto;
+        margin-bottom: 0px;
+        padding: 2px;
+      }
+
+      .user h2 {
+        font-size: 14px;
+        margin: 0px;
+      }
+      
+      .logout-btn {
+        padding: 4px 8px;
+        font-size: 15px;
+        font-weight: bold;
+
+      }
+
+      .hamburger {
+        display: flex;
+        height: 35px;
+        width: 35px;
+        background-color: rgba(0,0,0,0.2);
+        cursor: pointer;
+        padding: 8px;
+        margin-right: 10px;
+        border-radius: 4px;
+      }
+
+      .hamburger i {
+        font-size: 20px;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+      }
+
+      .navigation-block {
+        right: 0;
+        width: 100vw;
+        top: 55px;
+        border-radius: 0;
+      }
+
+      /* By default, hide the menu off-screen to the right */
+      .navigation-block {
+        position: fixed;
+        top: 60px;
+        right: -250px; /* Hide off-screen to the right */
+        display: flex;
+        flex-direction: column;
+        background-color: var(--primary);
+        width: 220px;
+        border-radius: 8px;
+        padding: 10px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        z-index: 999;
+        transition: right 0.3s ease-in-out; /* Smooth slide animation */
+        border: 2px solid rgba(0, 0, 0, 0.1);
+      }
+
+      /* Each nav item */
+      .navigation-block .navi-block-items {
+        color: white;
+        padding: 12px;
+        font-size: 16px;
+        text-decoration: none;
+        transition: background 0.2s ease;
+        font-weight: 500;
+      }
+
+      .navigation-block .navi-block-items:hover {
+        background: rgba(255,255,255,0.1);
+        border-radius: 5px;
+      }
+
+      /* Show menu when active - slide in from right */
+      .navigation-block.active {
+        right: 10px; /* Slide into view from the right */
+      }
+
+      .navigation-block div {
+        background-color: rgba(0, 0, 0, 0.1);
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="common-styles.css">
+</head>
+<body>
+  <!-- Notification -->
+  <div class="notification" id="notification">
+      <i class="fas fa-check-circle"></i>
+      <span id="notification-text">Operation completed successfully</span>
+  </div>
+  
+  <!-- Header -->
+  <header>
+    <div class="logo">
+      <div class="logo-image">
+        <img src="logo.jpg" alt="logo image">
+      </div>
+      <h2>MES CMS</h2>
+    </div>
+
+    <div class="user">
+      <h2 id="user-id">Unknown</h2>
+      <button class="logout-btn" id="logout-btn">Logout</button>
+      <div class="hamburger">
+        <i class="fas fa-bars" id="hamburger-btn"></i>
+        <div class="navigation-block">
+          <a href="dashboard" class="navi-block-items">Dashboard</a>
+          <a href="complaints" class="navi-block-items">Complaints</a>
+          <a href="users" class="navi-block-items">Users</a>
+          <div class="navi-block-items active"">Reporting</div>
+          <a href="admin" class="navi-block-items">Admin</a>
+        </div>
+        </div>
+      </div>
+  </header>
+
+  <!-- Navigation -->
+  <div class="nav-bar">
+    <div class="nav-container">
+      <a href="dashboard" class="nav-item">
+        <i class="fas fa-chart-line"></i>
+        Dashboard
+      </a>
+      <a href="complaints" class="nav-item">
+        <i class="fas fa-ticket-alt"></i>
+        Complaints
+      </a>
+      <a href="users" class="nav-item">
+        <i class="fas fa-users"></i>
+        Users
+      </a>
+      <div class="nav-item active">
+        <i class="fas fa-file-alt"></i>
+        Reporting
+      </div>
+      <a href="admin" class="nav-item">
+        <i class="fas fa-user-tie"></i>
+        Admin
+      </a>
+    </div>
+  </div>
+  
+  <!-- Reporting Content -->
+  <div class="content">
+    <div class="complaints-section-container">
+      <div class="complaints-sidebar">
+        <a href="daily-report.html" class="complaints-option">
+          <i class="fas fa-calendar-day"></i>
+          Daily Report
+        </a>
+        <div class="complaints-option active">
+          <i class="fas fa-clipboard"></i>
+          Complaints Report
+        </div>
+        <a href="skillman-report.html" class="complaints-option">
+          <i class="fas fa-users"></i>
+          Skillman Report
+        </a>
+        <a href="vacant-apartments.html" class="complaints-option">
+          <i class="fas fa-building"></i>
+          Vacant Apartments
+        </a>
+        <a href="rating-report.html" class="complaints-option">
+          <i class="fas fa-star"></i>
+          Rating Report
+        </a>
+      </div>
+      
+      <div class="complaints-content">
+        <div class="report-header">
+          <h1 class="report-title">Complaints Report</h1>
+        </div>
+        
+
+        <!-- Report type selection with radio buttons -->
+         <!-- Report type selection -->
+        <div class="report-type">
+          <div class="report-option" data-type="sector">Sector Report</div>
+          <div class="report-option" data-type="sub-div">Sub Division Report</div>
+          <div class="report-option" data-type="summary">Summary Report</div>
+        </div>
+
+
+
+        <!-- Default Report Form -->
+        <div id="default-report-form" class="report-form">
+          <form>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="colony">Select Colony</label>
+                  <select class="form-control" name="colony">
+                    <option value="">Select Colony</option>
+                    <!--Will be populated dynamically-->
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="building">Select Building</label>
+                  <select class="form-control" name="building">
+                    <option value="">Select Building</option>
+                    <!--Will be populated dynamically-->
+                  </select>
+                </div>
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="category">Complaint Category</label>
+                  <select class="form-control" name="category">
+                    <option value="">Select Category</option>
+                    <!--Will be populated dynamically-->
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="nature">Nature of Complaint</label>
+                  <select class="form-control" name="nature">
+                    <option value="">Select Nature</option>
+                    <!--Will be populated dynamically-->
+                  </select>
+                </div>
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="status">Status</label>
+                  <select class="form-control" name="status">
+                    <option value="">Select Status</option>
+                    <option value="completed">Completed</option>
+                    <option value="in-progress">In-Progress</option>
+                    <option value="un-assigned">Un-Assigned</option>
+                    <option value="deferred">Deferred</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="priority">Priority</label>
+                  <select class="form-control" name="priority">
+                    <option value="">Select Priority</option>
+                    <option value="immediate">Immediate</option>
+                    <option value="urgent">Urgent</option>
+                    <option value="routine">Routine</option>
+                    <option value="deferred">Deferred</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="from-date">From Date</label>
+                  <input type="date" class="form-control" id="from-date">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="to-date">To Date</label>
+                  <input type="date" class="form-control" id="to-date">
+                </div>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <button class="btn btn-primary" id="generate-report-for-default">
+                <i class="fas fa-download"></i> Export to CSV
+              </button>
+              <button class="btn btn-secondary" id="print-report-for-default">
+                <i class="fas fa-print"></i> Print Report
+              </button>
+            </div>
+          </form>
+        </div>
+        
+  
+
+        <!-- Sub Division Report Form -->
+        <div id="subdiv-report-form" class="report-form hidden">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="subdiv-from-date">From Date</label>
+                <input type="date" class="form-control" id="subdiv-from-date">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="subdiv-to-date">To Date</label>
+                <input type="date" class="form-control" id="subdiv-to-date">
+              </div>
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-8">
+              <div class="form-group">
+                <label for="subdiv-category">Select Category</label>
+                <select class="form-control" id="subdiv-category">
+                  <option value="">All Categories</option>
+                  <option value="E&M-I">E&M-I</option>
+                  <option value="E&M-II">E&M-II</option>
+                  <option value="B&R-I">B&R-I</option>
+                  <option value="B&R-II">B&R-II</option>
+                  <option value="B&R-III">B&R-III</option>
+                  <option value="-">-</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group" style="margin-top: 30px;">
+                <button class="btn btn-primary">
+                  Generate Report
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <div class="subdivision-table hidden">
+            <div class="visual-header">
+              <h3 class="visual-title">Sub Division Analysis</h3>
+            </div>
+            <table id="subdivision-status-table" style="margin-bottom: 10px;">
+              <thead>
+                <tr>
+                  <th>Sub Division</th>
+                  <th>Inprogress</th>
+                  <th>Completed</th>
+                  <th>SNA</th>
+                  <th>Deferred</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!--Will be populated dynamically-->
+              </tbody>
+            </table>
+            <table id="subdivision-priority-table" style="margin-bottom: 10px;">
+              <thead>
+                <tr>
+                  <th>Sub Division</th>
+                  <th>Immediate</th>
+                  <th>Urgent</th>
+                  <th>Routine</th>
+                  <th>Deferred</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!--Will be populated dynamically-->
+              </tbody>
+            </table>
+            <div class="form-group">
+              <button class="btn btn-primary" id="export-subdiv-report">
+                <i class="fas fa-print"></i> Print
+              </button>
+            </div>
+          </div>
+        </div>
+
+
+
+        
+
+
+        <!-- Summary Report Section -->
+        <div id="summary-report-form" class="report-form hidden">
+          <div class="summary-action-bar">
+            <div class="year-selection">
+              <span class="year-label">Select Year:</span>
+              <input type="text" class="form-control" id="yearPicker" placeholder="YYYY">
+            </div>
+            <div class="report-buttons">
+              <button class="btn btn-primary" id="generate-summary-report">
+                <i class="fas fa-chart-pie"></i> Generate Report
+              </button>
+              <button class="btn btn-secondary" id="print-summary-report">
+                <i class="fas fa-print"></i> Print Report
+              </button>
+            </div>
+          </div>
+          
+          <div id="summary-results">
+            <div class="summary-header">
+              <h2 class="summary-title">Complaints Summary Report</h2>
+              <p class="summary-subtitle">YYYY Annual Performance Overview</p>
+            </div>
+            
+            <div class="data-tables">
+              <!-- Table 1: Complaints by Nature -->
+              <div class="data-table">
+                <table id="colony-summary-table">
+                  <thead>
+                    <tr>
+                      <th>Colony</th>
+                      <th>Total</th>
+                      <th>Percentage</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <!--Will be populated dynamically-->
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Table 2: Complaints by Colony -->
+              <div class="data-table">
+                <table id="nature-summary-table">
+                  <thead>
+                    <tr>
+                      <th>Nature</th>
+                      <th>Total</th>
+                      <th>Percentage</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <!--Will be populated dynamically-->
+                  </tbody>
+                </table>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        
+      </div>
+    </div>
+  </div>
+
+<script>
+  const hamburgerBtn = document.getElementById("hamburger-btn");
+  const navBlock = document.querySelector(".navigation-block");
+
+  // Toggle navigation on hamburger click
+  hamburgerBtn.addEventListener("click", (e) => {
+    e.stopPropagation(); // Prevent click from bubbling to document
+    navBlock.classList.toggle("active");
+  });
+
+  // Close navigation when clicking outside
+  document.addEventListener("click", (e) => {
+    // Check if click is outside the navigation block and hamburger button
+    if (!navBlock.contains(e.target) && e.target !== hamburgerBtn) {
+      navBlock.classList.remove("active");
+    }
+  });
+
+  // Optional: Prevent clicks inside navigation from closing it
+  navBlock.addEventListener("click", (e) => {
+    e.stopPropagation();
+  });
+</script>
+
+
+<script>
+// Add this script to control navigation visibility based on backend permissions
+document.addEventListener('DOMContentLoaded', async function() {
+    try {
+        const authToken = localStorage.getItem('authToken');
+        if (!authToken) {
+            console.error('No authentication token found');
+            return;
+        }
+
+        // Fetch allowed pages from backend
+        const response = await fetch(`${SERVER_URL}/api/allowed-pages`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${authToken}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch allowed pages');
+        }
+
+        const data = await response.json();
+        
+        if (data.success) {
+            // Process navigation items based on allowed pages
+            processNavigationItems(data.allowedPages, data.navigationItems);
+        }
+    } catch (error) {
+        console.error('Error fetching allowed pages:', error);
+        // In case of error, you might want to show a default set of navigation items
+        // or handle it according to your application's requirements
+    }
+});
+
+function processNavigationItems(allowedPages, navigationItems) {
+    // Process header navigation items
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+        const href = item.getAttribute('href');
+        if (href) {
+            const pageName = href; // Get the page name without extension
+            
+            // Check if this category has an accessible page
+            if (navigationItems[pageName]) {
+                // Set the href to the first accessible page in this category
+                item.setAttribute('href', `${navigationItems[pageName]}.html`);
+                item.style.display = 'flex';
+            } else {
+                item.style.display = 'none';
+            }
+        }
+    });
+    
+    // Process hamburger menu navigation items
+    const hamburgerItems = document.querySelectorAll('.navi-block-items');
+    hamburgerItems.forEach(item => {
+        const href = item.getAttribute('href');
+        if (href) {
+            const pageName = href; // Get the page name without extension
+            
+            // Check if this category has an accessible page
+            if (navigationItems[pageName]) {
+                // Set the href to the first accessible page in this category
+                item.setAttribute('href', `${navigationItems[pageName]}.html`);
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        }
+    });
+    
+    // Process sidebar navigation items (use the allowedPages array)
+    const sidebarItems = document.querySelectorAll('.complaints-option');
+    sidebarItems.forEach(item => {
+        const href = item.getAttribute('href');
+        if (href) {
+            const pageName = getPageNameFromHref(href);
+            if (allowedPages.includes(pageName) || item.classList.contains('active')) {
+                item.style.display = 'flex';
+            } else {
+                item.style.display = 'none';
+            }
+        }
+    });
+}
+
+function getPageNameFromHref(href) {
+    if (!href) return '';
+    
+    // Extract page name from href (e.g., "dashboard.html" -> "dashboard")
+    const pageWithExtension = href.split('/').pop();
+    return pageWithExtension.split('.')[0];
+}
+</script>
+
+
+<script>
+  let USER_ID = localStorage.getItem('UserId');
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById("user-id").textContent = USER_ID;
+      localStorage.removeItem('UserId');
+    });
+
+  // Logout functionality
+  document.addEventListener('DOMContentLoaded', function() {
+
+    // DOM Elements
+    const logoutBtn = document.getElementById('logout-btn');
+    
+    logoutBtn.addEventListener('click', async () => {
+      try {
+        const authToken = localStorage.getItem('authToken');
+        const response = await fetch(SERVER_URL+'/logout', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${authToken}`,'Content-Type': 'application/json' }
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          document.getElementById("user-id").textContent = 'Unknown';
+          console.log('Logout success:', data);
+          //alert('Logged out successfully!');
+          
+          // 👇 you can add more procedural lines here
+          // e.g., redirect:
+          setTimeout(() => {
+            window.location.href = 'login.html';
+          }, 500); // 500 ms = 0.5 sec
+
+        } else {
+          console.error('Logout failed:', data);
+          alert('Logout failed!');
+        }
+
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Something went wrong!');
+      }
+    });
+    
+  });
+</script>
+
+  <script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+      const options = document.querySelectorAll(".report-option");
+
+      const defaultForm = document.getElementById("default-report-form");
+      const subdivForm = document.getElementById("subdiv-report-form");
+      const summaryForm = document.getElementById("summary-report-form");
+
+      options.forEach(opt => {
+        opt.addEventListener("click", function () {
+          // toggle off if already active
+          if (this.classList.contains("active")) {
+            this.classList.remove("active");
+            hideAll(); 
+            defaultForm.classList.remove("hidden"); // show default when none active
+            resetForm(defaultForm, false); 
+            return;
+          }
+
+          // make sure only one active
+          options.forEach(o => o.classList.remove("active"));
+          this.classList.add("active");
+
+          // handle based on type
+          switch (this.dataset.type) {
+            case "sector":
+              hideAll();
+              defaultForm.classList.remove("hidden");
+              resetForm(defaultForm, true); // disable selects, only dates active
+              break;
+            case "sub-div":
+              hideAll();
+              subdivForm.classList.remove("hidden");
+              break;
+            case "summary":
+              hideAll();
+              summaryForm.classList.remove("hidden");
+              break;
+          }
+        });
+      });
+
+      function hideAll() {
+        defaultForm.classList.add("hidden");
+        subdivForm.classList.add("hidden");
+        summaryForm.classList.add("hidden");
+      }
+
+      function resetForm(form, sectorMode) {
+        const selects = form.querySelectorAll("select");
+        const dates = form.querySelectorAll('input[type="date"]');
+
+        selects.forEach(s => {
+          s.value = ""; 
+          s.disabled = sectorMode; 
+        });
+
+        dates.forEach(d => {
+          d.disabled = false;
+          d.value = ""; 
+        });
+      }
+
+      // initial state: only default visible
+      hideAll();
+      defaultForm.classList.remove("hidden");
+    });
+
+  </script>
+
+
+  <script> 
+
+    // To populate colonies and buildings
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        // DOM Elements
+        const colonySelect = document.querySelector('select[name="colony"]');
+        const buildingSelect = document.querySelector('select[name="building"]');
+        
+        // Store the colonies data for later use
+        let coloniesData = [];
+        
+        // Fetch colonies and their buildings from the backend
+        async function fetchColoniesAndBuildings() {
+            try {
+                const authToken = localStorage.getItem('authToken');
+                const response = await fetch(`${SERVER_URL}/api/colonies-with-buildings`, {
+                    method: 'GET',
+                    headers: { 'Authorization': `Bearer ${authToken}`,'Content-Type': 'application/json' }
+                  });
+                if (!response.ok) {
+                    throw new Error('Failed to fetch colonies and buildings');
+                }
+                coloniesData = await response.json();
+                
+                // Clear existing options except the first one
+                while (colonySelect.options.length > 1) {
+                    colonySelect.remove(1);
+                }
+                
+                // Add colony options
+                coloniesData.forEach(colony => {
+                    const option = document.createElement('option');
+                    option.value = colony.id;
+                    option.textContent = colony.name;
+                    colonySelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error fetching colonies and buildings:', error);
+                // You might want to show an error message to the user here
+            }
+        }
+        
+        // Update buildings dropdown based on selected colony
+        function updateBuildingsDropdown(colonyId) {
+            // Clear existing building options except the first one
+            while (buildingSelect.options.length > 1) {
+                buildingSelect.remove(1);
+            }
+            
+            // If no colony is selected, return early
+            if (!colonyId) return;
+            
+            // Find the selected colony
+            const selectedColony = coloniesData.find(colony => colony.id == colonyId);
+            
+            if (selectedColony && selectedColony.buildings) {
+                // Add building options for the selected colony
+                selectedColony.buildings.forEach(building => {
+                    const option = document.createElement('option');
+                    option.value = building.id;
+                    option.textContent = building.name;
+                    buildingSelect.appendChild(option);
+                });
+            }
+        }
+        
+        // Event listener for colony dropdown change
+        colonySelect.addEventListener('change', function() {
+            updateBuildingsDropdown(this.value);
+        });
+        
+        // Initialize the form by fetching colonies and buildings data
+        fetchColoniesAndBuildings();
+    });
+
+
+    // To populate categories and natures
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        // DOM Elements
+        const categorySelect = document.querySelector('select[name="category"]');
+        const natureSelect = document.querySelector('select[name="nature"]');
+        
+        // Store the categories data for later use
+        let categoriesData = [];
+        
+        // Fetch categories and their natures from the backend
+        async function fetchCategoriesAndNatures() {
+            try {
+                const authToken = localStorage.getItem('authToken');
+                const response = await fetch(`${SERVER_URL}/api/categories-with-natures`, {
+                    method: 'GET',
+                    headers: { 'Authorization': `Bearer ${authToken}`,'Content-Type': 'application/json' }
+                  });
+                if (!response.ok) {
+                    throw new Error('Failed to fetch categories and natures');
+                }
+                categoriesData = await response.json();
+                
+                // Debug: log what we received from the API
+                console.log('Categories API response:', categoriesData);
+                
+                // Clear existing options except the first one
+                while (categorySelect.options.length > 1) {
+                    categorySelect.remove(1);
+                }
+                
+                // Add category options
+                categoriesData.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category.name;
+                    option.textContent = category.name;
+                    categorySelect.appendChild(option);
+                    
+                    // Debug: log each category
+                    console.log('Added category:', category.name);
+                });
+            } catch (error) {
+                console.error('Error fetching categories and natures:', error);
+                // You might want to show an error message to the user here
+            }
+        }
+        
+        // Update natures dropdown based on selected category
+        function updateNaturesDropdown(categoryName) {
+            // Clear existing nature options except the first one
+            while (natureSelect.options.length > 1) {
+                natureSelect.remove(1);
+            }
+            
+            // If no category is selected, return early
+            if (!categoryName) return;
+            
+            // Find the selected category
+            const selectedCategory = categoriesData.find(category => category.name === categoryName);
+            
+            // Debug: log the selected category and its natures
+            console.log('Selected category:', selectedCategory);
+            
+            if (selectedCategory && selectedCategory.natures) {
+                // Add nature options for the selected category
+                selectedCategory.natures.forEach(nature => {
+                    // Debug: log each nature
+                    console.log('Adding nature:', nature);
+                    
+                    const option = document.createElement('option');
+                    option.value = nature;
+                    option.textContent = nature;
+                    natureSelect.appendChild(option);
+                });
+            }
+        }
+        
+        // Event listener for category dropdown change
+        categorySelect.addEventListener('change', function() {
+            updateNaturesDropdown(this.value);
+        });
+        
+        // Initialize the form by fetching categories and natures data
+        fetchCategoriesAndNatures();
+    });
+
+    // Buttons functionality for default report
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get the buttons
+        const exportCsvBtn = document.getElementById('generate-report-for-default');
+        const printReportBtn = document.getElementById('print-report-for-default');
+        
+        // Function to get all form values as an object
+        function getFormValues() {
+            return {
+                colony: document.querySelector('select[name="colony"]').value,
+                building: document.querySelector('select[name="building"]').value,
+                category: document.querySelector('select[name="category"]').value,
+                nature: document.querySelector('select[name="nature"]').value,
+                status: document.querySelector('select[name="status"]').value,
+                priority: document.querySelector('select[name="priority"]').value,
+                fromDate: document.getElementById('from-date').value,
+                toDate: document.getElementById('to-date').value
+            };
+        }
+        
+        // Event listener for Export to CSV button
+        exportCsvBtn.addEventListener('click', function(e) {
+            e.preventDefault(); // Prevent form submission
+            console.log('Exporting CSV...');
+            
+            // Get all form values
+            const formValues = getFormValues();
+            console.log('Form Values:', formValues);
+        });
+        
+        // Event listener for Print Report button
+        printReportBtn.addEventListener('click', function(e) {
+            e.preventDefault(); // Prevent form submission
+            console.log('Printing PDF...');
+            
+            // Get all form values
+            const formValues = getFormValues();
+            console.log('Form Values:', formValues);
+        });
+    });
+
+
+  </script>
+
+
+  <script> 
+// Function to fetch data from the backend server with applied filters
+async function fetchComplaintsData(filters = {}) {
+    try {
+        // Build query string from filters
+        const queryParams = new URLSearchParams();
+        for (const key in filters) {
+            if (filters[key]) {
+                queryParams.append(key, filters[key]);
+            }
+        }
+        const authToken = localStorage.getItem('authToken');
+        const response = await fetch(SERVER_URL+`/api/complaints-report?${queryParams}`, {
+                    method: 'GET',
+                    headers: { 'Authorization': `Bearer ${authToken}`,'Content-Type': 'application/json' }
+                  });
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        alert('Failed to fetch data from server. Please check if the server is running.');
+        return [];
+    }
+}
+
+// Function to get filter values from the form
+function getFilterValues() {
+    return {
+        colony: document.querySelector('select[name="colony"]').value,
+        building: document.querySelector('select[name="building"]').value,
+        category: document.querySelector('select[name="category"]').value,
+        nature: document.querySelector('select[name="nature"]').value,
+        status: document.querySelector('select[name="status"]').value,
+        priority: document.querySelector('select[name="priority"]').value,
+        fromDate: document.getElementById('from-date').value,
+        toDate: document.getElementById('to-date').value
+    };
+}
+
+// Function to generate table in a new tab
+function generateReportTable(data, filters) {
+    // Create a new window
+    const newWindow = window.open('', '_blank');
+    
+    if (!newWindow) {
+        alert('Please allow popups for this site to generate reports.');
+        return null;
+    }
+    
+    // Create HTML content for the new window
+    const htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Complaints Report</title>
+            <style>
+                body { 
+                    font-family: Arial, sans-serif; 
+                    margin: 20px; 
+                    font-size: 14px;
+                }
+                table { 
+                    width: 100%; 
+                    border-collapse: collapse; 
+                    margin-top: 20px;
+                    font-size: 12px;
+                }
+                th, td { 
+                    border: 1px solid #ddd; 
+                    padding: 6px; 
+                    text-align: left; 
+                }
+                th { 
+                    background-color: #f2f2f2; 
+                    position: relative;
+                }
+                .report-header { 
+                    margin-bottom: 20px; 
+                    padding-bottom: 10px;
+                    border-bottom: 2px solid #333;
+                }
+                .filter-info { 
+                    margin-bottom: 10px; 
+                    font-size: 14px; 
+                    padding: 10px;
+                    background-color: #f9f9f9;
+                    border-radius: 5px;
+                }
+                tr:nth-child(even) {
+                    background-color: #f9f9f9;
+                }
+                @media print {
+                    body { margin: 0; }
+                    .no-print { display: none; }
+                }
+                    
+                @media print {
+                body { margin: 0; }
+                .no-print { display: none; }
+
+                table {
+                    border-collapse: collapse;
+                    page-break-inside: auto;
+                }
+
+                th {
+                  background-color: rgba(0, 0, 0, 0.1);
+                }
+
+                tr, td, th {
+                    page-break-inside: avoid; /* Don’t cut rows */
+                    page-break-after: auto;
+                    line-height: 1.2em;        /* consistent row spacing */
+                    min-height: 1vh;           /* ensure at least 1vh */
+                }
+            }
+
+            </style>
+        </head>
+        <body>
+            <div class="report-header">
+                <h1>Complaints Report</h1>
+                <div class="filter-info">
+                    <strong>Generated on:</strong> ${new Date().toLocaleString()}<br>
+                    <strong>Filters applied:</strong> ${Object.entries(filters)
+                        .filter(([key, value]) => value)
+                        .map(([key, value]) => `${key}: ${value}`)
+                        .join(', ') || 'None'}
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Id</th>
+                        <th>Date</th>
+                        <th>Sub-div</th>
+                        <th>Nature</th>
+                        <th>N-Type</th>
+                        <th>Colony</th>
+                        <th>Building</th>
+                        <th>Launched By</th>
+                        <th>Skillman</th>
+                        <th>Customer</th>
+                        <th>P-Type</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${data.map((item, index) => `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${item.id || ''}</td>
+                            <td>${item.date ? new Date(item.date).toLocaleDateString() : ''}</td>
+                            <td>${item.subdiv || ''}</td>
+                            <td>${item.nature || ''}</td>
+                            <td>${item.ntype || ''}</td>
+                            <td>${item.colony || ''}</td>
+                            <td>${item.building || ''}</td>
+                            <td>${item.launchedBy || ''}</td>
+                            <td>${item.skillman || ''}</td>
+                            <td>${item.customer || ''}</td>
+                            <td>${item.ptype || ''}</td>
+                            <td>${item.status || ''}</td>
+                        </tr>
+                    `).join('')}
+                    ${data.length === 0 ? '<tr><td colspan="13" style="text-align: center;">No data found with the selected filters</td></tr>' : ''}
+                </tbody>
+            </table>
+            <div class="no-print" style="margin-top: 20px;">
+                <button onclick="window.print()" style="padding: 10px 15px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    Print Report
+                </button>
+            </div>
+        </body>
+        </html>
+    `;
+    
+    // Write the content to the new window
+    newWindow.document.write(htmlContent);
+    newWindow.document.close();
+    
+    // Return the new window for potential further operations
+    return newWindow;
+}
+
+
+// Function to handle print button click
+async function handlePrintReport() {
+    // Show loading indicator
+    const printButton = document.getElementById('print-report-for-default');
+    const originalText = printButton.innerHTML;
+    printButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating Report...';
+    printButton.disabled = true;
+    
+    try {
+        // Get filter values
+        const filters = getFilterValues();
+        
+        // Remove empty filters
+        const activeFilters = Object.fromEntries(
+            Object.entries(filters).filter(([_, value]) => value)
+        );
+        
+        // Fetch data with filters
+        const data = await fetchComplaintsData(activeFilters);
+        
+        // Generate table in new tab
+        const reportWindow = generateReportTable(data, activeFilters);
+        
+        if (reportWindow) {
+            // Wait for the window to load before printing
+            reportWindow.onload = function() {
+                reportWindow.focus();
+            };
+        }
+    } catch (error) {
+        console.error('Error generating report:', error);
+        alert('Failed to generate report. Please try again.');
+    } finally {
+        // Restore button state
+        printButton.innerHTML = originalText;
+        printButton.disabled = false;
+    }
+}
+
+// Function to export data as CSV
+async function exportToCSV() {
+    // Show loading indicator
+    const exportButton = document.getElementById('generate-report-for-default');
+    const originalText = exportButton.innerHTML;
+    exportButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Exporting...';
+    exportButton.disabled = true;
+    
+    try {
+        // Get filter values
+        const filters = getFilterValues();
+        
+        // Remove empty filters
+        const activeFilters = Object.fromEntries(
+            Object.entries(filters).filter(([_, value]) => value)
+        );
+        
+        // Fetch data with filters
+        const data = await fetchComplaintsData(activeFilters);
+        
+        // Define CSV headers
+        const headers = ['#', 'Id', 'Date', 'Sub-div', 'Nature', 'N-Type', 'Colony', 'Building', 
+                        'Launched By', 'Skillman', 'Customer', 'P-Type', 'Status'];
+        
+        // Convert data to CSV
+        let csvContent = headers.join(',') + '\n';
+        
+        data.forEach((item, index) => {
+            const row = [
+                index + 1,
+                item.id || '',
+                item.date ? new Date(item.date).toLocaleDateString() : '',
+                item.subdiv || '',
+                item.nature || '',
+                item.ntype || '',
+                item.colony || '',
+                item.building || '',
+                item.launchedBy || '',
+                item.skillman || '',
+                item.customer || '',
+                item.ptype || '',
+                item.status || ''
+            ];
+            
+            // Escape values that might contain commas
+            csvContent += row.map(value => `"${value.toString().replace(/"/g, '""')}"`).join(',') + '\n';
+        });
+        
+        // Generate filename with from_date and to_date
+        const fromDate = filters.fromDate || 'all';
+        const toDate = filters.toDate || 'all';
+        const filename = `complaints_${fromDate}_${toDate}.csv`;
+        
+        // Create download link
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.setAttribute('href', url);
+        link.setAttribute('download', filename);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } catch (error) {
+        console.error('Error exporting CSV:', error);
+        alert('Failed to export CSV. Please try again.');
+    } finally {
+        // Restore button state
+        exportButton.innerHTML = originalText;
+        exportButton.disabled = false;
+    }
+}
+
+// Initialize when document is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Add event listeners
+    document.getElementById('generate-report-for-default').addEventListener('click', function(e) {
+        e.preventDefault();
+        exportToCSV();
+    });
+    
+    document.getElementById('print-report-for-default').addEventListener('click', function(e) {
+        e.preventDefault();
+        handlePrintReport();
+    });
+});
+        
+
+  </script>
+
+
+  <script> 
+
+    // Javascript for Subdivision Complaint Section
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get the generate report button
+        const generateBtn = document.querySelector('#subdiv-report-form .btn-primary');
+        
+        // Add click event listener to the button
+        generateBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Get form values
+            const fromDate = document.getElementById('subdiv-from-date').value;
+            const toDate = document.getElementById('subdiv-to-date').value;
+            const category = document.getElementById('subdiv-category').value;
+            
+            // Validate dates
+            if (!fromDate || !toDate) {
+                console.error('Please select both from and to dates');
+                alert('Please select both from and to dates');
+                return;
+            }
+            
+            if (new Date(fromDate) > new Date(toDate)) {
+                console.error('From date cannot be after to date');
+                alert('From date cannot be after to date');
+                return;
+            }
+            
+            // Show loading state
+            const originalText = generateBtn.textContent;
+            generateBtn.textContent = 'Loading...';
+            generateBtn.disabled = true;
+            
+            // Prepare request data
+            const requestData = {
+                fromDate: fromDate,
+                toDate: toDate,
+                category: category
+            };
+            const authToken = localStorage.getItem('authToken');
+            // Fetch data from the server at port 3000
+            fetch(SERVER_URL+'/api/subdiv-report', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${authToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Make tables visible
+                document.querySelector('.subdivision-table').classList.remove('hidden');
+                
+                // Populate status table
+                populateStatusTable(data.statusData, category);
+                
+                // Populate priority table
+                populatePriorityTable(data.priorityData, category);
+            })
+            .catch(error => {
+                console.error('Error fetching report data:', error);
+                alert('Failed to fetch report data. Please check if the server is running on port 3000.');
+            })
+            .finally(() => {
+                // Reset button state
+                generateBtn.textContent = originalText;
+                generateBtn.disabled = false;
+            });
+        });
+        
+        // Function to populate status table
+        function populateStatusTable(data, selectedCategory) {
+            const tableBody = document.querySelector('#subdivision-status-table tbody');
+            tableBody.innerHTML = ''; // Clear existing content
+            
+            // Get all subdivision options from the dropdown (including '-')
+            const allSubdivisions = Array.from(document.getElementById('subdiv-category').options)
+                .map(option => option.value)
+                .filter(value => value !== ''); // Exclude only empty value (keep '-')
+            
+            // Check if data is available
+            if (!data || data.length === 0) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td colspan="6" style="text-align: center;">No data available for the selected criteria</td>`;
+                tableBody.appendChild(tr);
+                return;
+            }
+            
+            // Create a map of the data for easy lookup
+            const dataMap = {};
+            data.forEach(row => {
+                dataMap[row.subDivision] = row;
+            });
+            
+            // Initialize totals
+            let totalInprogress = 0;
+            let totalCompleted = 0;
+            let totalSna = 0;
+            let totalDeferred = 0;
+            let grandTotal = 0;
+            
+            // Determine which subdivisions to show
+            let subdivisionsToShow = allSubdivisions;
+            if (selectedCategory !== '') {
+                subdivisionsToShow = [selectedCategory];
+            }
+            
+            // Show all subdivisions, even if they have no data
+            subdivisionsToShow.forEach(subDiv => {
+                const rowData = dataMap[subDiv] || {
+                    subDivision: subDiv,
+                    inprogress: 0,
+                    completed: 0,
+                    sna: 0,
+                    deferred: 0,
+                    total: 0
+                };
+                
+                // Add to totals
+                totalInprogress += rowData.inprogress;
+                totalCompleted += rowData.completed;
+                totalSna += rowData.sna;
+                totalDeferred += rowData.deferred;
+                grandTotal += rowData.total;
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${rowData.subDivision}</td>
+                    <td>${rowData.inprogress}</td>
+                    <td>${rowData.completed}</td>
+                    <td>${rowData.sna}</td>
+                    <td>${rowData.deferred}</td>
+                    <td>${rowData.total}</td>
+                `;
+                tableBody.appendChild(tr);
+            });
+            
+            // Add total row
+            const totalRow = document.createElement('tr');
+            totalRow.style.fontWeight = 'bold';
+            totalRow.innerHTML = `
+                <td colspan="5" style="text-align: center;">Total</td>
+                <td>${grandTotal}</td>
+            `;
+            tableBody.appendChild(totalRow);
+        }
+        
+        // Function to populate priority table
+        function populatePriorityTable(data, selectedCategory) {
+            const tableBody = document.querySelector('#subdivision-priority-table tbody');
+            tableBody.innerHTML = ''; // Clear existing content
+            
+            // Get all subdivision options from the dropdown (including '-')
+            const allSubdivisions = Array.from(document.getElementById('subdiv-category').options)
+                .map(option => option.value)
+                .filter(value => value !== ''); // Exclude only empty value (keep '-')
+            
+            // Check if data is available
+            if (!data || data.length === 0) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td colspan="6" style="text-align: center;">No data available for the selected criteria</td>`;
+                tableBody.appendChild(tr);
+                return;
+            }
+            
+            // Create a map of the data for easy lookup
+            const dataMap = {};
+            data.forEach(row => {
+                dataMap[row.subDivision] = row;
+            });
+            
+            // Initialize totals
+            let totalImmediate = 0;
+            let totalUrgent = 0;
+            let totalRoutine = 0;
+            let totalDeferred = 0;
+            let grandTotal = 0;
+            
+            // Determine which subdivisions to show
+            let subdivisionsToShow = allSubdivisions;
+            if (selectedCategory !== '') {
+                subdivisionsToShow = [selectedCategory];
+            }
+            
+            // Show all subdivisions, even if they have no data
+            subdivisionsToShow.forEach(subDiv => {
+                const rowData = dataMap[subDiv] || {
+                    subDivision: subDiv,
+                    immediate: 0,
+                    urgent: 0,
+                    routine: 0,
+                    deferred: 0,
+                    total: 0
+                };
+                
+                // Add to totals
+                totalImmediate += rowData.immediate;
+                totalUrgent += rowData.urgent;
+                totalRoutine += rowData.routine;
+                totalDeferred += rowData.deferred;
+                grandTotal += rowData.total;
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${rowData.subDivision}</td>
+                    <td>${rowData.immediate}</td>
+                    <td>${rowData.urgent}</td>
+                    <td>${rowData.routine}</td>
+                    <td>${rowData.deferred}</td>
+                    <td>${rowData.total}</td>
+                `;
+                tableBody.appendChild(tr);
+            });
+            
+            // Add total row
+            const totalRow = document.createElement('tr');
+            totalRow.style.fontWeight = 'bold';
+            totalRow.innerHTML = `
+                <td colspan="5" style="text-align: center;">Total</td>
+                <td>${grandTotal}</td>
+            `;
+            tableBody.appendChild(totalRow);
+        }
+    });
+
+    // JS to print Subdivision Report
+    document.addEventListener('DOMContentLoaded', function() {
+        // Format date to dd-MMM-yyyy format
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            
+            const date = new Date(dateString);
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+                          'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            
+            const day = date.getDate();
+            const month = months[date.getMonth()];
+            const year = date.getFullYear();
+            
+            return `${day}-${month}-${year}`;
+        }
+
+        // Print functionality
+        document.getElementById('export-subdiv-report').addEventListener('click', function() {
+            // Get the date values
+            const fromDate = document.getElementById('subdiv-from-date').value;
+            const toDate = document.getElementById('subdiv-to-date').value;
+            
+            // Format the dates
+            const formattedFromDate = formatDate(fromDate);
+            const formattedToDate = formatDate(toDate);
+            
+            // Get the tables HTML
+            const statusTable = document.getElementById('subdivision-status-table').outerHTML;
+            const priorityTable = document.getElementById('subdivision-priority-table').outerHTML;
+            
+            // Create print overlay
+            const printOverlay = document.createElement('div');
+            printOverlay.id = 'print-overlay-subdiv';
+            printOverlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: white;
+                z-index: 10000;
+                padding: 30px;
+                overflow-y: auto;
+            `;
+            
+            if (formattedFromDate === formattedToDate) {
+              // Create print content
+              printOverlay.innerHTML = `
+                  <div class="print-header" style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #000; padding-bottom: 15px;">
+                      <h2 style="margin-bottom: 10px;">CMES (DP) HIT Taxila</h2>
+                      <h3 style="margin-bottom: 10px;">GE DP</h3>
+                      <h4 style="margin-bottom: 10px;">Sub Division Wise Report</h4>
+                      <p style="font-size: 18px;">${formattedFromDate}</p>
+                  </div>
+                  ${statusTable}
+                  ${priorityTable}
+              `;
+            } else {
+              printOverlay.innerHTML = `
+                  <div class="print-header" style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #000; padding-bottom: 15px;">
+                      <h2 style="margin-bottom: 10px;">CMES (DP) HIT Taxila</h2>
+                      <h3 style="margin-bottom: 10px;">GE DP</h3>
+                      <h4 style="margin-bottom: 10px;">Sub Division Wise Report</h4>
+                      <p style="font-size: 18px;">${formattedFromDate} To ${formattedToDate}</p>
+                  </div>
+                  ${statusTable}
+                  ${priorityTable}
+              `;
+            }
+            
+            // Add print styles
+            const printStyle = document.createElement('style');
+            printStyle.innerHTML = `
+                #print-overlay-subdiv table { 
+                    width: 100%; 
+                    border-collapse: collapse; 
+                    margin-bottom: 25px; 
+                    border: 2px solid #000; 
+                }
+                #print-overlay-subdiv th, #print-overlay-subdiv td { 
+                    border: 1px solid #000; 
+                    padding: 10px; 
+                    text-align: center; 
+                    color: black;
+                }
+                #print-overlay-subdiv th { 
+                    background-color: #f0f0f0; 
+                    font-weight: bold; 
+                }
+                @media print {
+                    body * {
+                        visibility: hidden;
+                    }
+                    #print-overlay-subdiv, #print-overlay-subdiv * {
+                        visibility: visible;
+                    }
+                    #print-overlay-subdiv {
+                        position: absolute;
+                        left: 0;
+                        top: 0;
+                        width: 100%;
+                        padding: 0;
+                        margin: 0;
+                    }
+                }
+            `;
+            
+            // Add to document
+            document.head.appendChild(printStyle);
+            document.body.appendChild(printOverlay);
+            
+            // Store original title
+            const originalTitle = document.title;
+            document.title = "Sub Division Wise Report";
+            
+            // Print the overlay
+            window.print();
+            
+            // Clean up after printing
+            const cleanup = function() {
+                document.head.removeChild(printStyle);
+                document.body.removeChild(printOverlay);
+                document.title = originalTitle;
+                window.onafterprint = null;
+            };
+            
+            // Set up afterprint event
+            window.onafterprint = cleanup;
+            
+            // Also set a timeout as a fallback in case onafterprint doesn't fire
+            setTimeout(cleanup, 100);
+        });
+    });
+
+  </script>
+
+
+  <script>
+
+    $('#yearPicker').datepicker({
+      format: "yyyy",
+      viewMode: "years", 
+      minViewMode: "years"
+    });
+
+  </script>
+
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const generateBtn = document.getElementById('generate-summary-report');
+        const yearPicker = document.getElementById('yearPicker');
+        const printBtn = document.getElementById('print-summary-report');
+        const summarySubtitle = document.querySelector('.summary-subtitle');
+
+        // Initialize year picker with current year
+        const currentYear = new Date().getFullYear();
+        yearPicker.value = currentYear;
+        updateSubtitle(currentYear);
+
+        // Generate report button click handler
+        generateBtn.addEventListener('click', function() {
+            const year = yearPicker.value.trim();
+            
+            if (!year || year.length !== 4 || isNaN(year)) {
+                alert('Please enter a valid year (YYYY)');
+                return;
+            }
+            
+            fetchSummaryReport(year);
+        });
+
+        // Print report button click handler
+        printBtn.addEventListener('click', function() {
+            window.print();
+        });
+
+        // Fetch data from backend
+        function fetchSummaryReport(year) {
+            // Show loading state
+            generateBtn.disabled = true;
+            generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+            const authToken = localStorage.getItem('authToken');
+            fetch(SERVER_URL+`/api/summary-report?year=${year}`, {
+                    method: 'GET',
+                    headers: { 'Authorization': `Bearer ${authToken}`,'Content-Type': 'application/json' }
+                  })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    populateTables(data);
+                    updateSubtitle(year);
+                    generateBtn.disabled = false;
+                    generateBtn.innerHTML = '<i class="fas fa-chart-pie"></i> Generate Report';
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                    alert('Failed to fetch data from server. Please check if the server is running on port 3000.');
+                    generateBtn.disabled = false;
+                    generateBtn.innerHTML = '<i class="fas fa-chart-pie"></i> Generate Report';
+                });
+        }
+
+        // Populate both tables with data using specific IDs
+        function populateTables(data) {
+            // Populate Nature table (using ID: nature-summary-table)
+            const natureTableBody = document.querySelector('#nature-summary-table tbody');
+            natureTableBody.innerHTML = '';
+            
+            if (data.nature && data.nature.length > 0) {
+                data.nature.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${item.nature || 'N/A'}</td>
+                        <td>${item.total || 0}</td>
+                        <td>${item.percentage ? item.percentage.toFixed(2) + '%' : '0%'}</td>
+                    `;
+                    natureTableBody.appendChild(row);
+                });
+            } else {
+                natureTableBody.innerHTML = '<tr><td colspan="3">No data available</td></tr>';
+            }
+
+            // Populate Colony table (using ID: colony-summary-table)
+            const colonyTableBody = document.querySelector('#colony-summary-table tbody');
+            colonyTableBody.innerHTML = '';
+            
+            if (data.colony && data.colony.length > 0) {
+                data.colony.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${item.colony || 'N/A'}</td>
+                        <td>${item.total || 0}</td>
+                        <td>${item.percentage ? item.percentage.toFixed(2) + '%' : '0%'}</td>
+                    `;
+                    colonyTableBody.appendChild(row);
+                });
+            } else {
+                colonyTableBody.innerHTML = '<tr><td colspan="3">No data available</td></tr>';
+            }
+        }
+
+        // Update subtitle with selected year
+        function updateSubtitle(year) {
+            summarySubtitle.textContent = `${year} Annual Performance Overview`;
+        }
+            summarySubtitle.textContent = `YYYY Annual Performance Overview`;
+
+        // Optional: Auto-generate report on page load for current year
+        // fetchSummaryReport(currentYear);
+    });
+    
+    
+    // Print functionality for summary report
+    document.getElementById('print-summary-report').addEventListener('click', function () {
+        console.log(">>> Print button clicked");
+
+        // Get year and tables
+        const year = document.getElementById('yearPicker').value || new Date().getFullYear();
+        const colonyTable = document.getElementById('colony-summary-table').outerHTML;
+        const natureTable = document.getElementById('nature-summary-table').outerHTML;
+
+        // Create print overlay
+        const printOverlay = document.createElement('div');
+        printOverlay.id = 'print-overlay';
+        printOverlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            z-index: 10000;
+            padding: 30px;
+            overflow-y: auto;
+        `;
+
+        // Create print content
+        printOverlay.innerHTML = `
+            <div class="print-header" style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #000; padding-bottom: 15px;">
+                <h2 style="margin-bottom: 10px;">CMES (DP) HIT Taxila</h2>
+                <h3 style="margin-bottom: 10px;">GE DP</h3>
+                <h4 style="margin-bottom: 10px;">Summary Wise Report</h4>
+                <p style="font-size: 18px;">Year ${year}</p>
+            </div>
+            <div class="tables-container" style="display: flex; justify-content: space-between; gap: 30px;">
+                <div class="table-wrapper" style="width: 48%;">${colonyTable}</div>
+                <div class="table-wrapper" style="width: 48%;">${natureTable}</div>
+            </div>
+        `;
+
+        // Add print styles
+        const printStyle = document.createElement('style');
+        printStyle.innerHTML = `
+            #print-overlay table { width: 100%; border-collapse: collapse; margin-bottom: 25px; border: 2px solid #000; }
+            #print-overlay th, #print-overlay td { border: 1px solid #000; padding: 10px; text-align: center; }
+            #print-overlay th { background-color: #f0f0f0; font-weight: bold; }
+            @media print {
+                body * {
+                    visibility: hidden;
+                }
+                #print-overlay, #print-overlay * {
+                    visibility: visible;
+                }
+                #print-overlay {
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                    width: 100%;
+                    padding: 0;
+                    margin: 0;
+                }
+            }
+        `;
+
+        // Add to document
+        document.head.appendChild(printStyle);
+        document.body.appendChild(printOverlay);
+
+        // Store original title
+        const originalTitle = document.title;
+        document.title = "Summary Wise Report - " + year;
+
+
+        // Clean up after printing
+        const cleanup = function() {
+            document.head.removeChild(printStyle);
+            document.body.removeChild(printOverlay);
+            document.title = originalTitle;
+            window.onafterprint = null;
+        };
+
+        // Set up afterprint event
+        window.onafterprint = cleanup;
+
+        // Also set a timeout as a fallback in case onafterprint doesn't fire
+        setTimeout(cleanup, 1000);
+    });
+
+  </script>
+  <script src="chat-bot.js"></script>
+</body>
+</html>

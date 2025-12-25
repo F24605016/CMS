@@ -1,0 +1,10 @@
+<svg width="100%" height="100%" viewBox="0 0 800 800" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="
+    M700,0
+    C767,100 767,300 700,400
+    C633,500 633,700 700,800
+    L0,800
+    L0,0
+    Z
+  " fill="#881c1c"/>
+</svg>

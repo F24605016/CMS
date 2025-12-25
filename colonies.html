@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script src="server-url.js"></script>
+  <script>
+    const page = 'colonies';
+  </script>
+  <script src="verification.js"></script>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="logo.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MES CMS - Colonies</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    
+
+    .users-section-container {
+      display: grid;
+      grid-template-columns: 250px 1fr;
+      gap: 30px;
+      min-height: 600px;
+    }
+    
+    .users-sidebar {
+      background: white;
+      border-radius: 8px;
+      padding: 25px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .users-option {
+      padding: 18px 20px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #f8f9fa;
+    }
+    
+    .users-option:hover {
+      background: rgba(0,0,0,0.05);
+    }
+    
+    .users-option.active {
+      background: rgba(0,0,0,0.1);
+      color: rgb(136, 28, 28);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .users-option i {
+      font-size: 20px;
+    }
+    
+    .users-content {
+      background: white;
+      border-radius: 8px;
+      padding: 30px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .users-panel {
+      display: none;
+    }
+    
+    .users-panel.active {
+      display: block;
+      animation: fadeIn 0.4s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+    }
+    
+    .panel-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: rgb(136, 28, 28);
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #212529;
+    }
+    
+    .form-control {
+      width: 100%;
+      padding: 14px 18px;
+      border-radius: 8px;
+      border: 1px solid rgba(0,0,0,0.1);
+      background: #f8f9fa;
+      font-size: 16px;
+      transition: all 0.3s;
+    }
+    
+    .form-control:focus {
+      outline: none;
+      border-color: rgb(136, 28, 28);
+      box-shadow: 0 0 0 3px rgba(136, 28, 28, 0.2);
+    }
+    
+    .btn {
+      padding: 14px 28px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .btn-primary {
+      background: rgb(136, 28, 28);
+      color: white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .btn-primary:hover {
+      background: #a52a2a;
+      transform: translateY(-3px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    
+    .btn-danger {
+      background: #f44336;
+      color: white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .btn-danger:hover {
+      background: #d32f2f;
+      transform: translateY(-3px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    
+    .search-box {
+      display: flex;
+      margin-bottom: 30px;
+      height: 40px;
+    }
+    
+    .search-box input {
+      flex: 1;
+      border-radius: 8px 0 0 8px;
+    }
+    
+    .search-box button {
+      border-radius: 0 8px 8px 0;
+      width: 120px;
+      text-align: center;
+    }
+    
+    .action-btn {
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgb(136, 28, 28);
+      color: white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .action-btn:hover {
+      background: #a52a2a;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    
+    .users-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    
+    .users-table th {
+      background: rgba(136, 28, 28, 0.1);
+      color: rgb(136, 28, 28);
+      font-weight: 700;
+      padding: 16px;
+      text-align: left;
+    }
+    
+    .users-table td {
+      padding: 8px 16px;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      border-left: 1px solid #f3f3f3; /* vertical line color */
+      height: 25px;
+    }
+    
+    .users-table tr:hover {
+      background: rgba(136, 28, 28, 0.05);
+    }
+    
+    .edit-btn {
+      padding: 8px 15px;
+      border-radius: 8px;
+      background: rgba(136, 28, 28, 0.1);
+      color: rgb(136, 28, 28);
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-weight: 600;
+    }
+    
+    .edit-btn:hover {
+      background: rgb(136, 28, 28);
+      color: white;
+    }
+    
+    .add-form {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 25px;
+      margin-bottom: 30px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      display: none;
+    }
+    
+    .add-form.active {
+      display: block;
+      animation: fadeIn 0.4s ease;
+    }
+    
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .form-actions {
+      display: flex;
+      gap: 15px;
+      margin-top: 20px;
+    }
+    
+    .edit-form-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .edit-form-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: rgb(136, 28, 28);
+    }
+    
+    .close-edit-form {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #6c757d;
+      transition: color 0.3s;
+    }
+    
+    .close-edit-form:hover {
+      color: #f44336;
+    }
+    
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 15px 25px;
+      border-radius: 8px;
+      color: white;
+      font-weight: 600;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transform: translateX(110%);
+      transition: transform 0.3s ease;
+    }
+    
+    .notification.show {
+      transform: translateX(0);
+    }
+    
+    .notification.success {
+      background: #4caf50;
+    }
+    
+    .notification.error {
+      background: #f44336;
+    }
+    
+    .notification.warning {
+      background: #ff9800;
+    }
+    
+    .notification i {
+      font-size: 20px;
+    }
+    
+    .no-data {
+      text-align: center;
+      padding: 40px;
+      color: #6c757d;
+      font-size: 18px;
+    }
+    
+    .no-data i {
+      font-size: 48px;
+      margin-bottom: 15px;
+      color: #ced4da;
+    }
+
+    #all-users-option, #skillman-option {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    #add-new-colony {
+      margin-bottom: 20px;
+      color:rgb(136, 28, 28);
+    }
+    
+    @media (max-width: 992px) {
+      .users-section-container {
+        grid-template-columns: 1fr;
+      }
+      
+      .users-sidebar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      
+      .users-option {
+        margin-bottom: 0;
+        flex: 1;
+        min-width: 150px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .brand {
+        flex-direction: column;
+        text-align: center;
+      }
+      
+      
+      .user-info {
+        text-align: center;
+        margin: 10px 0;
+      }
+      
+      .users-option {
+        padding: 12px 15px;
+        font-size: 14px;
+      }
+      
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    
+@media (max-width: 500px) {
+  .logo {
+    flex-direction: column;
+  }
+
+  .panel-title {
+    font-size: medium;
+  }
+}
+  </style>
+  
+  <link rel="stylesheet" href="common-styles.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Notification -->
+  <div class="notification" id="notification">
+      <i class="fas fa-check-circle"></i>
+      <span id="notification-text">Operation completed successfully</span>
+  </div>
+  
+  <header>
+    <div class="logo">
+      <div class="logo-image">
+        <img src="logo.jpg" alt="logo image">
+      </div>
+      <h2>MES CMS</h2>
+    </div>
+
+    <div class="user">
+      <h2 id="user-id">Unknown</h2>
+      <button class="logout-btn" id="logout-btn">Logout</button>
+      <div class="hamburger">
+        <i class="fas fa-bars" id="hamburger-btn"></i>
+        <div class="navigation-block">
+          <a href="dashboard" class="navi-block-items">Dashboard</a>
+          <a href="complaints" class="navi-block-items">Complaints</a>
+          <div href="users" class="navi-block-items active">Users</div>
+          <a href="reporting" class="navi-block-items">Reporting</a>
+          <a href="admin" class="navi-block-items">Admin</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="nav-bar">
+    <div class="nav-container">
+      <a href="dashboard" class="nav-item" onclick="showNavTab('dashboard')">
+        <i class="fas fa-chart-line"></i>
+        Dashboard
+      </a>
+      <a href="complaints" class="nav-item" onclick="showNavTab('complaints')">
+        <i class="fas fa-ticket-alt"></i>
+        Complaints
+      </a>
+      <div class="nav-item active" id="active">
+        <i class="fas fa-users"></i>
+        Users
+      </div>
+      <a href="reporting" class="nav-item" onclick="showNavTab('reporting')">
+        <i class="fas fa-file-alt"></i>
+        Reporting
+      </a>
+      <a href="admin" class="nav-item">
+        <i class="fas fa-user-tie"></i>
+        Admin
+      </a>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- Users Section -->
+    <div class="users-section-container">
+      <div class="users-sidebar">
+        <a href="all-users.html" class="users-option" data-panel="all-users-panel" id="all-users-option">
+          <i class="fas fa-users"></i>
+          All Users
+        </a>
+        <div class="users-option active" data-panel="colonies-panel">
+          <i class="fas fa-building"></i>
+          Colonies
+        </div>
+        <a href="skillman.html" class="users-option" data-panel="skillman-panel" id="skillman-option">
+          <i class="fas fa-tools"></i>
+          Skill Man
+        </a>
+      </div>
+      
+      <div class="users-content">
+        <!-- Colonies Panel -->
+        <div id="colonies-panel" class="users-panel active">
+          <div class="panel-header">
+            <h2 class="panel-title">Colonies</h2>
+            <button class="action-btn" id="show-colony-form-btn">
+              <i class="fas fa-plus"></i>
+              Add Colony
+            </button>
+          </div>
+          
+          <!-- Add Colony Form -->
+          <div class="add-form" id="add-colony-form">
+            <h3 id="add-new-colony">Add New Colony</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="colony-name">Colony Name</label>
+                <input type="text" id="colony-name" class="form-control" placeholder="Enter colony name" required>
+              </div>
+              <div class="form-group">
+                <label for="colony-id">Colony Number</label>
+                <input type="text" id="colony-id" class="form-control" placeholder="Enter colony number" required>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button class="btn btn-primary" id="add-colony-btn">
+                <i class="fas fa-building"></i>
+                Add Colony
+              </button>
+              <button type="button" class="btn btn-danger" id="cancel-add-colony">
+                <i class="fas fa-times"></i>
+                Cancel
+              </button>
+            </div>
+          </div>
+          
+          <!-- Edit Colony Form -->
+          <div class="add-form" id="edit-colony-form">
+            <div class="edit-form-header">
+              <h3 class="edit-form-title">Edit Colony</h3>
+              <button class="close-edit-form" id="close-edit-colony-form">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+            <input type="hidden" id="edit-colony-id">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="edit-colony-name">Colony Name</label>
+                <input type="text" id="edit-colony-name" class="form-control" required>
+              </div>
+              <div class="form-group">
+                <label for="edit-colony-number">Colony Number</label>
+                <input type="text" id="edit-colony-number" class="form-control" required>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button class="btn btn-primary" id="update-colony-btn">
+                <i class="fas fa-save"></i>
+                Update Colony
+              </button>
+            </div>
+          </div>
+          
+          <!-- Search Box -->
+          <div class="search-box">
+            <input type="text" id="colony-search" class="form-control" placeholder="Search by name or number">
+            <button class="btn btn-primary" id="search-colonies-btn">
+              <i class="fas fa-search"></i>
+              Search
+            </button>
+          </div>
+          
+          <!-- Colonies Table -->
+          <div class="table-container">
+            <table class="users-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Name</th>
+                  <th>Colony Number</th>
+                  <th>Number of Buildings</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="colonies-table-body">
+                <!-- Colonies will be generated here -->
+              </tbody>
+            </table>
+          </div>
+          <div id="colonies-no-data" class="no-data" style="display: none;">
+            <i class="fas fa-building"></i>
+            <p>No colonies found</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const hamburgerBtn = document.getElementById("hamburger-btn");
+  const navBlock = document.querySelector(".navigation-block");
+
+  // Toggle navigation on hamburger click
+  hamburgerBtn.addEventListener("click", (e) => {
+    e.stopPropagation(); // Prevent click from bubbling to document
+    navBlock.classList.toggle("active");
+  });
+
+  // Close navigation when clicking outside
+  document.addEventListener("click", (e) => {
+    // Check if click is outside the navigation block and hamburger button
+    if (!navBlock.contains(e.target) && e.target !== hamburgerBtn) {
+      navBlock.classList.remove("active");
+    }
+  });
+
+  // Optional: Prevent clicks inside navigation from closing it
+  navBlock.addEventListener("click", (e) => {
+    e.stopPropagation();
+  });
+</script>
+
+
+<script>
+// Add this script to control navigation visibility based on backend permissions
+document.addEventListener('DOMContentLoaded', async function() {
+    try {
+        const authToken = localStorage.getItem('authToken');
+        if (!authToken) {
+            console.error('No authentication token found');
+            return;
+        }
+
+        // Fetch allowed pages from backend
+        const response = await fetch(`${SERVER_URL}/api/allowed-pages`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${authToken}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch allowed pages');
+        }
+
+        const data = await response.json();
+        
+        if (data.success) {
+            // Process navigation items based on allowed pages
+            processNavigationItems(data.allowedPages, data.navigationItems);
+        }
+    } catch (error) {
+        console.error('Error fetching allowed pages:', error);
+        // In case of error, you might want to show a default set of navigation items
+        // or handle it according to your application's requirements
+    }
+});
+
+function processNavigationItems(allowedPages, navigationItems) {
+    // Process header navigation items
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+        const href = item.getAttribute('href');
+        if (href) {
+            const pageName = href; // Get the page name without extension
+            
+            // Check if this category has an accessible page
+            if (navigationItems[pageName]) {
+                // Set the href to the first accessible page in this category
+                item.setAttribute('href', `${navigationItems[pageName]}.html`);
+                item.style.display = 'flex';
+            } else {
+                item.style.display = 'none';
+            }
+        }
+    });
+    
+    // Process hamburger menu navigation items
+    const hamburgerItems = document.querySelectorAll('.navi-block-items');
+    hamburgerItems.forEach(item => {
+        const href = item.getAttribute('href');
+        if (href) {
+            const pageName = href; // Get the page name without extension
+            
+            // Check if this category has an accessible page
+            if (navigationItems[pageName]) {
+                // Set the href to the first accessible page in this category
+                item.setAttribute('href', `${navigationItems[pageName]}.html`);
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        }
+    });
+    
+    // Process sidebar navigation items (use the allowedPages array)
+    const sidebarItems = document.querySelectorAll('.users-option');
+    sidebarItems.forEach(item => {
+        const href = item.getAttribute('href');
+        if (href) {
+            const pageName = getPageNameFromHref(href);
+            if (allowedPages.includes(pageName) || item.classList.contains('active')) {
+                item.style.display = 'flex';
+            } else {
+                item.style.display = 'none';
+            }
+        }
+    });
+}
+
+function getPageNameFromHref(href) {
+    if (!href) return '';
+    
+    // Extract page name from href (e.g., "dashboard.html" -> "dashboard")
+    const pageWithExtension = href.split('/').pop();
+    return pageWithExtension.split('.')[0];
+}
+</script>
+
+
+  <script>
+    
+    let USER_ID = localStorage.getItem('UserId');
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById("user-id").textContent = USER_ID;
+      localStorage.removeItem('UserId');
+    });
+    // Notification system
+    function showNotification(message, type) {
+      const notification = document.getElementById('notification');
+      const text = document.getElementById('notification-text');
+      
+      text.textContent = message;
+      notification.className = 'notification ' + type;
+      notification.classList.add('show');
+      
+      setTimeout(() => {
+        notification.classList.remove('show');
+      }, 3000);
+    }
+
+    
+  document.addEventListener('DOMContentLoaded', function() {
+
+    // DOM Elements
+    const logoutBtn = document.getElementById('logout-btn');
+    
+    logoutBtn.addEventListener('click', async () => {
+      try {
+        const authToken = localStorage.getItem('authToken');
+        const response = await fetch(SERVER_URL+'/logout', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${authToken}`,'Content-Type': 'application/json' }
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          console.log('Logout success:', data);
+          //alert('Logged out successfully!');
+          // 👇 you can add more procedural lines here
+          // e.g., redirect:
+          showNotification('Logging out');
+          localStorage.removeItem('authToken');
+          setTimeout(() => {
+            window.location.href = 'login.html';
+          }, 1000); // 1000 ms = 1 sec
+        } else {
+          console.error('Logout failed:', data);
+          alert('Logout failed!');
+        }
+
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Something went wrong!');
+      }
+    });
+    
+  });
+
+    
+    // Global variable to store colonies data
+    let coloniesData = [];
+
+    // Function to handle API errors
+    function handleApiError(error) {
+      console.error('API Error:', error);
+      if (error.message === 'Failed to fetch') {
+        showNotification('Server error: Could not connect to backend', 'error');
+      } else {
+        showNotification(error.message || 'An error occurred', 'error');
+      }
+    }
+
+    // Load colonies from backend
+    async function loadColonies() {
+      try {
+        const authToken = localStorage.getItem('authToken');
+        const response = await fetch(`${SERVER_URL}/getColonies`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`
+          }
+        });
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Failed to load colonies');
+        }
+        
+        const colonies = await response.json();
+        return colonies;
+      } catch (error) {
+        handleApiError(error);
+        return [];
+      }
+    }
+
+    // Add new colony
+    async function addColony(colonyData) {
+      try {
+        const authToken = localStorage.getItem('authToken');
+        const response = await fetch(`${SERVER_URL}/addColony`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`
+          },
+          body: JSON.stringify(colonyData)
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Failed to add colony');
+        }
+        
+        const result = await response.json();
+        showNotification(result.message || 'Colony added successfully!', 'success');
+        return result;
+      } catch (error) {
+        handleApiError(error);
+        return null;
+      }
+    }
+
+    // Update colony
+    async function updateColony(previousData, newData) {
+      try {
+        const authToken = localStorage.getItem('authToken');
+        const response = await fetch(`${SERVER_URL}/editColony`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`
+          },
+          body: JSON.stringify({
+            previous: previousData,
+            new: newData
+          })
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Failed to update colony');
+        }
+        
+        const result = await response.json();
+        showNotification(result.message || 'Colony updated successfully!', 'success');
+        return result;
+      } catch (error) {
+        handleApiError(error);
+        return null;
+      }
+    }
+
+    // Function to generate colonies table rows
+    function generateColoniesTable(colonies) {
+      if (colonies.length === 0) {
+        document.getElementById('colonies-no-data').style.display = 'block';
+        return '';
+      }
+      
+      document.getElementById('colonies-no-data').style.display = 'none';
+      return colonies.map((colony, index) => `
+        <tr>
+          <td>${index + 1}</td>
+          <td>${colony.name}</td>
+          <td>${colony.colonyNumber}</td>
+          <td>${colony.buildings || 0}</td>
+          <td>
+            <button class="edit-btn" data-id="${colony.colonyNumber}" data-name="${colony.name}">
+              <i class="fas fa-edit"></i>
+              Edit
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // Render colonies table
+    function renderColoniesTable(colonies) {
+      const tableBody = document.getElementById('colonies-table-body');
+      if (tableBody) {
+        tableBody.innerHTML = generateColoniesTable(colonies);
+      }
+    }
+
+    // Load and display colonies
+    async function loadAndRenderColonies() {
+      try {
+        const colonies = await loadColonies();
+        coloniesData = colonies;
+        renderColoniesTable(colonies);
+      } catch (error) {
+        console.error('Failed to load colonies:', error);
+      }
+    }
+
+    // Navigation tab functionality
+    function showNavTab(tabName) {
+      // Remove active class from all nav items
+      document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.remove('active');
+      });
+      
+      // Add active class to clicked nav item
+      const activeTab = document.querySelector(`.nav-item[onclick="showNavTab('${tabName}')"]`);
+      if (activeTab) {
+        activeTab.classList.add('active');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize colonies content
+      loadAndRenderColonies();
+      
+      // Logout button functionality
+      document.querySelector('.logout-btn').addEventListener('click', function() {
+        showNotification('Logging out... Redirecting to login page.', 'success');
+        setTimeout(() => {
+          alert('You have been logged out');
+        }, 1500);
+      });
+      
+      // Users sidebar navigation
+      const usersOptions = document.querySelectorAll('.users-option');
+      const usersPanels = document.querySelectorAll('.users-panel');
+      
+      usersOptions.forEach(option => {
+        option.addEventListener('click', function() {
+          // Remove active class from all options and panels
+          usersOptions.forEach(opt => opt.classList.remove('active'));
+          usersPanels.forEach(panel => panel.classList.remove('active'));
+          
+          // Add active class to clicked option
+          this.classList.add('active');
+          
+          // Show corresponding panel
+          const panelId = this.getAttribute('data-panel');
+          document.getElementById(panelId).classList.add('active');
+        });
+      });
+      
+      // Toggle forms for Colonies
+      document.getElementById('show-colony-form-btn').addEventListener('click', function() {
+        const form = document.getElementById('add-colony-form');
+        form.classList.toggle('active');
+        document.getElementById('edit-colony-form').classList.remove('active');
+        
+        // Reset form
+        document.getElementById('colony-name').value = '';
+        document.getElementById('colony-id').value = '';
+      });
+      
+      document.getElementById('cancel-add-colony').addEventListener('click', function() {
+        document.getElementById('add-colony-form').classList.remove('active');
+      });
+      
+      // Close edit forms
+      document.getElementById('close-edit-colony-form').addEventListener('click', function() {
+        document.getElementById('edit-colony-form').classList.remove('active');
+      });
+      
+      // Get the input and button elements
+const colonySearchInput = document.getElementById('colony-search');
+const searchButton = document.getElementById('search-colonies-btn');
+
+// Listen for keydown events on the document
+document.addEventListener('keydown', function(event) {
+  // Check if Enter is pressed AND the input is currently focused
+  if (event.key === 'Enter' && document.activeElement === colonySearchInput) {
+    event.preventDefault();  // prevent default form submission if any
+    searchButton.click();    // trigger the search button
+  }
+});
+
+      // Search functionality
+      document.getElementById('search-colonies-btn').addEventListener('click', function() {
+        const term = document.getElementById('colony-search').value.toLowerCase();
+        const filteredColonies = coloniesData.filter(colony => 
+          colony.name.toLowerCase().includes(term) ||
+          colony.colonyNumber.toLowerCase().includes(term)
+        );
+        renderColoniesTable(filteredColonies);
+      });
+      
+      // Add new colony
+      document.getElementById('add-colony-btn').addEventListener('click', async function() {
+        const name = document.getElementById('colony-name').value;
+        const colonyNumber = document.getElementById('colony-id').value;
+        
+        if (!name || !colonyNumber) {
+          showNotification('Please fill all fields', 'error');
+          return;
+        }
+        
+        const colonyData = { name, colonyNumber };
+        const result = await addColony(colonyData);
+        if (result) {
+          // Reload colonies if successful
+          loadAndRenderColonies();
+          document.getElementById('add-colony-form').classList.remove('active');
+        }
+      });
+      
+      // Edit button functionality
+      document.addEventListener('click', function(e) {
+        if (e.target.closest('.edit-btn')) {
+          const button = e.target.closest('.edit-btn');
+          const colonyNumber = button.dataset.id;
+          const colonyName = button.dataset.name;
+          
+          // Find the colony in our data
+          const colony = coloniesData.find(c => c.colonyNumber === colonyNumber);
+          
+          if (colony) {
+            // Set form values
+            document.getElementById('edit-colony-id').value = colonyNumber;
+            document.getElementById('edit-colony-name').value = colonyName;
+            document.getElementById('edit-colony-number').value = colonyNumber;
+            
+            // Store previous data on the form
+            document.getElementById('edit-colony-form').dataset.previousName = colonyName;
+            document.getElementById('edit-colony-form').dataset.previousNumber = colonyNumber;
+            
+            // Show edit form
+            document.getElementById('edit-colony-form').classList.add('active');
+            document.getElementById('add-colony-form').classList.remove('active');
+          }
+        }
+      });
+      
+      // Update colony
+      document.getElementById('update-colony-btn').addEventListener('click', async function() {
+        const previousName = document.getElementById('edit-colony-form').dataset.previousName;
+        const previousNumber = document.getElementById('edit-colony-form').dataset.previousNumber;
+        const newName = document.getElementById('edit-colony-name').value;
+        const newNumber = document.getElementById('edit-colony-number').value;
+        
+        if (!newName || !newNumber) {
+          showNotification('Please fill all fields', 'error');
+          return;
+        }
+        
+        const previousData = { name: previousName, colonyNumber: previousNumber };
+        const newData = { name: newName, colonyNumber: newNumber };
+        
+        const result = await updateColony(previousData, newData);
+        if (result) {
+          // Reload colonies if successful
+          loadAndRenderColonies();
+          document.getElementById('edit-colony-form').classList.remove('active');
+        }
+      });
+    });
+  </script>
+  <script src="chat-bot.js"></script>
+</body>
+</html>

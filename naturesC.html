@@ -1,0 +1,2449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="server-url.js"></script>
+  <script>
+    const page = 'natures';
+  </script>
+  <script src="verification.js"></script>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/png" href="logo.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MES CMS - Natures Management</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+      scrollbar-width: thin;
+      scroll-behavior: smooth;
+      scrollbar-color: rgb(138, 119, 119) transparent;
+    }
+    /*////////////updated */
+    :root {
+      --primary: #881c1c;
+      --primary-dark: #6e1515;
+      --secondary: #8c2f2f;
+      --accent: #4caf50;
+      --warning: #ff9800;
+      --danger: #f44336;
+      --light: #f8f9fa;
+      --dark: #212529;
+      --gray: #6c757d;
+      --card-bg: rgba(255, 255, 255, 0.95);
+      --nav-bg: rgba(255, 255, 255, 0.85);
+      --nav-active: rgba(136, 28, 28, 0.15);
+      --nav-hover: rgba(136, 28, 28, 0.08);
+      --success: #4caf50;
+      --border-radius: 10px;
+      --box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    }
+    
+    body {
+      display: none;
+      background-color: #eef2f5;
+      padding-bottom: 40px;
+    }
+    
+    /* Header Styles from Code 1 */
+    header {
+      width: 100vw;
+      height: 60px;
+      background-color: rgb(136, 28, 28);
+      margin-top: 36px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 25px;
+      margin-bottom: 30px;
+      position: relative;
+      z-index: 10;
+      margin-bottom: 30px;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 2;
+    }
+
+    .logo .logo-image {
+      width: 130px;
+      height: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 5px;
+      background-color: #f4f4f4;
+      border-radius: 50%;
+    }
+
+    .logo .logo-image img {
+      border-radius: 50%;
+      width: 100%;
+      height: auto;
+    }
+
+    .logo h2 {
+      color: white;
+      font-size: 20px;
+      white-space: nowrap;
+    }
+
+    .user {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      color: white;
+    }
+
+    .user h2 {
+      font-size: 16px;
+      white-space: nowrap;
+    }
+
+    .logout-btn {
+      background-color: white;
+      color: rgb(136, 28, 28);
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.3s;
+      border: 1px solid white;
+    }
+
+    .logout-btn:hover {
+      background-color: #ddd;
+    }
+
+    .logout-btn:active {
+      border: 1px solid white;
+      background-color: rgb(136, 28, 28);
+      color: white;
+    }
+
+    
+    .user {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      color: white;
+    }
+    
+    .user h3 {
+      font-weight: 500;
+    }
+    
+    .logout-btn {
+      background: white;
+      color: var(--primary);
+      border: none;
+      padding: 8px 15px;
+      border-radius: 5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      border: 1px solid white;
+    }
+    
+    .logout-btn:hover {
+      background: #f0f0f0;
+    }
+
+    .logout-btn:active {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .nav-container {
+      margin-top: 60px;
+      background-color: var(--primary);
+      padding: 0 30px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      border: 1px solid white;
+    }
+    
+    .nav-menu {
+      display: flex;
+      list-style: none;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .nav-item {
+      padding: 15px 20px;
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      position: relative;
+    }
+    
+    .nav-item:hover {
+      background-color: rgba(0,0,0,0.1);
+    }
+    
+    .nav-item.active {
+      background-color: rgba(0,0,0,0.2);
+    }
+    
+    .nav-item.active::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60%;
+      height: 3px;
+      background-color: white;
+    }
+    
+    .main-container {
+      width: 95%;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+    
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+    }
+    
+    .dashboard-title {
+      font-size: 1.8rem;
+      color: var(--primary);
+      font-weight: 700;
+    }
+    
+    .dashboard-content {
+      display: grid;
+      grid-template-columns: 250px 1fr;
+      gap: 25px;
+    }
+    
+    .sidebar {
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      padding: 20px;
+      box-shadow: var(--box-shadow);
+    }
+    
+    .sidebar-option {
+      padding: 15px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(248, 249, 250, 0.7);
+    }
+    
+    .sidebar-option:hover {
+      background: var(--nav-hover);
+    }
+    
+    .sidebar-option.active {
+      background: var(--nav-active);
+      color: var(--primary);
+      box-shadow: 0 5px 15px rgba(136, 28, 28, 0.1);
+    }
+    
+    .content-panel {
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      padding: 25px;
+      box-shadow: var(--box-shadow);
+    }
+    
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+    }
+    
+    .panel-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    
+    .btn {
+      padding: 12px 24px;
+      border-radius: var(--border-radius);
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      border: none;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 6px 18px rgba(136, 28, 28, 0.2);
+    }
+    
+    .btn-primary:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 22px rgba(136, 28, 28, 0.3);
+    }
+    
+    .table-container {
+      overflow-x: auto;
+      border-radius: var(--border-radius);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    
+    .nature-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 800px;
+    }
+    
+    .nature-table th {
+      background: rgba(136, 28, 28, 0.1);
+      color: var(--primary);
+      font-weight: 600;
+      text-align: center;
+    }
+    
+    .nature-table td {
+      padding: 12px 15px;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      height: 60px;
+      border-left: 1px solid #f3f3f3; /* vertical line color */
+      vertical-align: top;
+    }
+    
+    .nature-table tr:hover {
+      background: rgba(136, 28, 28, 0.03);
+    }
+
+    tr:nth-child(even) {
+      background-color: rgba(0, 0, 0, 0.02); /* very light black, 5% opacity */
+    }
+    
+    .tag-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    
+    .tag {
+      background: rgba(136, 28, 28, 0.1);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      display: inline-flex;
+      align-items: center;
+    }
+    
+    .tag .remove-btn {
+      background: none;
+      border: none;
+      color: var(--danger);
+      cursor: pointer;
+      margin-left: 8px;
+      font-weight: bold;
+      padding: 0;
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .action-btn {
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .action-btn.add {
+      background: var(--accent);
+      color: white;
+    }
+    
+    .action-btn.edit {
+      background: var(--warning);
+      color: white;
+    }
+    
+    .action-btn.delete {
+      background: var(--danger);
+      color: white;
+    }
+    
+    .pagination-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 25px;
+      padding: 15px 0;
+      border-top: 1px solid rgba(0,0,0,0.08);
+    }
+    
+    .pagination-info {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .page-size select {
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid #ddd;
+      background: white;
+    }
+    
+    .pagination-buttons {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .page-btn {
+      padding: 8px 15px;
+      border-radius: 6px;
+      border: 1px solid #ddd;
+      background: white;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .page-btn:hover {
+      background: rgba(136, 28, 28, 0.1);
+    }
+    
+    .page-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+    
+    .modal-content {
+      background: white;
+      border-radius: var(--border-radius);
+      padding: 30px;
+      width: 90%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+      transform: translateY(20px);
+      transition: transform 0.3s ease;
+    }
+    
+    .modal-overlay.active .modal-content {
+      transform: translateY(0);
+    }
+    
+    .modal-header {
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .modal-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    
+    .modal-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #777;
+      transition: color 0.2s;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+    
+    .modal-close:hover {
+      background: #f5f5f5;
+      color: var(--danger);
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--dark);
+    }
+    
+    .required::after {
+      content: " *";
+      color: var(--danger);
+    }
+    
+    .form-control {
+      width: 100%;
+      padding: 12px 15px;
+      border-radius: var(--border-radius);
+      border: 1px solid rgba(0,0,0,0.1);
+      background: rgba(248, 249, 250, 0.5);
+      font-size: 1rem;
+      transition: all 0.3s;
+    }
+    
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(136, 28, 28, 0.2);
+    }
+    
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 15px;
+      margin-top: 25px;
+      padding-top: 15px;
+      border-top: 1px solid rgba(0,0,0,0.08);
+    }
+    
+    .btn-secondary {
+      background: var(--gray);
+      color: white;
+      box-shadow: 0 6px 18px rgba(108, 117, 125, 0.3);
+    }
+    
+    .btn-secondary:hover {
+      background: #5a6268;
+    }
+    
+    .categories-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 10px 0;
+    }
+    
+    .category-tag {
+      background: rgba(136, 28, 28, 0.1);
+      padding: 8px 15px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .remove-category {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--danger);
+      font-weight: bold;
+    }
+    
+    .notification-area {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1100;
+      max-width: 350px;
+      width: 100%;
+    }
+    
+    .notification {
+      padding: 15px 20px;
+      border-radius: var(--border-radius);
+      margin-bottom: 15px;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+      animation: slideIn 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .notification::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 4px;
+      width: 100%;
+      background: rgba(255,255,255,0.5);
+      animation: progress 3s linear;
+    }
+
+    .sidebar-option {
+      color: inherit;
+      text-decoration: none;
+    }
+    
+    @keyframes progress {
+      from { width: 100%; }
+      to { width: 0%; }
+    }
+    
+    .notification.success {
+      background: var(--success);
+    }
+    
+    .notification.error {
+      background: var(--danger);
+    }
+    
+    .notification.warning {
+      background: var(--warning);
+    }
+    
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    
+    .no-data-container {
+      text-align: center;
+      padding: 50px 20px;
+      color: var(--gray);
+    }
+    
+    .no-data-icon {
+      font-size: 3.5rem;
+      margin-bottom: 20px;
+      color: #e0e0e0;
+    }
+    
+    .no-data-message {
+      font-size: 1.2rem;
+      font-weight: 500;
+      margin-bottom: 20px;
+    }
+    
+    @media (max-width: 992px) {
+      .dashboard-content {
+        grid-template-columns: 1fr;
+      }
+      
+      .sidebar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      
+      .sidebar-option {
+        margin-bottom: 0;
+        flex: 1;
+        min-width: 150px;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .nav-menu {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      
+      .nav-item {
+        padding: 12px 15px;
+        font-size: 0.9rem;
+      }
+      
+      .panel-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+      }
+      
+      .pagination-controls {
+        flex-direction: column;
+        gap: 15px;
+      }
+      
+      .pagination-info, .pagination-buttons {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+  
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+    
+    :root {
+      --primary: #881c1c;
+      --primary-dark: #6e1515;
+      --secondary: #8c2f2f;
+      --accent: #4caf50;
+      --warning: #ff9800;
+      --danger: #f44336;
+      --light: #f8f9fa;
+      --dark: #212529;
+      --gray: #6c757d;
+      --card-bg: rgba(255, 255, 255, 0.95);
+      --nav-bg: rgba(255, 255, 255, 0.85);
+      --nav-active: rgba(136, 28, 28, 0.15);
+      --nav-hover: rgba(136, 28, 28, 0.08);
+      --success: #4caf50;
+      --border-radius: 12px;
+      --box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+    
+    body {
+      background-color: #eef2f5;
+      padding-bottom: 40px;
+    }
+    
+    /* Updated Header Styles */
+    header {
+      width: 100vw;
+      height: 60px;
+      background-color: var(--primary);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 25px;
+      position: relative;
+      z-index: 10;
+      margin-top: 36px;
+      margin-bottom: 0;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 2;
+    }
+
+    .logo .logo-image {
+      width: 130px;
+      height: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 5px;
+      background-color: #f4f4f4;
+      border-radius: 50%;
+    }
+
+    .logo .logo-image img {
+      border-radius: 50%;
+      width: 100%;
+      height: auto;
+    }
+
+    .logo h1 {
+      color: white;
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+    
+    .user {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      color: white;
+    }
+    
+    .user h3 {
+      font-weight: 500;
+    }
+    
+    
+    /* Updated Navigation */
+    .nav-container {
+      background-color: var(--primary);
+      padding: 0;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      position: relative;
+      z-index: 1;
+      margin-top: 40px;
+    }
+    
+    .nav-menu {
+      display: flex;
+      list-style: none;
+      max-width: 1500px;
+      margin: 0 auto;
+      padding-left: 90px;
+    }
+    
+    .nav-item {
+      padding: 15px 25px;
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      position: relative;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .nav-item:hover {
+      background-color: rgba(0,0,0,0.1);
+    }
+    
+    .nav-item.active {
+      background-color: rgba(0,0,0,0.2);
+    }
+    
+    .nav-item.active::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60%;
+      height: 3px;
+      background-color: white;
+    }
+    
+    
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+    }
+    
+    .dashboard-title {
+      font-size: 24px;
+      color: var(--primary);
+      font-weight: 700;
+    }
+    
+    /* Updated Dashboard Content */
+    .dashboard-content {
+      display: grid;
+      grid-template-columns: 250px 1fr;
+      gap: 30px;
+      min-height: 600px;
+    }
+    
+    .sidebar {
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      padding: 25px;
+      box-shadow: var(--box-shadow);
+    }
+    
+    .sidebar-option {
+      padding: 18px 20px;
+      margin-bottom: 15px;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(248, 249, 250, 0.7);
+    }
+    
+    .sidebar-option:hover {
+      background: var(--nav-hover);
+    }
+    
+    .sidebar-option.active {
+      background: var(--nav-active);
+      color: var(--primary);
+      box-shadow: 0 5px 15px rgba(136, 28, 28, 0.1);
+    }
+    
+    /* Updated Content Panel */
+    .content-panel {
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      padding: 30px;
+      box-shadow: var(--box-shadow);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .panel-header {
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .panel-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    
+    /* Updated Buttons */
+    .btn {
+      padding: 14px 28px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 6px 18px rgba(136, 28, 28, 0.2);
+    }
+    
+    .btn-primary:hover {
+      background: #a33a3a;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 22px rgba(136, 28, 28, 0.3);
+    }
+    
+    .btn-secondary {
+      background: var(--gray);
+      color: white;
+      box-shadow: 0 6px 18px rgba(108, 117, 125, 0.3);
+    }
+    
+    .btn-secondary:hover {
+      background: #5a6268;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 22px rgba(108, 117, 125, 0.4);
+    }
+    
+    /* Updated Table */
+    .table-container {
+      overflow-x: auto;
+      border-radius: var(--border-radius);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    
+    .nature-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 800px;
+      margin-top: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    
+    .nature-table th {
+      background: rgba(136, 28, 28, 0.1);
+      color: var(--primary);
+      font-weight: 700;
+      padding: 16px;
+      text-align: left;
+    }
+    
+    .nature-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+    
+    .nature-table tr:hover {
+      background: rgba(136, 28, 28, 0.05);
+    }
+    
+    .tag-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    
+    .tag {
+      background: rgba(136, 28, 28, 0.1);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+    }
+    
+    .tag .remove-btn {
+      background: none;
+      border: none;
+      color: var(--danger);
+      cursor: pointer;
+      margin-left: 8px;
+      font-weight: bold;
+      padding: 0;
+    }
+    
+    /* Updated Action Buttons */
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .action-btn {
+      padding: 8px 15px;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .action-btn.add {
+      background: var(--accent);
+      color: white;
+    }
+    
+    .action-btn.edit {
+      background: var(--warning);
+      color: white;
+    }
+    
+    .action-btn.delete {
+      background: var(--danger);
+      color: white;
+    }
+    
+    /* Updated Pagination */
+    .pagination-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
+      padding: 10px 0;
+    }
+    
+    .pagination-info {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .page-size select {
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+    }
+    
+    .pagination-buttons {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .page-btn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      background: white;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .page-btn:hover {
+      background: rgba(136, 28, 28, 0.1);
+    }
+    
+    .page-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .current-page {
+      padding: 8px 16px;
+    }
+    
+    /* Updated Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+    
+    .modal-content {
+      background: white;
+      border-radius: 12px;
+      padding: 25px;
+      width: 90%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      transform: translateY(20px);
+      transition: transform 0.3s ease;
+    }
+    
+    .modal-overlay.active .modal-content {
+      transform: translateY(0);
+    }
+    
+    .modal-header {
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .modal-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    
+    .modal-close {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #777;
+      transition: color 0.2s;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+    
+    .modal-close:hover {
+      background: #f5f5f5;
+      color: var(--danger);
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--dark);
+    }
+    
+    .required::after {
+      content: " *";
+      color: var(--danger);
+    }
+    
+    .form-control {
+      width: 100%;
+      padding: 14px 18px;
+      border-radius: 12px;
+      border: 1px solid rgba(0,0,0,0.1);
+      background: rgba(248, 249, 250, 0.5);
+      font-size: 16px;
+      transition: all 0.3s;
+    }
+    
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(136, 28, 28, 0.2);
+    }
+    
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 15px;
+      margin-top: 25px;
+      padding-top: 15px;
+      border-top: 1px solid rgba(0,0,0,0.08);
+    }
+    
+    /* Notification Area */
+    .notification-area {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1100;
+      max-width: 350px;
+      width: 100%;
+    }
+    
+    .notification {
+      padding: 15px 20px;
+      border-radius: var(--border-radius);
+      margin-bottom: 15px;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+      animation: slideIn 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .notification::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 4px;
+      width: 100%;
+      background: rgba(255,255,255,0.5);
+      animation: progress 3s linear;
+    }
+
+    .sidebar-option {
+      color: inherit;
+      text-decoration: none;
+    }
+    
+    @keyframes progress {
+      from { width: 100%; }
+      to { width: 0%; }
+    }
+    
+    .notification.success {
+      background: var(--success);
+    }
+    
+    .notification.error {
+      background: var(--danger);
+    }
+    
+    .notification.warning {
+      background: var(--warning);
+    }
+    
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    
+    /* No Data Container */
+    .no-data-container {
+      text-align: center;
+      padding: 50px 20px;
+      color: var(--gray);
+    }
+    
+    .no-data-icon {
+      font-size: 3.5rem;
+      margin-bottom: 20px;
+      color: #e0e0e0;
+    }
+    
+    .no-data-message {
+      font-size: 1.2rem;
+      font-weight: 500;
+      margin-bottom: 20px;
+    }
+    
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Media Queries */
+    @media (max-width: 992px) {
+      .dashboard-content {
+        grid-template-columns: 1fr;
+      }
+      
+      .sidebar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      
+      .sidebar-option {
+        margin-bottom: 0;
+        flex: 1;
+        min-width: 150px;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .main-container {
+        width: 100%;
+        padding: 0px;
+      }
+      .nav-menu {
+        flex-wrap: wrap;
+        justify-content: center;
+        padding-left: 0;
+      }
+      
+      .nav-item {
+        padding: 15px;
+        font-size: 15px;
+      }
+      
+      .panel-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+      }
+      
+      .pagination-controls {
+        flex-direction: column;
+        gap: 15px;
+      }
+      
+      .pagination-info, .pagination-buttons {
+        width: 100%;
+        justify-content: center;
+      }
+      
+      .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+      }
+    }
+    
+@media (max-width: 500px) {
+  .logo {
+    flex-direction: column;
+  }
+
+  .panel-title {
+    font-size: medium;
+  }
+}
+
+    .hamburger {
+      display: none;
+    }
+    /* Responsive header */
+    @media (max-width: 768px) {
+      .report-type .report-option {
+        padding: 10px 20px;
+        font-size: 15px;
+      }
+
+      .btn {
+        font-size: 15px;
+      }
+
+      .report-header h1 {
+        font-size: 20px;
+      }
+      
+      .logo h2 {
+        font-size: 16px;
+      }
+
+      .nav-container {
+        margin-left: 0;
+        justify-content: center;
+        display: none;
+      }
+      
+      .nav-item {
+        padding: 12px 15px;
+        font-size: 14px;
+      }
+
+      
+      header {
+        /*flex-direction: column;*/
+        height: auto;
+        padding: 5px;
+        gap: 15px;
+        margin-top: 0px;
+      }
+      
+      .logo {
+        margin-bottom: 0px;
+      }
+
+      .logo .logo-image {
+        width: 60px;
+        height: auto;
+        margin-bottom: 0px;
+        padding: 2px;
+      }
+
+      .user h2 {
+        font-size: 14px;
+        margin: 0px;
+      }
+      
+      .logout-btn {
+        padding: 4px 8px;
+        font-size: 15px;
+        font-weight: 650;
+      }
+
+      .hamburger {
+        display: flex;
+        height: 35px;
+        width: 35px;
+        background-color: rgba(0,0,0,0.2);
+        cursor: pointer;
+        padding: 8px;
+        margin-right: 10px;
+        border-radius: 4px;
+      }
+
+      .hamburger i {
+        font-size: 20px;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+      }
+
+      .navigation-block {
+        right: 0;
+        width: 100vw;
+        top: 55px;
+        border-radius: 0;
+      }
+
+      /* By default, hide the menu off-screen to the right */
+      .navigation-block {
+        position: fixed;
+        top: 60px;
+        right: -250px; /* Hide off-screen to the right */
+        display: flex;
+        flex-direction: column;
+        background-color: var(--primary);
+        width: 220px;
+        border-radius: 8px;
+        padding: 10px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        z-index: 999;
+        transition: right 0.3s ease-in-out; /* Smooth slide animation */
+        border: 2px solid rgba(0, 0, 0, 0.1);
+      }
+
+      /* Each nav item */
+      .navigation-block .navi-block-items {
+        color: white;
+        padding: 12px;
+        font-size: 16px;
+        text-decoration: none;
+        transition: background 0.2s ease;
+        font-weight: 500;
+      }
+
+      .navigation-block .navi-block-items:hover {
+        background: rgba(255,255,255,0.1);
+        border-radius: 5px;
+      }
+
+      /* Show menu when active - slide in from right */
+      .navigation-block.active {
+        right: 10px; /* Slide into view from the right */
+      }
+
+      .navigation-block div {
+        background-color: rgba(0, 0, 0, 0.1);
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header Section -->
+  <header>
+    <div class="logo">
+      <div class="logo-image">
+        <img src="logo.jpg" alt="logo image">
+      </div>
+      <h2>MES CMS</h2>
+    </div>
+
+    <div class="user">
+      <h2 id="user-id">Unknown</h2>
+      <button class="logout-btn" id="logout-btn">Logout</button>
+      <div class="hamburger">
+        <i class="fas fa-bars" id="hamburger-btn"></i>
+        <div class="navigation-block">
+          <a href="dashboard" class="navi-block-items">Dashboard</a>
+          <a href="complaints" class="navi-block-items active">Complaints</a>
+          <a href="users" class="navi-block-items">Users</a>
+          <a href="reporting" class="navi-block-items">Reporting</a>
+          <a href="admin" class="navi-block-items">Admin</a>
+        </div>
+        </div>
+      </div>
+  </header>
+  
+  <!-- Navigation -->
+  <div class="nav-container">
+    <ul class="nav-menu">
+      <a href="dashboard" class="nav-item">
+        <i class="fas fa-chart-line"></i>
+        Dashboard
+      </a>
+      <div class="nav-item active">
+        <i class="fas fa-ticket-alt"></i>
+        Complaints
+      </div>
+      <a href="users" class="nav-item">
+        <i class="fas fa-users"></i>
+        Users
+      </a>
+      <a href="reporting" class="nav-item">
+        <i class="fas fa-file-alt"></i>
+        Reporting
+      </a>
+      <a href="admin" class="nav-item">
+        <i class="fas fa-user-tie"></i>
+        Admin
+      </a>
+    </ul>
+  </div>
+  
+  <!-- Main Content -->
+  <div class="main-container">
+    
+    <div class="dashboard-content">
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <a href="launch-complaints.html" class="sidebar-option">
+          <i class="fas fa-rocket"></i>
+          Launch Complaints
+        </a>
+        <a href="all-complaints.html" class="sidebar-option">
+          <i class="fas fa-list"></i>
+          All Complaints
+        </a>
+        <a href="delay-complaints.html" class="sidebar-option">
+          <i class="fas fa-hourglass-half"></i> 
+          Delay Complaints
+        </a>
+        <div class="sidebar-option active">
+          <i class="fas fa-chart-pie"></i>
+          Natures
+        </div>
+      </div>
+      
+      <!-- Content Panel -->
+      <div class="content-panel">
+        <div class="panel-header">
+          <h3 class="panel-title">Complaint Natures</h3>
+          <button class="btn btn-primary" id="add-nature-btn">
+            <i class="fas fa-plus"></i>
+            Add New Nature
+          </button>
+        </div>
+        
+        <!-- Notification Area -->
+        <div class="notification-area" id="notification-area"></div>
+        
+        <!-- Pagination Controls -->
+        <div class="pagination-controls">
+          <div class="pagination-info">
+            <div class="page-size">
+              <span>Items per page: </span>
+              <select id="items-per-page">
+                <option value="5">5</option>
+                <option value="10" selected>10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="pagination-buttons">
+            <button class="page-btn" id="prev-page">
+              <i class="fas fa-chevron-left"></i> Prev
+            </button>
+            <span class="current-page" id="current-page">Page 1 of 1</span>
+            <button class="page-btn" id="next-page">
+              Next <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Table Container -->
+        <div class="table-container">
+          <table class="nature-table" id="natures-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Nature Type</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="natures-table-body">
+              <!-- Data will be populated by JavaScript -->
+            </tbody>
+          </table>
+        </div>
+        
+        <!-- No Data Message -->
+        <div class="no-data-container" id="no-data-container" style="display: none;">
+          <div class="no-data-icon">
+            <i class="fas fa-inbox"></i>
+          </div>
+          <div class="no-data-message">
+            No natures data available
+          </div>
+          <button class="btn btn-primary" id="add-first-nature">
+            <i class="fas fa-plus"></i>
+            Add Your First Nature
+          </button>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+  
+  <!-- Modals -->
+  <!-- Add Nature Modal -->
+  <div class="modal-overlay" id="add-nature-modal">
+    <div class="modal-content">
+      <button class="modal-close">&times;</button>
+      <div class="modal-header">
+        <i class="fas fa-plus-circle"></i>
+        <h3 class="modal-title">Add New Nature</h3>
+      </div>
+      
+      <div class="form-group">
+        <label for="nature-name" class="form-label required">Nature Name</label>
+        <input type="text" id="nature-name" class="form-control" placeholder="Enter nature name" required>
+      </div>
+      
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="cancel-add-nature">
+          <i class="fas fa-times"></i>
+          Cancel
+        </button>
+        <button class="btn btn-primary" id="save-nature">
+          <i class="fas fa-save"></i>
+          Save Nature
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Add Type Modal -->
+  <div class="modal-overlay" id="add-type-modal">
+    <div class="modal-content">
+      <button class="modal-close">&times;</button>
+      <div class="modal-header">
+        <i class="fas fa-plus-circle"></i>
+        <h3 class="modal-title">Add New Type</h3>
+      </div>
+      
+      <div class="form-group">
+        <label for="type-name" class="form-label required">Type Name</label>
+        <input type="text" id="type-name" class="form-control" placeholder="Enter type name" required>
+      </div>
+      
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="cancel-add-type">
+          <i class="fas fa-times"></i>
+          Cancel
+        </button>
+        <button class="btn btn-primary" id="save-type">
+          <i class="fas fa-plus"></i>
+          Add Type
+        </button>
+      </div>
+    </div>
+  </div>
+  
+
+
+  
+  <!-- Edit Nature Modal -->
+  <div class="modal-overlay" id="edit-nature-modal">
+    <div class="modal-content">
+      <button class="modal-close">&times;</button>
+      <div class="modal-header">
+        <i class="fas fa-edit"></i>
+        <h3 class="modal-title">Edit Nature</h3>
+      </div>
+      
+      <div class="form-group">
+        <label for="edit-name" class="form-label required">Nature Name</label>
+        <input type="text" id="edit-name" class="form-control" required>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Categories</label>
+        <div class="categories-container" id="current-categories">
+          <!-- Categories will be added here -->
+        </div>
+        
+        <div class="add-category">
+          <select id="category-dropdown" class="form-control">
+            <option value="-">-</option>
+            <option value="B&R-I">B&R-I</option>
+            <option value="B&R-II">B&R-II</option>
+            <option value="B&R-III">B&R-III</option>
+            <option value="E&M-I">E&M-I</option>
+            <option value="E&M-II">E&M-II</option>
+            <!--option value="F&S-I">F&S-I</option-->
+          </select>
+          <button id="add-category-btn" class="btn btn-primary" style="margin-top: 10px;">
+            <i class="fas fa-plus"></i>
+            Add Category
+          </button>
+        </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="cancel-edit-nature">
+          <i class="fas fa-times"></i>
+          Cancel
+        </button>
+        <button class="btn btn-danger" id="delete-nature">
+          <i class="fas fa-trash"></i>
+          Delete
+        </button>
+        <button class="btn btn-primary" id="save-edit">
+          <i class="fas fa-save"></i>
+          Save Changes
+        </button>
+      </div>
+    </div>
+  </div>
+  
+<script>
+  const hamburgerBtn = document.getElementById("hamburger-btn");
+  const navBlock = document.querySelector(".navigation-block");
+
+  // Toggle navigation on hamburger click
+  hamburgerBtn.addEventListener("click", (e) => {
+    e.stopPropagation(); // Prevent click from bubbling to document
+    navBlock.classList.toggle("active");
+  });
+
+  // Close navigation when clicking outside
+  document.addEventListener("click", (e) => {
+    // Check if click is outside the navigation block and hamburger button
+    if (!navBlock.contains(e.target) && e.target !== hamburgerBtn) {
+      navBlock.classList.remove("active");
+    }
+  });
+
+  // Optional: Prevent clicks inside navigation from closing it
+  navBlock.addEventListener("click", (e) => {
+    e.stopPropagation();
+  });
+</script>
+
+
+<script>
+// Add this script to control navigation visibility based on backend permissions
+document.addEventListener('DOMContentLoaded', async function() {
+    try {
+        const authToken = localStorage.getItem('authToken');
+        if (!authToken) {
+            console.error('No authentication token found');
+            return;
+        }
+
+        // Fetch allowed pages from backend
+        const response = await fetch(`${SERVER_URL}/api/allowed-pages`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${authToken}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch allowed pages');
+        }
+
+        const data = await response.json();
+        
+        if (data.success) {
+            // Process navigation items based on allowed pages
+            processNavigationItems(data.allowedPages, data.navigationItems);
+        }
+    } catch (error) {
+        console.error('Error fetching allowed pages:', error);
+        // In case of error, you might want to show a default set of navigation items
+        // or handle it according to your application's requirements
+    }
+});
+
+function processNavigationItems(allowedPages, navigationItems) {
+    // Process header navigation items
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+        const href = item.getAttribute('href');
+        if (href) {
+            const pageName = href; // Get the page name without extension
+            
+            // Check if this category has an accessible page
+            if (navigationItems[pageName]) {
+                // Set the href to the first accessible page in this category
+                item.setAttribute('href', `${navigationItems[pageName]}.html`);
+                item.style.display = 'flex';
+            } else {
+                item.style.display = 'none';
+            }
+        }
+    });
+    
+    // Process hamburger menu navigation items
+    const hamburgerItems = document.querySelectorAll('.navi-block-items');
+    hamburgerItems.forEach(item => {
+        const href = item.getAttribute('href');
+        if (href) {
+            const pageName = href; // Get the page name without extension
+            
+            // Check if this category has an accessible page
+            if (navigationItems[pageName]) {
+                // Set the href to the first accessible page in this category
+                item.setAttribute('href', `${navigationItems[pageName]}.html`);
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        }
+    });
+    
+    // Process sidebar navigation items (use the allowedPages array)
+    const sidebarItems = document.querySelectorAll('.sidebar-option');
+    sidebarItems.forEach(item => {
+        const href = item.getAttribute('href');
+        if (href) {
+            const pageName = getPageNameFromHref(href);
+            if (allowedPages.includes(pageName) || item.classList.contains('active')) {
+                item.style.display = 'flex';
+            } else {
+                item.style.display = 'none';
+            }
+        }
+    });
+}
+
+function getPageNameFromHref(href) {
+    if (!href) return '';
+    
+    // Extract page name from href (e.g., "dashboard.html" -> "dashboard")
+    const pageWithExtension = href.split('/').pop();
+    return pageWithExtension.split('.')[0];
+}
+</script>
+
+  
+  <script>
+    
+    let USER_ID = localStorage.getItem('UserId');
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById("user-id").textContent = USER_ID;
+      localStorage.removeItem('UserId');
+    });
+
+
+
+  document.addEventListener('DOMContentLoaded', function() {
+
+    // DOM Elements
+    const logoutBtn = document.getElementById('logout-btn');
+    
+    logoutBtn.addEventListener('click', async () => {
+      try {
+        const authToken = localStorage.getItem('authToken');
+        const response = await fetch(SERVER_URL+'/logout', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${authToken}`,'Content-Type': 'application/json' }
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          console.log('Logout success:', data);
+          //alert('Logged out successfully!');
+          // 👇 you can add more procedural lines here
+          // e.g., redirect:
+          showNotification('Logging out');
+          localStorage.removeItem('authToken');
+          setTimeout(() => {
+            window.location.href = 'login.html';
+          }, 1000); // 1000 ms = 1 sec
+        } else {
+          console.error('Logout failed:', data);
+          alert('Logout failed!');
+        }
+
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Something went wrong!');
+      }
+    });
+    
+  });
+
+
+
+    // API Configuration
+    
+    // State Management
+    let natures = [];
+    let filteredNatures = [];
+    let currentPage = 1;
+    let itemsPerPage = 10;
+    let currentNatureId = null;
+    
+    // DOM Elements
+    const naturesTableBody = document.getElementById('natures-table-body');
+    const naturesTable = document.getElementById('natures-table');
+    const noDataContainer = document.getElementById('no-data-container');
+    const notificationArea = document.getElementById('notification-area');
+    
+    // Utility Functions
+    function showNotification(message, type = 'success') {
+      const notification = document.createElement('div');
+      notification.className = `notification ${type}`;
+      notification.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+        ${message}
+      `;
+      notificationArea.appendChild(notification);
+      
+      // Auto remove after 5 seconds
+      setTimeout(() => {
+        notification.style.opacity = '0';
+        setTimeout(() => notification.remove(), 300);
+      }, 500);
+    }
+    
+    // Data Fetching
+    async function fetchNatures() {
+      try {
+        const authToken = localStorage.getItem('authToken');
+        showNotification('Loading natures data...', 'warning');
+        const response = await fetch(`${SERVER_URL}/api/natures`, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` }});
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch natures: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        natures = data;
+        filteredNatures = [...natures];
+        loadNaturesTable();
+        showNotification('Natures data loaded successfully');
+      } catch (error) {
+        console.error('Error fetching natures:', error);
+        showNotification(`Error: ${error.message}`, 'error');
+      }
+    }
+    
+    // Create New Nature
+    async function createNature(name) {
+      try {
+        const authToken = localStorage.getItem('authToken');
+        const response = await fetch(`${SERVER_URL}/createNewNatures`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+          body: JSON.stringify({ name })
+        });
+        
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || 'Failed to create nature');
+        }
+        
+        const result = await response.json();
+        showNotification(result.message || 'Nature created successfully');
+        await fetchNatures();
+        return result;
+      } catch (error) {
+        console.error('Error creating nature:', error);
+        showNotification(`Error: ${error.message}`, 'error');
+        throw error;
+      }
+    }
+    //update here 21314124
+    // Update Existing Nature
+    async function updateNature(natureId, updatedData) {
+      try {
+        const authToken = localStorage.getItem('authToken');
+        const response = await fetch(`${SERVER_URL}/updateNature/${encodeURIComponent(natureId)}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+          body: JSON.stringify(updatedData)
+        });
+        
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || 'Failed to update nature');
+        }
+        
+        const result = await response.json();
+        showNotification(result.message || 'Nature updated successfully');
+        await fetchNatures();
+        return result;
+      } catch (error) {
+        console.error('Error updating nature:', error);
+        showNotification(`Error: ${error.message}`, 'error');
+        throw error;
+      }
+    }
+    
+    // Delete Nature
+    async function deleteNature(natureId) {
+      try {
+        const authToken = localStorage.getItem('authToken');
+        const response = await fetch(`${SERVER_URL}/deleteNature/${encodeURIComponent(natureId)}`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` }
+        });
+        
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || 'Failed to delete nature');
+        }
+        
+        const result = await response.json();
+        showNotification(result.message || 'Nature deleted successfully');
+        await fetchNatures();
+        return result;
+      } catch (error) {
+        console.error('Error deleting nature:', error);
+        showNotification(`Error: ${error.message}`, 'error');
+        throw error;
+      }
+    }
+    
+    // Add Type to Nature
+    async function addTypeToNature(natureId, typeName) {
+      try {
+        const authToken = localStorage.getItem('authToken');
+        const response = await fetch(`${SERVER_URL}/addNatureType/${encodeURIComponent(natureId)}/types`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+          body: JSON.stringify({ type: typeName })
+        });
+        
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || 'Failed to add type');
+        }
+        
+        const result = await response.json();
+        showNotification(result.message || 'Type added successfully');
+        await fetchNatures();
+        return result;
+      } catch (error) {
+        console.error('Error adding type:', error);
+        showNotification(`Error: ${error.message}`, 'error');
+        throw error;
+      }
+    }
+    
+    // Remove Type from Nature
+    async function removeTypeFromNature(natureId, typeName) {
+      try {
+        const authToken = localStorage.getItem('authToken');
+        const response = await fetch(`${SERVER_URL}/deleteNatureType/${encodeURIComponent(natureId)}/types/${encodeURIComponent(typeName)}`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` }
+        });
+        
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || 'Failed to remove type');
+        }
+        
+        const result = await response.json();
+        showNotification(result.message || 'Type removed successfully');
+        await fetchNatures();
+        return result;
+      } catch (error) {
+        console.error('Error removing type:', error);
+        showNotification(`Error: ${error.message}`, 'error');
+        throw error;
+      }
+    }
+    
+    // UI Rendering
+    function renderCategories(categories) {
+      const container = document.getElementById('current-categories');
+      container.innerHTML = '';
+      
+      // Ensure categories are unique
+      const uniqueCategories = [...new Set(categories)];
+      
+      uniqueCategories.forEach(category => {
+        const tag = document.createElement('div');
+        tag.className = 'category-tag';
+        tag.innerHTML = `
+          ${category}
+          <button class="remove-category" data-category="${category}">&times;</button>
+        `;
+        container.appendChild(tag);
+      });
+      
+      // Add event listeners for remove buttons
+      document.querySelectorAll('.remove-category').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const category = this.dataset.category;
+          const nature = natures.find(n => n.id === currentNatureId);
+          
+          if (nature) {
+            // Update the nature locally for UI
+            nature.categories = nature.categories.filter(c => c !== category);
+            renderCategories(nature.categories);
+          }
+        });
+      });
+    }
+    
+    function loadNaturesTable() {
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const paginatedNatures = filteredNatures.slice(startIndex, startIndex + itemsPerPage);
+      
+      if (paginatedNatures.length === 0) {
+        naturesTable.style.display = 'none';
+        noDataContainer.style.display = 'block';
+      } else {
+        naturesTable.style.display = 'table';
+        noDataContainer.style.display = 'none';
+        naturesTableBody.innerHTML = generateTableRows(paginatedNatures);
+      }
+      
+      updatePaginationControls();
+    }
+    
+    function generateTableRows(natures) {
+      return natures.map((nature, index) => {
+        const globalIndex = (currentPage - 1) * itemsPerPage + index + 1;
+        
+        // Generate types with remove buttons
+        const typesHtml = nature.types.map(type => `
+          <div class="tag">
+            ${type}
+            <button class="remove-btn" data-nature-id="${nature.id}" data-type="${type}">
+              &times;
+            </button>
+          </div>
+        `).join('');
+        
+        return `
+          <tr data-nature-id="${nature.id}">
+            <td>${globalIndex}</td>
+            <td>${nature.name}</td>
+            <td>
+              <div class="tag-container">
+                ${nature.categories.map(cat => `<div class="tag">${cat}</div>`).join('')}
+              </div>
+            </td>
+            <td>
+              <div class="tag-container">
+                ${typesHtml}
+              </div>
+            </td>
+            <td>
+              <div class="action-buttons">
+                <button class="action-btn add" data-nature-id="${nature.id}">
+                  <i class="fas fa-plus"></i> Type
+                </button>
+                <button class="action-btn edit" data-nature-id="${nature.id}">
+                  <i class="fas fa-edit"></i> Edit
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+    
+    function updatePaginationControls() {
+      const totalPages = Math.ceil(filteredNatures.length / itemsPerPage);
+      document.getElementById('current-page').textContent = `Page ${currentPage} of ${totalPages}`;
+      
+      // Update button states
+      document.getElementById('prev-page').disabled = currentPage === 1;
+      document.getElementById('next-page').disabled = currentPage === totalPages || totalPages === 0;
+    }
+    
+    // Modal Management
+    function openModal(modalId) {
+      document.getElementById(modalId).classList.add('active');
+    }
+    
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove('active');
+    }
+    
+    function closeAllModals() {
+      document.querySelectorAll('.modal-overlay').forEach(modal => {
+        modal.classList.remove('active');
+      });
+    }
+    
+    // Event Handlers
+    function setupEventListeners() {
+      // Add Nature Button
+      document.getElementById('add-nature-btn').addEventListener('click', () => {
+        document.getElementById('nature-name').value = '';
+        openModal('add-nature-modal');
+      });
+      
+      // Add First Nature Button
+      document.getElementById('add-first-nature').addEventListener('click', () => {
+        document.getElementById('nature-name').value = '';
+        openModal('add-nature-modal');
+      });
+      
+      // Save Nature Button
+      document.getElementById('save-nature').addEventListener('click', async () => {
+        const name = document.getElementById('nature-name').value.trim();
+        if (!name) {
+          showNotification('Nature name is required', 'error');
+          return;
+        }
+        
+        await createNature(name);
+        closeModal('add-nature-modal');
+      });
+      
+      // Cancel Add Nature
+      document.getElementById('cancel-add-nature').addEventListener('click', () => {
+        closeModal('add-nature-modal');
+      });
+      
+      // Edit Nature Button
+      document.addEventListener('click', (e) => {
+        if (e.target.closest('.action-btn.edit')) {
+          const btn = e.target.closest('.action-btn.edit');
+          currentNatureId = btn.dataset.natureId;
+          const nature = natures.find(n => n.id === currentNatureId);
+          
+          if (nature) {
+            document.getElementById('edit-name').value = nature.name;
+            renderCategories(nature.categories);
+            openModal('edit-nature-modal');
+          }
+        }
+      });
+      
+      // Add Type Button
+      document.addEventListener('click', (e) => {
+        if (e.target.closest('.action-btn.add')) {
+          const btn = e.target.closest('.action-btn.add');
+          currentNatureId = btn.dataset.natureId;
+          document.getElementById('type-name').value = '';
+          openModal('add-type-modal');
+        }
+      });
+      
+      // Remove Type Button
+      document.addEventListener('click', (e) => {
+        if (e.target.closest('.remove-btn')) {
+          const btn = e.target.closest('.remove-btn');
+          const natureId = btn.dataset.natureId;
+          const type = btn.dataset.type;
+          
+            removeTypeFromNature(natureId, type);
+        }
+      });
+      
+      // Save Type Button
+      document.getElementById('save-type').addEventListener('click', async () => {
+        const typeName = document.getElementById('type-name').value.trim();
+        if (!typeName) {
+          showNotification('Type name is required', 'error');
+          return;
+        }
+        
+        await addTypeToNature(currentNatureId, typeName);
+        closeModal('add-type-modal');
+      });
+      
+      // Cancel Add Type
+      document.getElementById('cancel-add-type').addEventListener('click', () => {
+        closeModal('add-type-modal');
+      });
+      
+      // Add Category Button
+      document.getElementById('add-category-btn').addEventListener('click', () => {
+        const category = document.getElementById('category-dropdown').value;
+        const nature = natures.find(n => n.id === currentNatureId);
+        
+        if (nature) {
+          // Add category only if it doesn't exist
+          if (!nature.categories.includes(category)) {
+            nature.categories.push(category);
+            renderCategories(nature.categories);
+          } else {
+            showNotification('Category already added', 'warning');
+          }
+        }
+      });
+      
+      // Save Edit Button
+      document.getElementById('save-edit').addEventListener('click', async () => {
+        const name = document.getElementById('edit-name').value.trim();
+        if (!name) {
+          showNotification('Nature name is required', 'error');
+          return;
+        }
+        
+        const nature = natures.find(n => n.id === currentNatureId);
+        if (nature) {
+          // Ensure categories are unique
+          const uniqueCategories = [...new Set(nature.categories)];
+          
+          await updateNature(currentNatureId, {
+            name: name,
+            categories: uniqueCategories
+          });
+          closeModal('edit-nature-modal');
+        }
+      });
+      
+      // Delete Nature Button
+      document.getElementById('delete-nature').addEventListener('click', () => {
+        if (confirm('Are you sure you want to delete this nature? This action cannot be undone.')) {
+          deleteNature(currentNatureId);
+          closeModal('edit-nature-modal');
+        }
+      });
+      
+      // Cancel Edit Nature
+      document.getElementById('cancel-edit-nature').addEventListener('click', () => {
+        closeModal('edit-nature-modal');
+      });
+      
+      // Pagination Controls
+      document.getElementById('items-per-page').addEventListener('change', (e) => {
+        itemsPerPage = parseInt(e.target.value);
+        currentPage = 1;
+        loadNaturesTable();
+      });
+      
+      document.getElementById('prev-page').addEventListener('click', () => {
+        if (currentPage > 1) {
+          currentPage--;
+          loadNaturesTable();
+        }
+      });
+      
+      document.getElementById('next-page').addEventListener('click', () => {
+        const totalPages = Math.ceil(filteredNatures.length / itemsPerPage);
+        if (currentPage < totalPages) {
+          currentPage++;
+          loadNaturesTable();
+        }
+      });
+      
+      // Close modals when clicking outside
+      document.querySelectorAll('.modal-overlay').forEach(overlay => {
+        overlay.addEventListener('click', (e) => {
+          if (e.target === overlay) {
+            closeAllModals();
+          }
+        });
+      });
+    }
+    
+    // Initialize Application
+    document.addEventListener('DOMContentLoaded', () => {
+      setupEventListeners();
+      fetchNatures();
+    });
+  </script>
+  <script src="chat-bot.js"></script>
+</body>
+</html>

@@ -1,0 +1,1424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="server-url.js"></script>
+  <script>
+    const page = 'all-complaints';
+  </script>
+  <script src="verification.js"></script>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="logo.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MES CMS - All Complaints</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+      cursor: default;
+      scrollbar-width: thin;
+      scroll-behavior: smooth;
+      scrollbar-color: rgb(138, 119, 119) transparent;
+    }
+
+    body {
+      display: none;
+      background-color: #eef2f5;
+      padding-bottom: 40px;
+      overflow-x: hidden;
+    }
+
+    /* Header Styles */
+    header {
+      width: 100vw;
+      height: 60px;
+      background-color: rgb(136, 28, 28);
+      margin-top: 36px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 25px;
+      margin-bottom: 30px;
+      position: relative;
+      z-index: 10;
+    }
+
+    .nav-bar {
+      width: 100vw;
+      background-color: rgb(136, 28, 28);
+      display: flex;
+      justify-content: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      position: relative;
+      z-index: 1;
+      margin-top: 40px;
+    }
+
+    .nav-container {
+      width: 100%;
+      max-width: 1500px;
+      display: flex;
+      margin-left: 90px;
+    }
+
+    .nav-item {
+      padding: 15px 25px;
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      position: relative;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-item:hover {
+      background-color: rgba(0,0,0,0.1);
+    }
+
+    .nav-item.active {
+      background-color: rgba(0,0,0,0.2);
+    }
+
+    .nav-item.active::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60%;
+      height: 3px;
+      background-color: white;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 2;
+    }
+
+    .logo .logo-image {
+      width: 130px;
+      height: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 5px;
+      background-color: #f4f4f4;
+      border-radius: 50%;
+    }
+
+    .logo .logo-image img {
+      border-radius: 50%;
+      width: 100%;
+      height: auto;
+    }
+
+    .logo h2 {
+      color: white;
+      font-size: 20px;
+      white-space: nowrap;
+    }
+
+    .user {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      color: white;
+    }
+
+    .user h2 {
+      font-size: 16px;
+      white-space: nowrap;
+    }
+
+    .logout-btn {
+      background-color: white;
+      color: rgb(136, 28, 28);
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.3s;
+      border: 1px solid white;
+    }
+
+    .logout-btn:hover {
+      background-color: #ddd;
+    }
+
+    .logout-btn:active {
+      border: 1px solid white;
+      background-color: rgb(136, 28, 28);
+      color: white;
+    }
+
+    .content {
+      width: 100%;
+      max-width: 1800px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+    
+    /* Variables */
+    :root {
+      --primary: rgb(136, 28, 28);
+      --secondary: #8c2f2f;
+      --accent: #4caf50;
+      --warning: #ff9800;
+      --danger: #f44336;
+      --light: #f8f9fa;
+      --dark: #212529;
+      --gray: #6c757d;
+      --card-bg: rgba(255, 255, 255, 0.95);
+      --nav-bg: rgba(255, 255, 255, 0.85);
+      --nav-active: rgba(136, 28, 28, 0.15);
+      --nav-hover: rgba(136, 28, 28, 0.08);
+      --success: #4caf50;
+    }
+    
+    /* Notification Styles */
+    .notification-area {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1100;
+      max-width: 350px;
+      width: 100%;
+    }
+
+    .notification {
+      padding: 15px 20px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+      animation: slideIn 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+    }
+
+    .notification::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 4px;
+      width: 100%;
+      background: rgba(255,255,255,0.5);
+      animation: progress 3s linear;
+    }
+
+    .notification.success {
+      background: #4CAF50;
+    }
+
+    .notification.error {
+      background: #F44336;
+    }
+
+    .notification.warning {
+      background: #FF9800;
+    }
+
+    .notification.info {
+      background: #2196F3;
+    }
+    
+    @keyframes progress {
+      from { width: 100%; }
+      to { width: 0%; }
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    /* Complaints Section */
+    .complaints-section-container {
+      display: grid;
+      grid-template-columns: 250px 1fr;
+      gap: 30px;
+      min-height: 600px;
+    }
+    
+    .complaints-sidebar {
+      background: var(--card-bg);
+      border-radius: 18px;
+      padding: 25px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+    
+    .complaints-option {
+      padding: 18px 20px;
+      margin-bottom: 15px;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(248, 249, 250, 0.7);
+    }
+    
+    .complaints-option:hover {
+      background: var(--nav-hover);
+    }
+    
+    .complaints-option.active {
+      background: var(--nav-active);
+      color: var(--primary);
+      box-shadow: 0 5px 15px rgba(136, 28, 28, 0.1);
+    }
+    
+    .complaints-option i {
+      font-size: 20px;
+    }
+    
+    .complaints-content {
+      background: var(--card-bg);
+      border-radius: 18px;
+      padding: 30px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .complaints-panel {
+      display: none;
+    }
+    
+    .complaints-panel.active {
+      display: block;
+      animation: fadeIn 0.4s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .panel-header {
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .panel-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    
+    .form-control {
+      width: 100%;
+      padding: 14px 18px;
+      border-radius: 12px;
+      border: 1px solid rgba(0,0,0,0.1);
+      background: rgba(248, 249, 250, 0.5);
+      font-size: 16px;
+      transition: all 0.3s;
+    }
+    
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(136, 28, 28, 0.2);
+    }
+    
+    .btn {
+      padding: 14px 28px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 6px 18px rgba(136, 28, 28, 0.2);
+    }
+    
+    .btn-primary:hover {
+      background: #a33a3a;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 22px rgba(136, 28, 28, 0.3);
+    }
+    
+    .search-box {
+      display: flex;
+      margin-bottom: 30px;
+    }
+    
+    .search-box input {
+      flex: 1;
+      border-radius: 12px 0 0 12px;
+    }
+    
+    .search-box button {
+      border-radius: 0 12px 12px 0;
+    }
+    
+    /* Table-specific styles */
+    .complaints-history-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      border-radius: 12px;
+      overflow: hidden;
+      background: white;
+      font-size: 13px;
+    }
+    
+    .complaints-history-table th {
+      background: rgba(136, 28, 28, 0.1);
+      color: var(--primary);
+      font-weight: 700;
+      padding: 10px 12px;
+      text-align: center;
+      font-size: 14px;
+    }
+    
+    .complaints-history-table td {
+      padding: 8px 12px;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      vertical-align: middle;
+      height: 60px;
+      border-left: 1px solid #f3f3f3; /* vertical line color */
+    }
+    
+    .complaints-history-table tr:hover {
+      background: rgba(136, 28, 28, 0.05);
+    }
+    
+    .status-badge {
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-block;
+    }
+    
+    .status-in-progress {
+      background: #2196F3;
+      color: white;
+    }
+    
+    .status-completed {
+      background: #4CAF50;
+      color: white;
+    }
+    
+    .status-deffered {
+      background: #0f0f0f;
+      color: white;
+    }
+    
+    .status-un-assigned {
+      background: #F44336;
+      color: white;
+    }
+    
+    .editable-cell {
+      position: relative;
+    }
+    
+    .editable-cell .static-value {
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.2s;
+      font-size: 13px;
+    }
+    
+    .editable-cell .static-value:hover {
+      background: rgba(136, 28, 28, 0.1);
+    }
+    
+    .editable-select {
+      width: 100%;
+      padding: 4px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background: white;
+      outline: none;
+      font-size: 13px;
+    }
+    
+    .editable-select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(136, 28, 28, 0.2);
+    }
+    
+    .action-cell {
+      display: flex;
+      gap: 5px;
+    }
+    
+    .action-btn {
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+      background: rgba(136, 28, 28, 0.1);
+      color: var(--primary);
+      font-size: 12px;
+    }
+    
+    .action-btn:hover {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .action-btn.delete {
+      background: rgba(244, 67, 54, 0.1);
+      color: var(--danger);
+    }
+    
+    .action-btn.delete:hover {
+      background: var(--danger);
+      color: white;
+    }
+    
+    .pagination-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
+    }
+    
+    .pagination-controls {
+      display: flex;
+      gap: 5px;
+    }
+    
+    .page-btn {
+      padding: 8px 12px;
+      border-radius: 6px;
+      background: rgba(136, 28, 28, 0.1);
+      border: 1px solid rgba(136, 28, 28, 0.3);
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .page-btn:hover {
+      background: rgba(136, 28, 28, 0.2);
+    }
+    
+    .page-btn.active {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .page-btn.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .entries-per-page {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .entries-per-page select {
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid rgba(0,0,0,0.1);
+    }
+
+    #launch-complaints,#natures, #delay-complaints, #all-complaints {
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .action-dropdown {
+      position: relative;
+      display: inline-block;
+    }
+    
+    .action-dropdown-btn {
+      padding: 6px 12px;
+      background: rgba(136, 28, 28, 0.1);
+      color: var(--primary);
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    
+    .action-dropdown-content {
+      position: fixed;
+      display: none;
+      background-color: white;
+      min-width: 160px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      z-index: 100;
+      border-radius: 4px;
+      overflow: visible;
+    }
+    
+    .action-dropdown-content a {
+      color: var(--dark);
+      padding: 8px 12px;
+      text-decoration: none;
+      display: block;
+      font-size: 14px;
+    }
+    
+    .action-dropdown-content a:hover {
+      background-color: rgba(136, 28, 28, 0.1);
+    }
+    
+    .action-dropdown:hover .action-dropdown-content {
+      display: block;
+    }
+
+    @media (max-width: 1200px) {
+      .complaints-history-table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+    }
+
+    @media (max-width: 992px) {
+      .complaints-section-container {
+        grid-template-columns: 1fr;
+      }
+      
+      .complaints-sidebar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      
+      .complaints-option {
+        margin-bottom: 0;
+        flex: 1;
+        min-width: 150px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .nav-bar {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      
+      .nav-item {
+        padding: 15px;
+        font-size: 15px;
+      }
+      
+      .search-box {
+        flex-direction: column;
+      }
+      
+      .search-box input {
+        border-radius: 12px;
+        margin-bottom: 10px;
+      }
+      
+      .search-box button {
+        border-radius: 12px;
+        width: 100%;
+      }
+    }
+    
+    @media (max-width: 576px) {
+      .nav-container {
+        margin-left: 0;
+        justify-content: center;
+      }
+      
+      .action-dropdown-content {
+        min-width: 140px;
+      }
+      
+      .action-dropdown-content a {
+        padding: 6px 10px;
+        font-size: 13px;
+      }
+    }
+
+
+
+
+/* Buttons */
+.btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+}
+
+
+.btn-primary {
+  background-color: var(--primary);
+  color: white;
+  border: 1px solid var(--primary);
+}
+
+.btn-primary:hover {
+  background-color: #9e1e1e;
+}
+
+@media (max-width: 500px) {
+  .logo {
+    flex-direction: column;
+  }
+
+  .panel-title {
+    font-size: medium;
+  }
+}
+
+    .hamburger {
+      display: none;
+    }
+    /* Responsive header */
+    @media (max-width: 768px) {
+      .report-type .report-option {
+        padding: 10px 20px;
+        font-size: 15px;
+      }
+
+      .btn {
+        font-size: 15px;
+      }
+
+      .report-header h1 {
+        font-size: 20px;
+      }
+      
+      .logo h2 {
+        font-size: 16px;
+      }
+
+      .nav-container {
+        margin-left: 0;
+        justify-content: center;
+        display: none;
+      }
+      
+      .nav-item {
+        padding: 12px 15px;
+        font-size: 14px;
+      }
+
+      .content {
+        margin-top: 0px;
+        width: 100%;
+        padding: 10px 5px;
+      }
+      
+      header {
+        /*flex-direction: column;*/
+        height: auto;
+        padding: 5px;
+        gap: 15px;
+        margin-top: 0px;
+      }
+      
+      .logo {
+        margin-bottom: 0px;
+      }
+
+      .logo .logo-image {
+        width: 60px;
+        height: auto;
+        margin-bottom: 0px;
+        padding: 2px;
+      }
+
+      .user h2 {
+        font-size: 14px;
+        margin: 0px;
+      }
+      
+      .logout-btn {
+        padding: 4px 8px;
+        font-size: 15px;
+        font-weight: 650;
+      }
+
+      .hamburger {
+        display: flex;
+        height: 35px;
+        width: 35px;
+        background-color: rgba(0,0,0,0.2);
+        cursor: pointer;
+        padding: 8px;
+        margin-right: 10px;
+        border-radius: 4px;
+      }
+
+      .hamburger i {
+        font-size: 20px;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+      }
+
+      .navigation-block {
+        right: 0;
+        width: 100vw;
+        top: 55px;
+        border-radius: 0;
+      }
+
+      /* By default, hide the menu off-screen to the right */
+      .navigation-block {
+        position: fixed;
+        top: 60px;
+        right: -250px; /* Hide off-screen to the right */
+        display: flex;
+        flex-direction: column;
+        background-color: var(--primary);
+        width: 220px;
+        border-radius: 8px;
+        padding: 10px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        z-index: 999;
+        transition: right 0.3s ease-in-out; /* Smooth slide animation */
+        border: 2px solid rgba(0, 0, 0, 0.1);
+      }
+
+      /* Each nav item */
+      .navigation-block .navi-block-items {
+        color: white;
+        padding: 12px;
+        font-size: 16px;
+        text-decoration: none;
+        transition: background 0.2s ease;
+        font-weight: 500;
+      }
+
+      .navigation-block .navi-block-items:hover {
+        background: rgba(255,255,255,0.1);
+        border-radius: 5px;
+      }
+
+      /* Show menu when active - slide in from right */
+      .navigation-block.active {
+        right: 10px; /* Slide into view from the right */
+      }
+
+      .navigation-block div {
+        background-color: rgba(0, 0, 0, 0.1);
+      }
+    }
+
+
+
+
+
+    
+    .complaint-link {
+      color:#212529;
+      font-weight: bold;
+    }
+  </style>
+  <link rel="stylesheet" href="common-styles.css">
+</head>
+<body>
+  <!-- Notification Container (place this in your HTML) -->
+  <div class="notification-area" id="notification-area"></div>
+
+  <header>
+    <div class="logo">
+      <div class="logo-image">
+        <img src="logo.jpg" alt="logo image">
+      </div>
+      <h2>MES CMS</h2>
+    </div>
+
+    <div class="user">
+      <h2 id="user-id">Unknown</h2>
+      <button class="logout-btn" id="logout-btn">Logout</button>
+      <div class="hamburger">
+        <i class="fas fa-bars" id="hamburger-btn"></i>
+        <div class="navigation-block">
+          <a href="dashboard" class="navi-block-items">Dashboard</a>
+          <div class="navi-block-items active">Complaints</div>
+          <a href="users" class="navi-block-items">Users</a>
+          <a href="reporting" class="navi-block-items">Reporting</a>
+          <a href="admin" class="navi-block-items">Admin</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="nav-bar">
+    <div class="nav-container">
+      <a href="dashboard" class="nav-item">
+        <i class="fas fa-chart-line"></i>
+        Dashboard
+      </a>
+      <div class="nav-item active">
+        <i class="fas fa-ticket-alt"></i>
+        Complaints
+      </div>
+      <a href="users" class="nav-item">
+        <i class="fas fa-users"></i>
+        Users
+      </a>
+      <a href="reporting" class="nav-item">
+        <i class="fas fa-file-alt"></i>
+        Reporting
+      </a>
+      <a href="admin" class="nav-item">
+        <i class="fas fa-user-tie"></i>
+        Admin
+      </a>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="complaints-section-container">
+      <div class="complaints-sidebar">
+        <a href="launch-complaints.html" class="complaints-option" id="launch-complaints">
+          <i class="fas fa-rocket"></i>
+          Launch Complaints
+        </a>
+        <a href="all-complaints.html" class="complaints-option" id="all-complaints" >
+          <i class="fas fa-list"></i>
+          All Complaints
+        </a>
+        <a href="delay-complaints.html" class="complaints-option" id="delay-complaints">
+          <i class="fas fa-hourglass-half"></i>
+          Delay Complaints
+        </a>
+        <a href="natures.html" class="complaints-option" id="natures">
+          <i class="fas fa-chart-pie"></i>
+          Natures
+        </a>
+      </div>
+
+      <div class="complaints-content">
+        <div id="all-complaints" class="complaints-panel active">
+          <div class="panel-header">
+            <h2 class="panel-title">Immediate Complaints</h2>
+
+
+            <div class="entries-per-page">
+              <span>Show</span>
+              <select id="per-page-select">
+                <option value="10">10</option>
+                <option value="30">30</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+              <span>entries</span>
+            </div>
+          </div>
+
+          <div class="pagination-container">
+            <div id="pagination-info">Loading data...</div>
+            <div class="pagination-controls" id="complaints-pagination">
+              <button class="page-btn prev-btn disabled">
+                <i class="fas fa-chevron-left"></i>
+              </button>
+              <button class="page-btn active">1</button>
+              <button class="page-btn next-btn disabled">
+                <i class="fas fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+          
+          <table class="complaints-history-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Date/Time</th>
+                <th>Complaint ID</th>
+                <th>Type</th>
+                <th>Category</th>
+                <th>Colony</th>
+                <th>Building</th>
+                <th>Complaint By</th>
+                <th>Skillman</th>
+                <th>Tenant</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="complaints-table-body">
+              <!-- Data will be populated by JavaScript -->
+            </tbody>
+          </table>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+  
+<script>
+  const hamburgerBtn = document.getElementById("hamburger-btn");
+  const navBlock = document.querySelector(".navigation-block");
+
+  // Toggle navigation on hamburger click
+  hamburgerBtn.addEventListener("click", (e) => {
+    e.stopPropagation(); // Prevent click from bubbling to document
+    navBlock.classList.toggle("active");
+  });
+
+  // Close navigation when clicking outside
+  document.addEventListener("click", (e) => {
+    // Check if click is outside the navigation block and hamburger button
+    if (!navBlock.contains(e.target) && e.target !== hamburgerBtn) {
+      navBlock.classList.remove("active");
+    }
+  });
+
+  // Optional: Prevent clicks inside navigation from closing it
+  navBlock.addEventListener("click", (e) => {
+    e.stopPropagation();
+  });
+</script>
+
+
+<script>
+// Add this script to control navigation visibility based on backend permissions
+document.addEventListener('DOMContentLoaded', async function() {
+    try {
+        const authToken = localStorage.getItem('authToken');
+        if (!authToken) {
+            console.error('No authentication token found');
+            return;
+        }
+
+        // Fetch allowed pages from backend
+        const response = await fetch(`${SERVER_URL}/api/allowed-pages`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${authToken}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch allowed pages');
+        }
+
+        const data = await response.json();
+        
+        if (data.success) {
+            // Process navigation items based on allowed pages
+            processNavigationItems(data.allowedPages, data.navigationItems);
+        }
+    } catch (error) {
+        console.error('Error fetching allowed pages:', error);
+        // In case of error, you might want to show a default set of navigation items
+        // or handle it according to your application's requirements
+    }
+});
+
+function processNavigationItems(allowedPages, navigationItems) {
+    // Process header navigation items
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+        const href = item.getAttribute('href');
+        if (href) {
+            const pageName = href; // Get the page name without extension
+            
+            // Check if this category has an accessible page
+            if (navigationItems[pageName]) {
+                // Set the href to the first accessible page in this category
+                item.setAttribute('href', `${navigationItems[pageName]}.html`);
+                item.style.display = 'flex';
+            } else {
+                item.style.display = 'none';
+            }
+        }
+    });
+    
+    // Process hamburger menu navigation items
+    const hamburgerItems = document.querySelectorAll('.navi-block-items');
+    hamburgerItems.forEach(item => {
+        const href = item.getAttribute('href');
+        if (href) {
+            const pageName = href; // Get the page name without extension
+            
+            // Check if this category has an accessible page
+            if (navigationItems[pageName]) {
+                // Set the href to the first accessible page in this category
+                item.setAttribute('href', `${navigationItems[pageName]}.html`);
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        }
+    });
+    
+    // Process sidebar navigation items (use the allowedPages array)
+    const sidebarItems = document.querySelectorAll('.complaints-option');
+    sidebarItems.forEach(item => {
+        const href = item.getAttribute('href');
+        if (href) {
+            const pageName = getPageNameFromHref(href);
+            if (allowedPages.includes(pageName) || item.classList.contains('active')) {
+                item.style.display = 'flex';
+            } else {
+                item.style.display = 'none';
+            }
+        }
+    });
+}
+
+function getPageNameFromHref(href) {
+    if (!href) return '';
+    
+    // Extract page name from href (e.g., "dashboard.html" -> "dashboard")
+    const pageWithExtension = href.split('/').pop();
+    return pageWithExtension.split('.')[0];
+}
+</script>
+
+
+<script>
+    
+    let USER_ID = localStorage.getItem('UserId');
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById("user-id").textContent = USER_ID;
+      localStorage.removeItem('UserId');
+    });
+
+
+    function showNotification(message, type = 'success', duration = 3000) {
+      const notificationArea = document.getElementById('notification-area');
+      
+      // Create notification element
+      const notification = document.createElement('div');
+      notification.className = `notification ${type}`;
+      
+      // Set icon based on type
+      let icon;
+      switch(type) {
+        case 'success': icon = 'fa-check-circle'; break;
+        case 'error': icon = 'fa-exclamation-circle'; break;
+        case 'warning': icon = 'fa-exclamation-triangle'; break;
+        default: icon = 'fa-info-circle';
+      }
+      
+      notification.innerHTML = `
+        <i class="fas ${icon}"></i>
+        ${message}
+      `;
+      
+      // Add to notification area
+      notificationArea.appendChild(notification);
+      
+      // Auto-remove after duration
+      setTimeout(() => {
+        notification.style.opacity = '0';
+        setTimeout(() => notification.remove(), 300);
+      }, duration);
+    }
+
+
+  document.addEventListener('DOMContentLoaded', function() {
+
+    // DOM Elements
+    const logoutBtn = document.getElementById('logout-btn');
+    
+    logoutBtn.addEventListener('click', async () => {
+      try {
+        const authToken = localStorage.getItem('authToken');
+        const response = await fetch(SERVER_URL+'/logout', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${authToken}`,'Content-Type': 'application/json' }
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          console.log('Logout success:', data);
+          //alert('Logged out successfully!');
+          // 👇 you can add more procedural lines here
+          // e.g., redirect:
+          showNotification('Logging out');
+          localStorage.removeItem('authToken');
+          setTimeout(() => {
+            window.location.href = 'login.html';
+          }, 1000); // 1000 ms = 1 sec
+        } else {
+          console.error('Logout failed:', data);
+          alert('Logout failed!');
+        }
+
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Something went wrong!');
+      }
+    });
+    
+  });
+
+
+let currentPage = 1;
+let itemsPerPage = 10;
+let totalItems = 0;
+
+const tableBody = document.getElementById('complaints-table-body');
+const paginationInfo = document.getElementById('pagination-info');
+const paginationControls = document.getElementById('complaints-pagination');
+const perPageSelect = document.getElementById('per-page-select');
+
+function renderTable(complaints) {
+  tableBody.innerHTML = '';
+  if (!complaints.length) {
+    tableBody.innerHTML = '<tr><td colspan="11" style="text-align:center;">No complaints found.</td></tr>';
+    return;
+  }
+  complaints.forEach((c, idx) => {
+    tableBody.innerHTML += `
+      <tr>
+        <td>${(currentPage - 1) * itemsPerPage + idx + 1}</td>
+        <td>${c.launched_at ? new Date(c.launched_at).toLocaleString() : ''}</td>
+    <td>
+        <a href="#" class="complaint-link" data-id="${c.complaint_id}">
+            ${c.complaint_id || 'N/A'}
+        </a>
+    </td>
+        <td>${c.type || ''}</td>
+        <td>${c.category || ''}</td>
+        <td>${c.colony || ''}</td>
+        <td>${c.building || ''}</td>
+        <td>${c.complaint_by || ''}</td>
+        <td>${c.skillman || ''}</td>
+        <td>${c.tenant || ''}</td>
+        <td><span class="status-badge">${c.status || ''}</span></td>
+      </tr>
+    `;
+  });
+}
+
+function updatePagination() {
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  paginationInfo.textContent = `Page ${currentPage} of ${totalPages} (${totalItems} complaints)`;
+
+  // Controls
+  paginationControls.innerHTML = `
+    <button class="page-btn prev-btn${currentPage === 1 ? ' disabled' : ''}"><i class="fas fa-chevron-left"></i></button>
+    <button class="page-btn active">${currentPage}</button>
+    <button class="page-btn next-btn${currentPage === totalPages ? ' disabled' : ''}"><i class="fas fa-chevron-right"></i></button>
+  `;
+
+  // Event listeners
+  paginationControls.querySelector('.prev-btn').onclick = () => {
+    if (currentPage > 1) {
+      currentPage--;
+      fetchComplaints();
+    }
+  };
+  paginationControls.querySelector('.next-btn').onclick = () => {
+    if (currentPage < totalPages) {
+      currentPage++;
+      fetchComplaints();
+    }
+  };
+}
+
+function fetchComplaints() {
+  try {
+    const authToken = localStorage.getItem('authToken');
+
+    const endpoint = '/api/complaints-by-priority' +
+                     `?page=${currentPage}&pageSize=${itemsPerPage}&priority=Immediate`;
+
+    paginationInfo.textContent = 'Loading data...';
+    tableBody.innerHTML = '';
+
+    fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authToken}`
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        totalItems = data.pagination.total;
+        renderTable(data.data);
+        updatePagination();
+        showNotification('Complaints loaded successfully', 'success');
+      } else {
+        throw new Error(data.message || 'Failed to fetch complaints');
+      }
+    })
+    .catch(error => {
+      tableBody.innerHTML = `<tr><td colspan="11" style="text-align:center;color:red;">${error.message}</td></tr>`;
+      paginationInfo.textContent = 'Error loading data';
+      showNotification('Error loading data', 'error');
+    });
+
+  } catch (error) {
+    showNotification(error, 'error');
+  }
+}
+
+
+function renderTable(complaints) {
+  tableBody.innerHTML = '';
+  if (!complaints.length) {
+    tableBody.innerHTML = '<tr><td colspan="11" style="text-align:center;">No complaints found.</td></tr>';
+    return;
+  }
+complaints.forEach((complaint, idx) => {
+  const launchedAt = complaint.launched_at ? new Date(complaint.launched_at) : null;
+  const dateStr = launchedAt ? launchedAt.toISOString().split('T')[0] : '';
+  const timeStr = launchedAt ? launchedAt.toTimeString().split(' ')[0].substring(0, 5) : '';
+
+  // Determine status class
+  let statusClass = '';
+  switch ((complaint.status || '').toLowerCase()) {
+    case 'in-progress':
+      statusClass = 'status-in-progress';
+      break;
+    case 'completed':
+      statusClass = 'status-completed';
+      break;
+    case 'deffered':
+      statusClass = 'status-deffered';
+      break;
+    case 'un-assigned':
+      statusClass = 'status-un-assigned';
+      break;
+    default:
+      statusClass = '';
+  }
+
+  tableBody.innerHTML += `
+    <tr>
+      <td>${(currentPage - 1) * itemsPerPage + idx + 1}</td>
+      <td>${dateStr}<br>${timeStr}</td>
+    <td>
+        <a href="#" class="complaint-link" data-id="${complaint.complaint_id}">
+            ${complaint.complaint_id || 'N/A'}
+        </a>
+    </td>
+      <td>${complaint.type || ''}</td>
+      <td>${complaint.category || ''}</td>
+      <td>${complaint.colony || complaint.location_colony_name || ''}</td>
+      <td>${complaint.building || complaint.location_building_number || ''}</td>
+      <td>${complaint.complaint_by || complaint.customer_name || ''}</td>
+      <td>${complaint.skillman || complaint.skillman_name || ''}</td>
+      <td>${complaint.tenant || complaint.customer_name || ''}</td>
+      <td><span class="status-badge ${statusClass}">${complaint.status || ''}</span></td>
+    </tr>
+  `;
+});
+}
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+
+    document.querySelectorAll('.complaints-option[data-panel="all-complaints"]').forEach(el => {
+        el.addEventListener('click', function() {
+        window.location.href = 'all-complaints.html';
+        });
+    });
+
+});
+
+
+// Per page selector
+perPageSelect.addEventListener('change', function() {
+  itemsPerPage = parseInt(this.value, 10);
+  currentPage = 1;
+  fetchComplaints();
+});
+
+
+// Initial load
+fetchComplaints();
+
+
+
+
+document.addEventListener('click', (e) => {
+  const link = e.target.closest('.complaint-link');
+  if (!link) return;
+  e.preventDefault();
+  const complaintId = link.dataset.id;
+  handleComplaintClick(complaintId);
+});
+
+  
+async function handleComplaintClick(complaintId) {
+  try {
+    const authToken = localStorage.getItem('authToken');
+    
+    // Show loading state if needed
+    showNotification('Loading complaint details...', 'info', 2000);
+    
+    // Send complaint ID to encryption API
+    const response = await fetch(`${SERVER_URL}/api/encrypt-id`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${authToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ complaint_id: complaintId })
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to encrypt complaint ID');
+    }
+    
+    const data = await response.json();
+    
+    if (data.success && data.encrypted_id) {
+      // Redirect to complaint details page with encrypted ID
+      showNotification('Navigating to complaint details...', 'success', 2000);
+      window.location.href = `complaint-details.html?${data.encrypted_id}`;
+      console.log(`Redirecting to complaint-details?${data.encrypted_id}`);
+
+    } else {
+      throw new Error(data.message || 'Failed to encrypt ID');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    showNotification('Failed to open complaint details: ' + error.message, 'error', 3000);
+  }
+}
+</script>
+
+  <script src="chat-bot.js"></script>
+</body>
+</html>

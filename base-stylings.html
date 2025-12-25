@@ -1,0 +1,2090 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complaint Cloud - launch-complaints</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #B00020;
+            --secondary: #D32F2F;
+            --accent: #4caf50;
+            --warning: #ff9800;
+            --danger: #f44336;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --cloud-color: rgba(255, 255, 255, 0.98);
+            --nav-bg: rgba(255, 255, 255, 0.85);
+            --nav-active: rgba(176, 0, 32, 0.15);
+            --nav-hover: rgba(176, 0, 32, 0.08);
+            --success: #4caf50;
+        }
+
+        body {
+            background: linear-gradient(135deg, #ff9a9e, #f54b5e, #B00020);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .cloud {
+            position: absolute;
+            background: var(--cloud-color);
+            border-radius: 50%;
+            animation: float 25s infinite ease-in-out;
+            z-index: -1;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.1));
+        }
+
+        .cloud:nth-child(1) {
+            width: 180px;
+            height: 180px;
+            top: 10%;
+            left: 5%;
+            animation-delay: 0s;
+        }
+
+        .cloud:nth-child(2) {
+            width: 240px;
+            height: 240px;
+            top: 25%;
+            right: 10%;
+            animation-delay: 3s;
+        }
+
+        .cloud:nth-child(3) {
+            width: 150px;
+            height: 150px;
+            bottom: 20%;
+            left: 15%;
+            animation-delay: 6s;
+        }
+
+        .cloud:nth-child(4) {
+            width: 210px;
+            height: 210px;
+            bottom: 15%;
+            right: 20%;
+            animation-delay: 9s;
+        }
+
+        .cloud:nth-child(5) {
+            width: 130px;
+            height: 130px;
+            top: 40%;
+            left: 25%;
+            animation-delay: 12s;
+        }
+        
+        .cloud:nth-child(6) {
+            width: 190px;
+            height: 190px;
+            top: 60%;
+            left: 40%;
+            animation-delay: 15s;
+        }
+        
+        .cloud:nth-child(7) {
+            width: 160px;
+            height: 160px;
+            top: 30%;
+            left: 70%;
+            animation-delay: 18s;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) translateX(0);
+            }
+            25% {
+                transform: translateY(-40px) translateX(30px);
+            }
+            50% {
+                transform: translateY(15px) translateX(60px);
+            }
+            75% {
+                transform: translateY(25px) translateX(30px);
+            }
+            100% {
+                transform: translateY(0) translateX(0);
+            }
+        }
+
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            margin-bottom: 10px;
+            border-bottom: 1px solid rgba(0,0,0,0.08);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .brand h1 {
+            font-size: 32px;
+            color: var(--primary);
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 0.5px;
+        }
+
+        .logo-container {
+            width: 70px;
+            height: 70px;
+            border-radius: 20px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+            overflow: hidden;
+            transition: all 0.4s ease;
+        }
+
+        .logo-container:hover {
+            transform: rotate(5deg) scale(1.08);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.18);
+        }
+
+        .custom-logo {
+            width: 80%;
+            height: 80%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .logo-cloud {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.6);
+        }
+
+        .logo-cloud::before,
+        .logo-cloud::after {
+            content: '';
+            position: absolute;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+        }
+
+        .logo-cloud::before {
+            width: 60%;
+            height: 60%;
+            top: -25%;
+            left: -15%;
+        }
+
+        .logo-cloud::after {
+            width: 50%;
+            height: 50%;
+            top: -20%;
+            right: -15%;
+        }
+
+        .logo-text {
+            position: absolute;
+            font-size: 28px;
+            font-weight: 800;
+            color: white;
+            z-index: 2;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            letter-spacing: 1px;
+        }
+
+        .user-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-info {
+            text-align: right;
+        }
+
+        .user-info .name {
+            font-weight: 700;
+            font-size: 18px;
+            letter-spacing: 0.5px;
+        }
+
+        .user-info .role {
+            color: var(--gray);
+            font-size: 14px;
+            margin-top: 3px;
+        }
+
+        .avatar {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 22px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+            transition: transform 0.3s ease;
+        }
+
+        .avatar:hover {
+            transform: scale(1.05);
+        }
+
+        .logout-btn {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            box-shadow: 0 6px 18px rgba(244, 67, 54, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logout-btn:hover {
+            background: #d32f2f;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 22px rgba(244, 67, 54, 0.4);
+        }
+
+        .nav-container {
+            margin: 20px 0 30px;
+            background: var(--nav-bg);
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+        }
+
+        .nav-bar {
+            display: flex;
+            padding: 0 20px;
+        }
+
+        .nav-item {
+            padding: 18px 25px;
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--dark);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .nav-item:hover {
+            background: var(--nav-hover);
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+            background: var(--nav-active);
+        }
+
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            border-radius: 0 0 4px 4px;
+        }
+
+        .nav-item i {
+            font-size: 20px;
+        }
+
+        .complaints-section-container {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 30px;
+            min-height: 600px;
+        }
+        
+        .complaints-sidebar {
+            background: var(--card-bg);
+            border-radius: 18px;
+            padding: 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+        
+        .complaints-option {
+            padding: 18px 20px;
+            margin-bottom: 15px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(248, 249, 250, 0.7);
+        }
+        
+        .complaints-option:hover {
+            background: var(--nav-hover);
+        }
+        
+        .complaints-option.active {
+            background: var(--nav-active);
+            color: var(--primary);
+            box-shadow: 0 5px 15px rgba(176, 0, 32, 0.2);
+        }
+        
+        .complaints-option i {
+            font-size: 20px;
+        }
+        
+        .complaints-content {
+            background: var(--card-bg);
+            border-radius: 18px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .complaints-panel {
+            display: none;
+        }
+        
+        .complaints-panel.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .panel-header {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(0,0,0,0.08);
+        }
+        
+        .panel-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .required:after {
+            content: " *";
+            color: var(--danger);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 14px 18px;
+            border-radius: 12px;
+            border: 1px solid rgba(0,0,0,0.1);
+            background: rgba(248, 249, 250, 0.5);
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(176, 0, 32, 0.2);
+        }
+        
+        .btn {
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 6px 18px rgba(176, 0, 32, 0.4);
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(to right, #9a001b, #e04747);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 22px rgba(176, 0, 32, 0.5);
+        }
+        
+        .btn-secondary {
+            background: var(--gray);
+            color: white;
+            box-shadow: 0 6px 18px rgba(108, 117, 125, 0.3);
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 22px rgba(108, 117, 125, 0.4);
+        }
+        
+        .search-box {
+            display: flex;
+            margin-bottom: 30px;
+        }
+        
+        .search-box input {
+            flex: 1;
+            border-radius: 12px 0 0 12px;
+        }
+        
+        .search-box button {
+            border-radius: 0 12px 12px 0;
+        }
+        
+        .complaint-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .complaint-card {
+            background: rgba(248, 249, 250, 0.7);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(0,0,0,0.05);
+            transition: all 0.3s;
+        }
+        
+        .complaint-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+        }
+        
+        .complaint-card-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        
+        .complaint-card-id {
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .complaint-card-title {
+            font-weight: 600;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        
+        .complaint-card-desc {
+            color: var(--gray);
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        .complaint-card-footer {
+            display: flex;
+            justify-content: space-between;
+            color: var(--gray);
+            font-size: 14px;
+        }
+        
+        .priority {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        .priority.high {
+            background: var(--danger);
+            box-shadow: 0 0 8px rgba(244, 67, 54, 0.4);
+        }
+
+        .priority.medium {
+            background: var(--warning);
+            box-shadow: 0 0 8px rgba(255, 152, 0, 0.4);
+        }
+
+        .priority.low {
+            background: var(--accent);
+            box-shadow: 0 0 8px rgba(76, 175, 80, 0.4);
+        }
+        
+        .action-select {
+            width: 100%;
+            padding: 14px 18px;
+            border-radius: 12px;
+            border: 1px solid rgba(0,0,0,0.1);
+            background: rgba(248, 249, 250, 0.5);
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .user-addresses {
+            display: none;
+            margin-bottom: 20px;
+        }
+        
+        .user-addresses.active {
+            display: block;
+        }
+        
+        .user-address {
+            background: rgba(176, 0, 32, 0.1);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .user-address:hover {
+            background: rgba(176, 0, 32, 0.2);
+        }
+        
+        .user-address.selected {
+            background: rgba(176, 0, 32, 0.3);
+            border: 2px solid var(--primary);
+        }
+        
+        .user-address h4 {
+            margin-bottom: 5px;
+            color: var(--primary);
+        }
+        
+        .user-address p {
+            margin: 3px 0;
+            color: var(--dark);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 18px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 30px;
+            position: relative;
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--gray);
+            transition: color 0.3s;
+        }
+        
+        .close-modal:hover {
+            color: var(--danger);
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 20px 0 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .new-building-toggle {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+        }
+        
+        .new-building-toggle label {
+            margin-left: 10px;
+            font-weight: 600;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .warning-note {
+            background: rgba(255, 152, 0, 0.1);
+            padding: 15px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border-left: 4px solid var(--warning);
+        }
+        
+        .locations-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .locations-table th {
+            background: rgba(176, 0, 32, 0.1);
+            color: var(--primary);
+            font-weight: 700;
+            padding: 16px;
+            text-align: left;
+        }
+        
+        .locations-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .locations-table tr:hover {
+            background: rgba(176, 0, 32, 0.05);
+        }
+        
+        .locations-table tr.selected {
+            background: rgba(176, 0, 32, 0.2);
+        }
+        
+        .user-found-details {
+            background: rgba(76, 175, 80, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--accent);
+            display: none;
+        }
+        
+        .user-found-details.active {
+            display: block;
+        }
+        
+        .user-detail-row {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        
+        .user-detail-label {
+            font-weight: 600;
+            width: 120px;
+            color: var(--dark);
+        }
+        
+        .user-detail-value {
+            flex: 1;
+            color: var(--gray);
+        }
+        
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+        .status-open {
+            background: rgba(33, 150, 243, 0.1);
+            color: #2196F3;
+        }
+        
+        .status-in-progress {
+            background: rgba(255, 152, 0, 0.1);
+            color: #FF9800;
+        }
+        
+        .status-resolved {
+            background: rgba(76, 175, 80, 0.1);
+            color: #4CAF50;
+        }
+        
+        .status-closed {
+            background: rgba(158, 158, 158, 0.1);
+            color: #9E9E9E;
+        }
+        
+        .editable-cell {
+            position: relative;
+        }
+        
+        .editable-cell .static-value {
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .editable-cell .static-value:hover {
+            background: rgba(176, 0, 32, 0.1);
+        }
+        
+        .editable-cell .edit-input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: transparent;
+            padding: 5px 10px;
+            font-size: inherit;
+            outline: 2px solid var(--primary);
+            border-radius: 4px;
+        }
+        
+        .editable-select {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: white;
+            outline: none;
+        }
+        
+        .editable-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(176, 0, 32, 0.2);
+        }
+        
+        .action-cell {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .action-btn {
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            background: rgba(176, 0, 32, 0.1);
+            color: var(--primary);
+        }
+        
+        .action-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .action-btn.delete {
+            background: rgba(244, 67, 54, 0.1);
+            color: var(--danger);
+        }
+        
+        .action-btn.delete:hover {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .complaints-history-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border-radius: 12px;
+            overflow: hidden;
+            background: white;
+        }
+        
+        .complaints-history-table th {
+            background: rgba(176, 0, 32, 0.1);
+            color: var(--primary);
+            font-weight: 700;
+            padding: 16px;
+            text-align: left;
+        }
+        
+        .complaints-history-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .complaints-history-table tr:hover {
+            background: rgba(176, 0, 32, 0.05);
+        }
+        
+        .complaints-history-table tr.selected {
+            background: rgba(176, 0, 32, 0.2);
+        }
+        
+        .nature-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .nature-table th {
+            background: rgba(176, 0, 32, 0.1);
+            color: var(--primary);
+            font-weight: 700;
+            padding: 16px;
+            text-align: left;
+        }
+        
+        .nature-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .nature-table tr:hover {
+            background: rgba(176, 0, 32, 0.05);
+        }
+        
+        .nature-types {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .nature-type {
+            background: rgba(176, 0, 32, 0.1);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .remove-type {
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            margin-left: 8px;
+            font-weight: bold;
+        }
+        
+        .add-type-form {
+            display: flex;
+            margin-top: 10px;
+        }
+        
+        .add-type-form input {
+            flex: 1;
+            padding: 10px 15px;
+            border-radius: 20px 0 0 20px;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        .add-type-form button {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 0 20px;
+            border-radius: 0 20px 20px 0;
+            cursor: pointer;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn-nature {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .action-btn-nature:hover {
+            opacity: 0.9;
+        }
+        
+        .action-btn-nature.delete {
+            background: var(--danger);
+        }
+        
+        .new-nature-form {
+            background: rgba(248, 249, 250, 0.7);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: none;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        .new-nature-form.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .edit-mode .static-field {
+            display: none;
+        }
+        
+        .edit-mode .edit-field {
+            display: block;
+        }
+        
+        .edit-field {
+            display: none;
+            width: 100%;
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        
+        .edit-field:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+        
+        .edit-controls {
+            display: none;
+            margin-top: 10px;
+        }
+        
+        .edit-mode .edit-controls {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+        
+        .pagination-controls {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .page-btn {
+            padding: 8px 12px;
+            border-radius: 6px;
+            background: rgba(176, 0, 32, 0.1);
+            border: 1px solid rgba(176, 0, 32, 0.3);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .page-btn:hover {
+            background: rgba(176, 0, 32, 0.2);
+        }
+        
+        .page-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .page-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .entries-per-page {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .entries-per-page select {
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        .search-method-toggle {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .method-toggle {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+        
+        .method-toggle input { 
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: var(--primary);
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(30px);
+        }
+        
+        .toggle-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+        
+        .nature-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 992px) {
+            .complaints-section-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .complaints-sidebar {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            
+            .complaints-option {
+                margin-bottom: 0;
+                flex: 1;
+                min-width: 150px;
+            }
+            
+            .complaints-history-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-bar {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .nav-item {
+                padding: 15px;
+                font-size: 15px;
+            }
+            
+            header {
+                flex-direction: column;
+                text-align: center;
+                gap: 20px;
+            }
+            
+            .brand {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .user-area {
+                margin-top: 10px;
+                flex-direction: column;
+            }
+            
+            .user-info {
+                text-align: center;
+                margin: 10px 0;
+            }
+            
+            .logout-btn {
+                margin-top: 10px;
+            }
+            
+            .complaints-option {
+                padding: 12px 15px;
+                font-size: 14px;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+            }
+            
+            .user-detail-row {
+                flex-direction: column;
+            }
+            
+            .user-detail-label {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+            
+            .nature-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="modal" id="add-user-modal">
+        <div class="modal-content">
+            <span class="close-modal" id="close-add-user-modal">&times;</span>
+            <h2 class="panel-title">Add New User</h2>
+            
+            <div class="section-title">Customer Information</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="customer-name" class="required">Full Name</label>
+                    <input type="text" id="customer-name" class="form-control" placeholder="Enter customer name" required>
+                </div>
+                <div class="form-group">
+                    <label for="customer-phone" class="required">Phone Number</label>
+                    <input type="tel" id="customer-phone" class="form-control" placeholder="Enter phone number" required>
+                </div>
+            </div>
+            
+            <div class="section-title">Address Information</div>
+            <div class="form-group">
+                <label for="building-search">Search Building by name</label>
+                <div class="search-box">
+                    <input type="text" id="building-search" class="form-control" placeholder="Enter building name">
+                    <button class="btn btn-secondary" id="find-building-btn">
+                        <i class="fas fa-search"></i>
+                        Find
+                    </button>
+                </div>
+            </div>
+            
+            <div class="new-building-toggle">
+                <input type="checkbox" id="new-building-checkbox">
+                <label for="new-building-checkbox">New Building</label>
+            </div>
+            
+            <div id="existing-locations-section">
+                <table class="locations-table" id="locations-table">
+                    <thead>
+                        <tr>
+                            <th>Building Name</th>
+                            <th>Colony</th>
+                            <th>Building Type</th>
+                            <th>Building No</th>
+                        </tr>
+                    </thead>
+                    <tbody id="locations-table-body">
+                    </tbody>
+                </table>
+            </div>
+            
+            <div id="new-building-form" style="display: none;">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="colony-select" class="required">Select Colony</label>
+                        <select id="colony-select" class="form-control" required>
+                            <option value="">Select Colony</option>
+                            <option value="colony1">Green Valley</option>
+                            <option value="colony2">Sunset Hills</option>
+                            <option value="colony3">River View</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="building-type" class="required">Select Building Type</label>
+                        <select id="building-type" class="form-control" required>
+                            <option value="">Select Type</option>
+                            <option value="residential">Residential</option>
+                            <option value="commercial">Commercial</option>
+                            <option value="mixed">Mixed Use</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="building-no" class="required">Building/House No</label>
+                        <input type="text" id="building-no" class="form-control" placeholder="Enter building number" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="apartment-no">Apartment/Unit</label>
+                        <input type="text" id="apartment-no" class="form-control" placeholder="Enter apartment number">
+                    </div>
+                    <div class="form-group">
+                        <label for="apartment-type">Apartment Type</label>
+                        <select id="apartment-type" class="form-control">
+                            <option value="">Select Type</option>
+                            <option value="studio">Studio</option>
+                            <option value="1bhk">1BHK</option>
+                            <option value="2bhk">2BHK</option>
+                            <option value="3bhk">3BHK</option>
+                            <option value="penthouse">Penthouse</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="warning-note">
+                <i class="fas fa-exclamation-triangle"></i> Apartments that are clearly accommodated will be overridden!
+            </div>
+            
+            <div class="form-actions">
+                <button class="btn btn-secondary" id="cancel-add-user">
+                    <i class="fas fa-times"></i>
+                    Close
+                </button>
+                <button class="btn btn-primary" id="save-new-user">
+                    <i class="fas fa-save"></i>
+                    Save User
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="dashboard-container">
+        <header>
+            <div class="brand">
+                <div class="logo-container">
+                    <div class="custom-logo">
+                        <div class="logo-cloud">
+                            <div class="logo-text">CC</div>
+                        </div>
+                    </div>
+                </div>
+                <h1>Complaint Cloud</h1>
+            </div>
+            
+            <div class="user-area">
+                <div class="user-info">
+                    <div class="name">Alex Johnson</div>
+                    <div class="role">Support Manager</div>
+                </div>
+                <div class="avatar">AJ</div>
+                <button class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </button>
+            </div>
+        </header>
+        
+        <div class="nav-container">
+            <div class="nav-bar">
+                <a href="complaints.html" class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    Dashboard
+                </a>
+                <a href="complaints.html" class="nav-item active">
+                    <i class="fas fa-ticket-alt"></i>
+                    Complaints
+                </a>
+                <a href="users.html" class="nav-item">
+                    <i class="fas fa-users"></i>
+                    Users
+                </a>
+                <a href="store.html" class="nav-item">
+                    <i class="fas fa-store"></i>
+                    Store
+                </a>
+                <a href="reporting.html" class="nav-item">
+                    <i class="fas fa-file-alt"></i>
+                    Reporting
+                </a>
+            </div>
+        </div>
+        
+        <div class="complaints-section-container">
+            <div class="complaints-sidebar">
+                <div class="complaints-option active" data-panel="launch-complaints">
+                    <i class="fas fa-rocket"></i>
+                    Launch Complaints
+                </div>
+                <a href="all-complaints.html" class="complaints-option">
+                    <i class="fas fa-list"></i>
+                    All Complaints
+                </a>
+                <a href="natures.html" class="complaints-option">
+                    <i class="fas fa-chart-pie"></i>
+                    Natures
+                </a>
+            </div>
+            
+            <div class="complaints-content">
+                <div id="launch-complaints" class="complaints-panel active">
+                    <div class="panel-header">
+                        <h2 class="panel-title">Launch New Complaint</h2>
+                    </div>
+                    
+                    <div class="search-method-toggle">
+                        <div class="toggle-label">
+                            <span>Find by Phone</span>
+                            <label class="method-toggle">
+                                <input type="checkbox" id="search-method-toggle">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span>Find by Location</span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group phone-search">
+                        <label for="find-phone" class="required">Find by Phone Number</label>
+                        <div class="search-box">
+                            <input type="tel" id="find-phone" class="form-control" placeholder="Enter phone number">
+                            <button class="btn btn-primary" id="find-user-btn">
+                                <i class="fas fa-search"></i>
+                                Find
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group location-search" style="display: none;">
+                        <label for="find-location" class="required">Find by Location</label>
+                        <div class="search-box">
+                            <input type="text" id="find-location" class="form-control" placeholder="Enter colony name">
+                            <button class="btn btn-primary" id="find-location-btn">
+                                <i class="fas fa-search"></i>
+                                Find
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="user-found-details" id="user-found-details">
+                        <h3><i class="fas fa-user-check"></i> User Found</h3>
+                        <div class="user-detail-row">
+                            <div class="user-detail-label">Name:</div>
+                            <div class="user-detail-value" id="found-user-name"></div>
+                        </div>
+                        <div class="user-detail-row">
+                            <div class="user-detail-label">Phone:</div>
+                            <div class="user-detail-value" id="found-user-phone"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="user-addresses" id="user-addresses">
+                        <h3>Select an Address</h3>
+                    </div>
+                    
+                    <div class="form-group" id="complaint-form" style="display: none;">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="category-select" class="required">Select Category</label>
+                                <select id="category-select" class="form-control" required>
+                                    <option value="">Select Category</option>
+                                    <option value="air-conditioner">Air Conditioner</option>
+                                    <option value="aluminium">Aluminium</option>
+                                    <option value="cooking-range">Cooking Range/Hub Stove</option>
+                                    <option value="electrical">Electrical</option>
+                                    <option value="plumbing">Plumbing</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="category-description">Category Description</label>
+                                <textarea id="category-description" class="form-control" rows="2" placeholder="Enter category description"></textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="skillman-select" class="required">Assign Skillman</label>
+                                <select id="skillman-select" class="form-control" required>
+                                    <option value="">Select Skillman</option>
+                                    <option value="John Davis (Electrician)">John Davis (Electrician)</option>
+                                    <option value="Mark Wilson (Plumber)">Mark Wilson (Plumber)</option>
+                                    <option value="Lisa Thompson (Carpenter)">Lisa Thompson (Carpenter)</option>
+                                    <option value="Mike Chen (AC Specialist)">Mike Chen (AC Specialist)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="poc" class="required">Point of Contact</label>
+                                <input type="text" id="poc" class="form-control" placeholder="Enter POC name" required>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-primary" id="launch-complaint-btn">
+                            <i class="fas fa-paper-plane"></i>
+                            Launch Complaint
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function initializeLocalStorage() {
+            if (!localStorage.getItem('complaintCloudUsers')) {
+                const initialUsers = [
+                    {
+                        id: 1,
+                        name: "Sarah Williams",
+                        phone: "+1 234 567 890",
+                        addresses: [
+                            {
+                                id: 1,
+                                name: "Home Address",
+                                street: "123 Main St",
+                                colony: "Green Valley",
+                                buildingType: "Residential",
+                                buildingNo: "5",
+                                apartmentNo: "301",
+                                apartmentType: "2BHK"
+                            }
+                        ]
+                    },
+                    {
+                        id: 2,
+                        name: "Michael Brown",
+                        phone: "+1 345 678 901",
+                        addresses: [
+                            {
+                                id: 1,
+                                name: "Office Address",
+                                street: "456 Business Ave",
+                                colony: "Sunset Hills",
+                                buildingType: "Commercial",
+                                buildingNo: "12",
+                                apartmentNo: "Suite 1200",
+                                apartmentType: "Office"
+                            },
+                            {
+                                id: 2,
+                                name: "Home Address",
+                                street: "789 Oak Lane",
+                                colony: "River View",
+                                buildingType: "Residential",
+                                buildingNo: "7B",
+                                apartmentNo: "102",
+                                apartmentType: "3BHK"
+                            }
+                        ]
+                    },
+                    {
+                        id: 3,
+                        name: "Robert Garcia",
+                        phone: "+1 456 789 012",
+                        addresses: [
+                            {
+                                id: 1,
+                                name: "Home Address",
+                                street: "101 Pine Street",
+                                colony: "Green Valley",
+                                buildingType: "Residential",
+                                buildingNo: "8",
+                                apartmentNo: "204",
+                                apartmentType: "1BHK"
+                            }
+                        ]
+                    },
+                    {
+                        id: 4,
+                        name: "Emily Chen",
+                        phone: "+1 567 890 123",
+                        addresses: [
+                            {
+                                id: 1,
+                                name: "Apartment",
+                                street: "202 Maple Road",
+                                colony: "Sunset Hills",
+                                buildingType: "Residential",
+                                buildingNo: "15B",
+                                apartmentNo: "502",
+                                apartmentType: "Penthouse"
+                            }
+                        ]
+                    }
+                ];
+                localStorage.setItem('complaintCloudUsers', JSON.stringify(initialUsers));
+            }
+            
+            if (!localStorage.getItem('complaintCloudComplaints')) {
+                const initialComplaints = [
+                    {
+                        id: 1001,
+                        customerName: "Sarah Williams",
+                        phone: "+1 234 567 890",
+                        address: "123 Main St, Green Valley, Building 5, Apt 301 (2BHK)",
+                        category: "Electrical",
+                        description: "Power outage in living room",
+                        skillman: "John Davis (Electrician)",
+                        status: "In Progress",
+                        date: "2023-05-15"
+                    },
+                    {
+                        id: 1002,
+                        customerName: "Michael Brown",
+                        phone: "+1 345 678 901",
+                        address: "789 Oak Lane, River View, Building 7B, Apt 102 (3BHK)",
+                        category: "Plumbing",
+                        description: "Kitchen sink leakage",
+                        skillman: "Mark Wilson (Plumber)",
+                        status: "Resolved",
+                        date: "2023-05-10"
+                    },
+                    {
+                        id: 1003,
+                        customerName: "Sarah Williams",
+                        phone: "+1 234 567 890",
+                        address: "123 Main St, Green Valley, Building 5, Apt 301 (2BHK)",
+                        category: "Air Conditioner",
+                        description: "AC not cooling properly",
+                        skillman: "Mike Chen (AC Specialist)",
+                        status: "Open",
+                        date: "2023-05-18"
+                    },
+                    {
+                        id: 1004,
+                        customerName: "Robert Garcia",
+                        phone: "+1 456 789 012",
+                        address: "101 Pine Street, Green Valley, Building 8, Apt 204 (1BHK)",
+                        category: "Electrical",
+                        description: "Flickering lights in bedroom",
+                        skillman: "John Davis (Electrician)",
+                        status: "Open",
+                        date: "2023-05-20"
+                    },
+                    {
+                        id: 1005,
+                        customerName: "Emily Chen",
+                        phone: "+1 567 890 123",
+                        address: "202 Maple Road, Sunset Hills, Building 15B, Apt 502 (Penthouse)",
+                        category: "Aluminium",
+                        description: "Window not closing properly",
+                        skillman: "Lisa Thompson (Carpenter)",
+                        status: "In Progress",
+                        date: "2023-05-22"
+                    }
+                ];
+                localStorage.setItem('complaintCloudComplaints', JSON.stringify(initialComplaints));
+            }
+        }
+        
+        const dummyLocations = [
+            {
+                id: 1,
+                name: "Green Valley Heights",
+                colony: "Green Valley",
+                buildingType: "Residential",
+                buildingNo: "GV-12"
+            },
+            {
+                id: 2,
+                name: "Sunset Business Center",
+                colony: "Sunset Hills",
+                buildingType: "Commercial",
+                buildingNo: "SH-05"
+            },
+            {
+                id: 3,
+                name: "River View Apartments",
+                colony: "River View",
+                buildingType: "Residential",
+                buildingNo: "RV-08"
+            },
+            {
+                id: 4,
+                name: "Central Plaza",
+                colony: "Downtown",
+                buildingType: "Mixed Use",
+                buildingNo: "CT-01"
+            },
+            {
+                id: 5,
+                name: "Pine Grove Complex",
+                colony: "North Park",
+                buildingType: "Residential",
+                buildingNo: "PG-23"
+            }
+        ];
+        
+        function getUsers() {
+            return JSON.parse(localStorage.getItem('complaintCloudUsers')) || [];
+        }
+        
+        function saveUsers(users) {
+            localStorage.setItem('complaintCloudUsers', JSON.stringify(users));
+        }
+        
+        function getComplaints() {
+            return JSON.parse(localStorage.getItem('complaintCloudComplaints')) || [];
+        }
+        
+        function saveComplaints(complaints) {
+            localStorage.setItem('complaintCloudComplaints', JSON.stringify(complaints));
+        }
+        
+        function addNewUser(user) {
+            const users = getUsers();
+            const newUser = {
+                id: Date.now(),
+                ...user
+            };
+            users.push(newUser);
+            saveUsers(users);
+            return newUser;
+        }
+        
+        function addNewComplaint(complaint) {
+            const complaints = getComplaints();
+            const newComplaint = {
+                id: Date.now(),
+                ...complaint
+            };
+            complaints.push(newComplaint);
+            saveComplaints(complaints);
+            return newComplaint;
+        }
+        
+        function findUserByPhone(phone) {
+            const users = getUsers();
+            return users.find(user => user.phone === phone);
+        }
+        
+        function findUsersByLocation(location) {
+            const users = getUsers();
+            const searchLower = location.toLowerCase();
+            return users.filter(user => 
+                user.addresses.some(address => 
+                    address.colony.toLowerCase() === searchLower
+                )
+            );
+        }
+        
+        function generateAddressHTML(address) {
+            return `
+                <div class="user-address" data-address-id="${address.id}">
+                    <h4>${address.name}</h4>
+                    <p>${address.street}, ${address.colony}</p>
+                    <p>Building ${address.buildingNo}, ${address.apartmentNo} (${address.apartmentType})</p>
+                </div>
+            `;
+        }
+        
+        function generateLocationRows(locations) {
+            return locations.map(location => `
+                <tr data-location-id="${location.id}">
+                    <td>${location.name}</td>
+                    <td>${location.colony}</td>
+                    <td>${location.buildingType}</td>
+                    <td>${location.buildingNo}</td>
+                </tr>
+            `).join('');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeLocalStorage();
+            
+            const locationsTableBody = document.getElementById('locations-table-body');
+            if (locationsTableBody) {
+                locationsTableBody.innerHTML = generateLocationRows(dummyLocations);
+            }
+            
+            document.getElementById('new-building-checkbox').addEventListener('change', function() {
+                const isChecked = this.checked;
+                document.getElementById('new-building-form').style.display = 
+                    isChecked ? 'block' : 'none';
+                document.getElementById('existing-locations-section').style.display = 
+                    isChecked ? 'none' : 'block';
+            });
+            
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('#locations-table-body tr')) {
+                    const row = e.target.closest('tr');
+                    document.querySelectorAll('#locations-table-body tr').forEach(r => {
+                        r.classList.remove('selected');
+                    });
+                    row.classList.add('selected');
+                }
+            });
+            
+            document.getElementById('find-user-btn').addEventListener('click', function() {
+                const phone = document.getElementById('find-phone').value;
+                if (phone) {
+                    const user = findUserByPhone(phone);
+                    if (user) {
+                        document.getElementById('user-found-details').classList.add('active');
+                        document.getElementById('found-user-name').textContent = user.name;
+                        document.getElementById('found-user-phone').textContent = user.phone;
+                        
+                        const userAddresses = document.getElementById('user-addresses');
+                        userAddresses.classList.add('active');
+                        userAddresses.innerHTML = '<h3>Select an Address</h3>';
+                        
+                        user.addresses.forEach(address => {
+                            userAddresses.innerHTML += generateAddressHTML(address);
+                        });
+                        
+                        document.querySelectorAll('.user-address').forEach(address => {
+                            address.addEventListener('click', function() {
+                                document.querySelectorAll('.user-address').forEach(a => {
+                                    a.classList.remove('selected');
+                                });
+                                this.classList.add('selected');
+                            });
+                        });
+                        
+                        document.getElementById('complaint-form').style.display = 'block';
+                    } else {
+                        document.getElementById('add-user-modal').classList.add('active');
+                        document.getElementById('customer-phone').value = phone;
+                    }
+                } else {
+                    alert('Please enter a phone number');
+                }
+            });
+            
+            document.getElementById('search-method-toggle').addEventListener('change', function() {
+                const isLocationSearch = this.checked;
+                document.querySelector('.phone-search').style.display = isLocationSearch ? 'none' : 'block';
+                document.querySelector('.location-search').style.display = isLocationSearch ? 'block' : 'none';
+            });
+            
+            document.getElementById('find-location-btn').addEventListener('click', function() {
+                const location = document.getElementById('find-location').value;
+                if (location) {
+                    const users = findUsersByLocation(location);
+                    const userAddresses = document.getElementById('user-addresses');
+                    
+                    if (users.length > 0) {
+                        userAddresses.classList.add('active');
+                        userAddresses.innerHTML = '<h3>Select a User</h3>';
+                        
+                        users.forEach(user => {
+                            const userElement = document.createElement('div');
+                            userElement.className = 'user-address';
+                            userElement.dataset.userId = user.id;
+                            userElement.innerHTML = `
+                                <h4>${user.name}</h4>
+                                <p>${user.phone}</p>
+                                <p>${user.addresses[0].colony}</p>
+                            `;
+                            userAddresses.appendChild(userElement);
+                        });
+                        
+                        document.querySelectorAll('.user-address[data-user-id]').forEach(el => {
+                            el.addEventListener('click', function() {
+                                const userId = this.dataset.userId;
+                                const user = getUsers().find(u => u.id == userId);
+                                
+                                if (user) {
+                                    document.getElementById('user-found-details').classList.add('active');
+                                    document.getElementById('found-user-name').textContent = user.name;
+                                    document.getElementById('found-user-phone').textContent = user.phone;
+                                    
+                                    const addressesContainer = document.getElementById('user-addresses');
+                                    addressesContainer.innerHTML = '<h3>Select an Address</h3>';
+                                    
+                                    user.addresses.forEach(address => {
+                                        addressesContainer.innerHTML += generateAddressHTML(address);
+                                    });
+                                    
+                                    document.querySelectorAll('.user-address').forEach(address => {
+                                        address.addEventListener('click', function() {
+                                            document.querySelectorAll('.user-address').forEach(a => {
+                                                a.classList.remove('selected');
+                                            });
+                                            this.classList.add('selected');
+                                        });
+                                    });
+                                    
+                                    document.getElementById('complaint-form').style.display = 'block';
+                                }
+                            });
+                        });
+                    } else {
+                        alert('No users found in this location');
+                    }
+                } else {
+                    alert('Please enter a location');
+                }
+            });
+            
+            document.getElementById('close-add-user-modal').addEventListener('click', function() {
+                document.getElementById('add-user-modal').classList.remove('active');
+            });
+            
+            document.getElementById('cancel-add-user').addEventListener('click', function() {
+                document.getElementById('add-user-modal').classList.remove('active');
+            });
+            
+            document.getElementById('save-new-user').addEventListener('click', function() {
+                const name = document.getElementById('customer-name').value;
+                const phone = document.getElementById('customer-phone').value;
+                
+                if (!name || !phone) {
+                    alert('Please fill in all required fields');
+                    return;
+                }
+                
+                let address = null;
+                const isNewBuilding = document.getElementById('new-building-checkbox').checked;
+                
+                if (isNewBuilding) {
+                    const colonySelect = document.getElementById('colony-select');
+                    const colony = colonySelect.options[colonySelect.selectedIndex].text;
+                    const buildingTypeSelect = document.getElementById('building-type');
+                    const buildingType = buildingTypeSelect.options[buildingTypeSelect.selectedIndex].text;
+                    const buildingNo = document.getElementById('building-no').value;
+                    const apartmentNo = document.getElementById('apartment-no').value || '';
+                    const apartmentTypeSelect = document.getElementById('apartment-type');
+                    const apartmentType = apartmentTypeSelect.value ? 
+                        apartmentTypeSelect.options[apartmentTypeSelect.selectedIndex].text : '';
+                    
+                    address = {
+                        id: Date.now(),
+                        name: "Primary Address",
+                        street: "New Building",
+                        colony: colony,
+                        buildingType: buildingType,
+                        buildingNo: buildingNo,
+                        apartmentNo: apartmentNo,
+                        apartmentType: apartmentType
+                    };
+                } else {
+                    const selectedRow = document.querySelector('#locations-table-body tr.selected');
+                    if (!selectedRow) {
+                        alert('Please select a location from the table');
+                        return;
+                    }
+                    const locationId = parseInt(selectedRow.dataset.locationId);
+                    const location = dummyLocations.find(loc => loc.id === locationId);
+                    
+                    address = {
+                        id: Date.now(),
+                        name: location.name,
+                        street: location.name,
+                        colony: location.colony,
+                        buildingType: location.buildingType,
+                        buildingNo: location.buildingNo,
+                        apartmentNo: "",
+                        apartmentType: ""
+                    };
+                }
+                
+                const newUser = {
+                    name,
+                    phone,
+                    addresses: [address]
+                };
+                
+                const addedUser = addNewUser(newUser);
+                document.getElementById('add-user-modal').classList.remove('active');
+                
+                document.getElementById('user-found-details').classList.add('active');
+                document.getElementById('found-user-name').textContent = addedUser.name;
+                document.getElementById('found-user-phone').textContent = addedUser.phone;
+                
+                const userAddresses = document.getElementById('user-addresses');
+                userAddresses.classList.add('active');
+                userAddresses.innerHTML = '<h3>Select an Address</h3>';
+                userAddresses.innerHTML += generateAddressHTML(addedUser.addresses[0]);
+                
+                document.querySelectorAll('.user-address').forEach(address => {
+                    address.addEventListener('click', function() {
+                        document.querySelectorAll('.user-address').forEach(a => {
+                            a.classList.remove('selected');
+                        });
+                        this.classList.add('selected');
+                    });
+                });
+                
+                document.getElementById('complaint-form').style.display = 'block';
+            });
+            
+            document.getElementById('launch-complaint-btn').addEventListener('click', function() {
+                const phone = document.getElementById('find-phone').value;
+                const user = findUserByPhone(phone);
+                
+                if (!user) {
+                    alert('User not found');
+                    return;
+                }
+                
+                const selectedAddress = document.querySelector('.user-address.selected');
+                if (!selectedAddress) {
+                    alert('Please select an address');
+                    return;
+                }
+                
+                const addressId = selectedAddress.dataset.addressId;
+                const address = user.addresses.find(addr => addr.id == addressId);
+                
+                const addressString = `${address.street}, ${address.colony}, Building ${address.buildingNo}, ${address.apartmentNo} (${address.apartmentType})`;
+                
+                const categorySelect = document.getElementById('category-select');
+                const category = categorySelect.options[categorySelect.selectedIndex].text;
+                
+                const skillmanSelect = document.getElementById('skillman-select');
+                const skillman = skillmanSelect.options[skillmanSelect.selectedIndex].text;
+                
+                const description = document.getElementById('category-description').value;
+                const poc = document.getElementById('poc').value;
+                
+                if (!category || !skillman || !poc) {
+                    alert('Please fill in all required fields');
+                    return;
+                }
+                
+                const complaint = {
+                    customerName: user.name,
+                    phone: user.phone,
+                    address: addressString,
+                    category: category,
+                    description: description,
+                    skillman: skillman,
+                    status: 'Open',
+                    date: new Date().toLocaleDateString()
+                };
+                
+                const newComplaint = addNewComplaint(complaint);
+                
+                alert(`Complaint #${newComplaint.id} launched successfully!`);
+                
+                document.getElementById('find-phone').value = '';
+                document.getElementById('find-location').value = '';
+                document.getElementById('user-found-details').classList.remove('active');
+                document.getElementById('user-addresses').classList.remove('active');
+                document.getElementById('user-addresses').innerHTML = '';
+                document.getElementById('complaint-form').style.display = 'none';
+                document.getElementById('category-select').value = '';
+                document.getElementById('category-description').value = '';
+                document.getElementById('skillman-select').value = '';
+                document.getElementById('poc').value = '';
+            });
+            
+            document.getElementById('find-building-btn').addEventListener('click', function() {
+                const searchTerm = document.getElementById('building-search').value.toLowerCase();
+                if (!searchTerm) {
+                    locationsTableBody.innerHTML = generateLocationRows(dummyLocations);
+                    return;
+                }
+                
+                const filteredLocations = dummyLocations.filter(location => 
+                    location.name.toLowerCase().includes(searchTerm) ||
+                    location.colony.toLowerCase().includes(searchTerm) ||
+                    location.buildingType.toLowerCase().includes(searchTerm) ||
+                    location.buildingNo.toLowerCase().includes(searchTerm)
+                );
+                
+                locationsTableBody.innerHTML = generateLocationRows(filteredLocations);
+            });
+            
+            document.querySelectorAll('.complaints-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    if (!this.hasAttribute('href')) {
+                        document.querySelectorAll('.complaints-option').forEach(opt => {
+                            opt.classList.remove('active');
+                        });
+                        
+                        this.classList.add('active');
+                        
+                        document.querySelectorAll('.complaints-panel').forEach(panel => {
+                            panel.classList.remove('active');
+                        });
+                        
+                        const panelId = this.dataset.panel;
+                        document.getElementById(panelId).classList.add('active');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

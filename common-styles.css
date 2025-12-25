@@ -1,0 +1,328 @@
+body {
+    overflow-x: hidden;
+    display: block;
+}
+header {
+width: 100vw;
+height: 60px;
+background-color: rgb(136, 28, 28);
+margin-top: 36px;
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 0 25px;
+margin-bottom: 30px;
+position: relative;
+z-index: 10;
+}
+
+.nav-bar {
+width: 100vw;
+background-color: rgb(136, 28, 28);
+display: flex;
+justify-content: center;
+box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+position: relative;
+z-index: 1;
+margin-top: 40px;
+}
+
+.nav-container {
+width: 100%;
+max-width: 1500px;
+display: flex;
+margin-left: 90px;
+}
+
+.nav-item {
+padding: 15px 25px;
+color: white;
+text-decoration: none;
+font-weight: bold;
+transition: all 0.3s ease;
+position: relative;
+text-align: center;
+display: flex;
+align-items: center;
+gap: 8px;
+}
+
+.nav-item:hover {
+background-color: rgba(0,0,0,0.1);
+}
+
+.nav-item.active {
+background-color: rgba(0,0,0,0.2);
+}
+
+.nav-item.active::after {
+content: "";
+position: absolute;
+bottom: 0;
+left: 50%;
+transform: translateX(-50%);
+width: 60%;
+height: 3px;
+background-color: white;
+}
+
+.logo {
+display: flex;
+align-items: center;
+gap: 10px;
+z-index: 2;
+}
+
+.logo .logo-image {
+width: 130px;
+height: auto;
+display: flex;
+align-items: center;
+justify-content: center;
+padding: 5px;
+background-color: #f4f4f4;
+border-radius: 50%;
+}
+
+.logo .logo-image img {
+border-radius: 50%;
+width: 100%;
+height: auto;
+}
+
+.logo h2 {
+color: white;
+font-size: 20px;
+white-space: nowrap;
+}
+
+.user {
+display: flex;
+align-items: center;
+gap: 15px;
+color: white;
+}
+
+.user h2 {
+font-size: 16px;
+white-space: nowrap;
+}
+
+.logout-btn {
+background-color: white;
+color: rgb(136, 28, 28);
+border: none;
+padding: auto;
+border-radius: 4px;
+cursor: pointer;
+font-weight: bold;
+transition: background-color 0.3s;
+border: 1px solid white;
+}
+
+.logout-btn:hover {
+background-color: #ddd;
+}
+
+.logout-btn:active {
+border: 1px solid white;
+background-color: rgb(136, 28, 28);
+color: white;
+}
+
+.content {
+width: 95%;
+margin: 0 auto;
+padding: 30px;
+background-color: white;
+box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+border-radius: 8px;
+margin-top: 30px;
+padding-bottom: 10px;
+}
+
+/* Variables */
+:root {
+--primary: rgb(136, 28, 28);
+--secondary: #8c2f2f;
+--accent: #4caf50;
+--warning: #ff9800;
+--danger: #f44336;
+--light: #f8f9fa;
+--dark: #212529;
+--gray: #6c757d;
+--card-bg: rgba(255, 255, 255, 0.95);
+--nav-bg: rgba(255, 255, 255, 0.85);
+--nav-active: rgba(136, 28, 28, 0.15);
+--nav-hover: rgba(136, 28, 28, 0.08);
+--success: #4caf50;
+}
+
+
+@media (max-width: 450px) {
+.logo {
+flex-direction: column;
+}
+}
+
+.hamburger {
+display: none;
+}
+/* Responsive header */
+@media (max-width: 768px) {
+.report-type .report-option {
+padding: 10px 20px;
+font-size: 15px;
+}
+
+.nav-bar {
+    display: none;
+}
+
+label {
+font-size: 15px;
+}
+
+select {
+font-size: 15px;
+height: 40px;
+}
+
+.btn {
+font-size: 15px;
+}
+
+.report-header h1 {
+font-size: 20px;
+}
+
+.logo h2 {
+font-size: 16px;
+}
+
+.nav-container {
+    width: 100%;
+    max-width: 1500px;
+    display: flex;
+    margin-left: 90px;
+}
+
+.nav-item {
+padding: 12px 15px;
+font-size: 14px;
+}
+
+.content {
+margin-top: 0px;
+width: 100%;
+}
+
+header {
+/*flex-direction: column;*/
+height: auto;
+padding: 5px;
+gap: 15px;
+margin-top: 0px;
+}
+
+.logo {
+margin-bottom: 0px;
+}
+
+.logo .logo-image {
+width: 60px;
+height: auto;
+margin-bottom: 0px;
+padding: 2px;
+}
+
+.user h2 {
+font-size: 14px;
+margin: 0px;
+}
+
+.logout-btn {
+padding: 4px 8px;
+font-size: 15px;
+font-weight: 650;
+}
+
+.hamburger {
+display: flex;
+height: 35px;
+width: 35px;
+background-color: rgba(0,0,0,0.2);
+cursor: pointer;
+padding: 8px;
+margin-right: 10px;
+border-radius: 4px;
+}
+
+.hamburger {
+display: flex;
+height: 35px;
+width: 35px;
+background-color: rgba(0,0,0,0.2);
+cursor: pointer;
+padding: 8px;
+margin-right: 10px;
+border-radius: 4px;
+}
+
+.hamburger i {
+font-size: 20px;
+color: white;
+display: flex;
+align-items: center;
+justify-content: center;
+text-align: center;
+}
+
+.navigation-block {
+right: 0;
+width: 100vw;
+top: 55px;
+border-radius: 0;
+}
+
+/* By default, hide the menu off-screen to the right */
+.navigation-block {
+position: fixed;
+top: 60px;
+right: -250px; /* Hide off-screen to the right */
+display: flex;
+flex-direction: column;
+background-color: var(--primary);
+width: 220px;
+border-radius: 8px;
+padding: 10px;
+box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+z-index: 999;
+transition: right 0.3s ease-in-out; /* Smooth slide animation */
+border: 2px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Each nav item */
+.navigation-block .navi-block-items {
+color: white;
+padding: 12px;
+font-size: 16px;
+text-decoration: none;
+transition: background 0.2s ease;
+font-weight: 500;
+}
+
+.navigation-block .navi-block-items:hover {
+background: rgba(255,255,255,0.1);
+border-radius: 5px;
+}
+
+/* Show menu when active - slide in from right */
+.navigation-block.active {
+right: 10px; /* Slide into view from the right */
+}
+
+.navigation-block div {
+background-color: rgba(0, 0, 0, 0.1);
+}
+}

@@ -1,0 +1,1800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="server-url.js"></script>
+  <script>
+    const page = 'rating-report';
+  </script>
+  <script src="verification.js"></script>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="logo.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MES CMS - Rating Report</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      caret-color: transparent;
+      scrollbar-width: thin;
+      scroll-behavior: smooth;
+      scrollbar-color: rgb(138, 119, 119) transparent;
+      user-select: none;
+      -webkit-overflow-scrolling: touch; /* smooth scroll on mobile */
+    }
+
+    body {
+      display: none;
+      background-color: #f5f7fa;
+      padding-bottom: 40px;
+      overflow-x: hidden;
+    }
+
+    /* Header Styles */
+    header {
+      width: 100vw;
+      height: 60px;
+      background-color: rgb(136, 28, 28);
+      margin-top: 36px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 25px;
+      margin-bottom: 30px;
+      position: relative;
+      z-index: 10;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .nav-bar {
+      width: 100vw;
+      background-color: rgb(136, 28, 28);
+      display: flex;
+      justify-content: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      position: relative;
+      z-index: 1;
+      margin-top: 40px;
+    }
+
+    .nav-container {
+      width: 100%;
+      max-width: 1500px;
+      display: flex;
+      margin-left: 90px;
+    }
+
+    .nav-item {
+      padding: 15px 25px;
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      position: relative;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-item:hover {
+      background-color: rgba(0,0,0,0.1);
+      text-decoration: none;
+      color: white;
+    }
+
+    .nav-item.active {
+      background-color: rgba(0,0,0,0.2);
+    }
+
+    .nav-item.active::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60%;
+      height: 3px;
+      background-color: white;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 2;
+    }
+
+    .logo .logo-image {
+      width: 130px;
+      height: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 5px;
+      background-color: #f4f4f4;
+      border-radius: 50%;
+    }
+
+    .logo .logo-image img {
+      border-radius: 50%;
+      width: 100%;
+      height: auto;
+    }
+
+    .logo h2 {
+      color: white;
+      font-size: 20px;
+      white-space: nowrap;
+      margin-top: auto;
+      margin-bottom: auto;
+    }
+
+    .user {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      color: white;
+    }
+
+    .user h2 {
+      font-size: 16px;
+      white-space: nowrap;
+      margin-top: auto;
+      margin-bottom: auto;
+    }
+
+    .logout-btn {
+      background-color: white;
+      color: rgb(136, 28, 28);
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.3s;
+      border: 1px solid white;
+    }
+
+    .logout-btn:hover {
+      background-color: #ddd;
+    }
+
+    .logout-btn:active {
+      border: 1px solid white;
+      background-color: rgb(136, 28, 28);
+      color: white;
+    }
+
+    /* Notification Styles */
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 15px 25px;
+      border-radius: 8px;
+      color: white;
+      font-weight: 600;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transform: translateX(110%);
+      transition: transform 0.3s ease;
+    }
+    
+    .notification.show {
+      transform: translateX(0);
+    }
+    
+    .notification.success {
+      background: #4caf50;
+    }
+    
+    .notification.error {
+      background: #f44336;
+    }
+    
+    .notification.warning {
+      background: #ff9800;
+    }
+    
+    .notification i {
+      font-size: 20px;
+    }
+
+    /* Reporting Section Styles */
+    .content {
+      width: 95%;
+      margin: 0 auto;
+      padding: 25px;
+      background-color: white;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+      border-radius: 16px;
+      margin-top: 20px;
+      max-width: 95vw;
+    }
+
+    /* Variables */
+    :root {
+      --primary: rgb(136, 28, 28);
+      --primary-light: rgba(136, 28, 28, 0.1);
+      --primary-light-2: rgba(136, 28, 28, 0.05);
+      --secondary: #8c2f2f;
+      --accent: #4caf50;
+      --warning: #ff9800;
+      --danger: #f44336;
+      --light: #f8f9fa;
+      --dark: #212529;
+      --gray: #6c757d;
+      --card-bg: rgba(255, 255, 255, 0.95);
+      --nav-bg: rgba(255, 255, 255, 0.85);
+      --nav-active: rgba(136, 28, 28, 0.15);
+      --nav-hover: rgba(136, 28, 28, 0.08);
+      --success: #4caf50;
+      --border-radius: 12px;
+    }
+
+    /* Complaints Section */
+    .complaints-section-container {
+      display: grid;
+      grid-template-columns: 250px 1fr;
+      gap: 30px;
+      min-height: 600px;
+    }
+    
+    .complaints-sidebar {
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      padding: 25px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+    
+    .complaints-option {
+      padding: 18px 20px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #f8f9fa;
+      color: black;
+    }
+    
+    .complaints-option:hover {
+      background: rgba(0,0,0,0.05);
+      text-decoration: none;
+      color: inherit;
+    }
+    
+    .complaints-option.active {
+      background: rgba(0,0,0,0.1);
+      color: rgb(136, 28, 28);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .complaints-option i {
+      font-size: 20px;
+      min-width: 24px;
+      text-align: center;
+    }
+    
+    .complaints-content {
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      padding: 30px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+    
+    /* NEW: Skillman Report Header Styles */
+    .report-header-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    
+    .report-title-section {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .report-title {
+      font-size: 28px;
+      color: var(--primary);
+      font-weight: 700;
+      margin: 0;
+    }
+    
+    .report-subtitle {
+      color: #666;
+      font-size: 16px;
+    }
+    
+    .report-controls-section {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      align-items: flex-end;
+    }
+    
+    .export-top-btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background-color 0.3s;
+      box-shadow: 0 4px 8px rgba(136, 28, 28, 0.2);
+    }
+    
+    .export-top-btn:hover {
+      background-color: #9a2d2d;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(136, 28, 28, 0.25);
+    }
+    
+    /* NEW: Filter and Search Section */
+    .filter-search-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      padding: 20px;
+      background-color: #f9f9f9;
+      border-radius: 10px;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+    
+    .entries-control {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      background: white;
+      padding: 8px 15px;
+      border-radius: 6px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    
+    .entries-control select {
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 5px;
+      background: white;
+    }
+    
+    .search-control {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    
+    .search-control input {
+      padding: 10px 15px 10px 40px;
+      border-radius: 25px;
+      border: 1px solid #ddd;
+      font-size: 14px;
+      width: 250px;
+      transition: all 0.3s;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    
+    .search-control input:focus {
+      width: 300px;
+      border-color: var(--primary);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(136, 28, 28, 0.1);
+    }
+    
+    .search-control i {
+      position: absolute;
+      left: 15px;
+      color: #777;
+    }
+    
+    /* Table Styles - FIXED */
+    .table-container {
+        width: 100%;
+        overflow-x: auto;
+        margin-bottom: 20px;
+
+        width: 100%;
+        overflow-x: auto; /* This will show scrollbar only when needed */
+        margin-bottom: 20px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+    
+    .report-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    
+    .report-table th {
+      background-color: var(--primary);
+      background: rgba(136, 28, 28, 0.1);
+      color: var(--primary);
+      text-align: left;
+      padding: 8px;
+      font-weight: 600;
+      position: sticky;
+      top: 0;
+      vertical-align: top; /* Align header content to top */
+      border: 1px solid #ffc4c4; /* vertical line color */
+    }
+    
+    .report-table td {
+      padding: 8px;
+      border-bottom: 1px solid #eee;
+      vertical-align: top; /* Align cell content to top */
+      text-align: left; /* Align cell content to left */
+      border: 1px solid #ffc4c4; /* vertical line color */
+    }
+    
+    /* Make review column wider */
+    .report-table td.review-cell {
+      min-width: 300px; /* Increased width for review column */
+      max-width: 500px;
+    }
+    
+    .report-table tbody tr:hover {
+      background-color: #f9f9f9;
+    }
+    
+    .report-table tbody tr:nth-child(even) {
+      background-color: #f8f8f8;
+    }
+    
+    .report-table tbody tr:nth-child(even):hover {
+      background-color: #f1f1f1;
+    }
+    
+    .profile-img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    
+    .status-badge {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      display: inline-block;
+      text-align: center;
+      min-width: 40px;
+    }
+    
+    .inprogress {
+      background-color: #fff8e1;
+      color: #ff9800;
+    }
+    
+    .completed {
+      background-color: #e8f5e9;
+      color: #4caf50;
+    }
+    
+    .rating {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      color: #ff9800;
+    }
+    
+    .report-btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .report-btn:hover {
+      background-color: #9a2d2d;
+      transform: translateY(-1px);
+    }
+    
+    .table-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 10px;
+      font-size: 14px;
+      color: #666;
+      background-color: #f9f9f9;
+      border-radius: 0 0 10px 10px;
+    }
+    
+    .pagination {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .pagination-btn {
+      min-width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #ddd;
+      background: white;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .pagination-btn i {
+        width: auto;
+    }
+    
+    .pagination-btn:hover {
+      background-color: #f1f1f1;
+      border-color: #ccc;
+    }
+    
+    .pagination-btn.active {
+      background-color: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+    
+    /* Detailed Report Modal - Simplified Version */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0,0,0,0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+    
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .detailed-report-modal {
+      background-color: white;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 600px;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .modal-title {
+      font-size: 22px;
+      color: var(--primary);
+      font-weight: 600;
+    }
+    
+    .close-modal {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #777;
+      transition: color 0.3s;
+    }
+    
+    .close-modal:hover {
+      color: var(--primary);
+    }
+    
+    .filter-controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 25px;
+    }
+    
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .filter-label {
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #555;
+    }
+    
+    .filter-select, .filter-input {
+      padding: 10px 15px;
+      border-radius: 6px;
+      border: 1px solid #ddd;
+      font-size: 14px;
+    }
+    
+    .filter-select:focus, .filter-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(136, 28, 28, 0.1);
+    }
+    
+    .modal-export-btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background-color 0.3s;
+      margin-top: 20px;
+      width: 100%;
+      justify-content: center;
+    }
+    
+    .modal-export-btn:hover {
+      background-color: #9a2d2d;
+    }
+
+    .complaint-link {
+        text-decoration: none;
+        font-weight: 600;
+        cursor: pointer;
+        transition: color 0.2s;
+        color: inherit;
+    }
+
+    .complaint-link:hover {
+        color: #9a2d2d;
+        text-decoration: underline;
+    }
+
+    .hamburger {
+      display: none;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 1200px) {
+      .report-table {
+        font-size: 13px;
+      }
+      
+      .report-table th,
+      .report-table td {
+        padding: 12px 10px;
+      }
+    }
+    
+    @media (max-width: 992px) {
+      .nav-container {
+        margin-left: 30px;
+      }
+      
+      .complaints-section-container {
+        grid-template-columns: 1fr;
+      }
+      
+      .complaints-sidebar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+      }
+      
+      .complaints-option {
+        margin-bottom: 0;
+        flex: 1;
+        min-width: 150px;
+      }
+      
+      .report-header-container {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .report-controls-section {
+        align-items: flex-start;
+        width: 100%;
+      }
+      
+      .filter-search-section {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .search-control {
+        width: 100%;
+      }
+      
+      .search-control input {
+        width: 100%;
+      }
+      
+      .search-control input:focus {
+        width: 100%;
+      }
+      
+      .filter-controls {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .nav-bar {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      
+      .nav-container {
+        margin-left: 0;
+        justify-content: center;
+      }
+      
+      .nav-item {
+        padding: 12px 15px;
+        font-size: 14px;
+      }
+      
+      .logo {
+        margin-bottom: 10px;
+      }
+      
+      .complaints-option {
+        padding: 12px 15px;
+        font-size: 14px;
+      }
+      
+      .content {
+        padding: 10px;
+        width: 100%;
+      }
+      
+      .table-container {
+        overflow-x: auto;
+      }
+      
+      .table-footer {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+      }
+      
+      .pagination {
+        width: 100%;
+        justify-content: center;
+      }
+      
+      .filter-controls {
+        grid-template-columns: 1fr;
+      }
+      
+      .detailed-report-modal {
+        width: 95%;
+        padding: 20px;
+      }
+    }
+    
+    @media (max-width: 576px) {
+      .complaints-content {
+        padding: 10px;
+      }
+
+      .report-title {
+        font-size: 24px;
+      }
+      
+      .export-top-btn {
+        width: 100%;
+        justify-content: center;
+      }
+      
+      .entries-control {
+        width: 100%;
+        justify-content: space-between;
+      }
+    }
+
+
+    
+    /* Responsive header */
+    @media (max-width: 768px) {
+      .report-type .report-option {
+        padding: 10px 20px;
+        font-size: 15px;
+      }
+
+      label {
+        font-size: 15px;
+      }
+
+      select {
+        font-size: 15px;
+        height: 35px;
+        padding: auto;
+      }
+
+      .btn {
+        font-size: 15px;
+      }
+
+      .report-header h1 {
+        font-size: 20px;
+      }
+      
+      .logo h2 {
+        font-size: 16px;
+      }
+
+      .nav-container {
+        margin-left: 0;
+        justify-content: center;
+        display: none;
+      }
+      
+      .nav-item {
+        padding: 12px 15px;
+        font-size: 14px;
+      }
+
+      .content {
+        margin-top: 0px;
+      }
+      
+      header {
+        /*flex-direction: column;*/
+        height: auto;
+        padding: 5px;
+        gap: 15px;
+        margin-top: 0px;
+      }
+      
+      .logo {
+        margin-bottom: 0px;
+      }
+
+      .logo .logo-image {
+        width: 60px;
+        height: auto;
+        margin-bottom: 0px;
+        padding: 2px;
+      }
+
+      .user h2 {
+        font-size: 14px;
+        margin: 0px;
+      }
+      
+      .logout-btn {
+        padding: 4px 8px;
+        font-size: 15px;
+        font-weight: 650;
+      }
+
+      .hamburger {
+        display: flex;
+        height: 35px;
+        width: 35px;
+        background-color: rgba(0,0,0,0.2);
+        cursor: pointer;
+        padding: 8px;
+        margin-right: 10px;
+        border-radius: 4px;
+      }
+
+      .hamburger i {
+        font-size: 20px;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+      }
+
+      .navigation-block {
+        right: 0;
+        width: 100vw;
+        top: 55px;
+        border-radius: 0;
+      }
+
+      /* By default, hide the menu off-screen to the right */
+      .navigation-block {
+        position: fixed;
+        top: 60px;
+        right: -250px; /* Hide off-screen to the right */
+        display: flex;
+        flex-direction: column;
+        background-color: var(--primary);
+        width: 220px;
+        border-radius: 8px;
+        padding: 10px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        z-index: 999;
+        transition: right 0.3s ease-in-out; /* Smooth slide animation */
+        border: 2px solid rgba(0, 0, 0, 0.1);
+      }
+
+      /* Each nav item */
+      .navigation-block .navi-block-items {
+        color: white;
+        padding: 12px;
+        font-size: 16px;
+        text-decoration: none;
+        transition: background 0.2s ease;
+        font-weight: 500;
+      }
+
+      .navigation-block .navi-block-items:hover {
+        background: rgba(255,255,255,0.1);
+        border-radius: 5px;
+      }
+
+      /* Show menu when active - slide in from right */
+      .navigation-block.active {
+        right: 10px; /* Slide into view from the right */
+      }
+
+      .navigation-block div {
+        background-color: rgba(0, 0, 0, 0.1);
+      }
+    }
+
+    @media (max-width: 450px) {
+      .logo {
+        flex-direction: column;
+        gap: 5px;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="common-styles.css">
+</head>
+<body>
+  <!-- Notification -->
+  <div class="notification" id="notification">
+      <i class="fas fa-check-circle"></i>
+      <span id="notification-text">Operation completed successfully</span>
+  </div>
+  
+  
+  <!-- Header -->
+  <header>
+    <div class="logo">
+      <div class="logo-image">
+        <img src="logo.jpg" alt="logo image">
+      </div>
+      <h2>MES CMS</h2>
+    </div>
+
+    <div class="user">
+      <h2 id="user-id">Unknown</h2>
+      <button class="logout-btn" id="logout-btn">Logout</button>
+      <div class="hamburger">
+        <i class="fas fa-bars" id="hamburger-btn"></i>
+        <div class="navigation-block">
+          <a href="dashboard" class="navi-block-items">Dashboard</a>
+          <a href="complaints" class="navi-block-items">Complaints</a>
+          <a href="users" class="navi-block-items">Users</a>
+          <div class="navi-block-items active"">Reporting</div>
+          <a href="admin" class="navi-block-items">Admin</a>
+        </div>
+        </div>
+      </div>
+  </header>
+
+  <!-- Navigation -->
+  <div class="nav-bar">
+    <div class="nav-container">
+      <a href="dashboard" class="nav-item">
+        <i class="fas fa-chart-line"></i>
+        Dashboard
+      </a>
+      <a href="complaints" class="nav-item">
+        <i class="fas fa-ticket-alt"></i>
+        Complaints
+      </a>
+      <a href="users" class="nav-item">
+        <i class="fas fa-users"></i>
+        Users
+      </a>
+      <div class="nav-item active">
+        <i class="fas fa-file-alt"></i>
+        Reporting
+      </div>
+      <a href="admin" class="nav-item">
+        <i class="fas fa-user-tie"></i>
+        Admin
+      </a>
+    </div>
+  </div>
+  
+  <!-- Reporting Content -->
+  <div class="content">
+    <div class="complaints-section-container">
+      <div class="complaints-sidebar">
+        <a href="daily-report.html" class="complaints-option">
+          <i class="fas fa-calendar-day"></i>
+          Daily Report
+        </a>
+        <a href="complaints-report.html" class="complaints-option">
+          <i class="fas fa-clipboard"></i>
+          Complaints Report
+        </a>
+        <a href="skillman-report.html" class="complaints-option">
+          <i class="fas fa-users"></i>
+          Skillman Report
+        </a>
+        <a href="vacant-apartments.html" class="complaints-option">
+          <i class="fas fa-building"></i>
+          Vacant Apartments
+        </a>
+        <div class="complaints-option active">
+          <i class="fas fa-star"></i>
+          Rating Report
+        </div>
+      </div>
+      
+      <!-- Rating Report Content -->
+      <div class="complaints-content">
+        <!-- NEW: Report Header with title and export button -->
+        <div class="report-header-container">
+          <div class="report-title-section">
+            <h2 class="report-title">Rating Report</h2>
+            <p class="report-subtitle">Rating received from Customers</p>
+          </div>
+          <div class="report-controls-section">
+            <button class="export-top-btn" id="export-csv">
+              <i class="fas fa-file-export"></i>
+              Export to CSV
+            </button>
+          </div>
+        </div>
+        
+        <!-- NEW: Filter and Search Section -->
+        <div class="filter-search-section">
+          <div class="entries-control">
+            <span>Show</span>
+            <select id="entries-select">
+            </select>
+            <span>entries</span>
+          </div>
+          
+          <div class="search-control">
+            <i class="fas fa-search"></i>
+            <input type="text" id="search-input" placeholder="Search customers...">
+          </div>
+        </div>
+        
+        <!-- Table container for horizontal scrolling -->
+        <div class="table-container">
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Date</th>
+                <th>Complain No.</th>
+                <th>User</th>
+                <th>Number</th>
+                <th>Type</th>
+                <th>Category</th>
+                <th>Colony</th>
+                <th>Building/Houses</th>
+                <th>Rating</th>
+                <th>Review</th>
+              </tr>
+            </thead>
+            <tbody id="reportTableBody">
+              <!-- Dynamic rows will be inserted here -->
+              <tr>
+                <td colspan="11" style="text-align: center; padding: 20px;">
+                  Loading data...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <!-- Table Footer with Pagination -->
+        <div class="table-footer">
+          <div class="showing-entries">
+            Showing 1 to 10 of 20 entries
+          </div>
+          <div class="pagination">
+            <button class="pagination-btn"><i class="fas fa-chevron-left"></i></button>
+            <button class="pagination-btn active">1</button>
+            <button class="pagination-btn">2</button>
+            <button class="pagination-btn"><i class="fas fa-chevron-right"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+<script>
+  const hamburgerBtn = document.getElementById("hamburger-btn");
+  const navBlock = document.querySelector(".navigation-block");
+
+  // Toggle navigation on hamburger click
+  hamburgerBtn.addEventListener("click", (e) => {
+    e.stopPropagation(); // Prevent click from bubbling to document
+    navBlock.classList.toggle("active");
+  });
+
+  // Close navigation when clicking outside
+  document.addEventListener("click", (e) => {
+    // Check if click is outside the navigation block and hamburger button
+    if (!navBlock.contains(e.target) && e.target !== hamburgerBtn) {
+      navBlock.classList.remove("active");
+    }
+  });
+
+  // Optional: Prevent clicks inside navigation from closing it
+  navBlock.addEventListener("click", (e) => {
+    e.stopPropagation();
+  });
+</script>
+
+
+<script>
+// Add this script to control navigation visibility based on backend permissions
+document.addEventListener('DOMContentLoaded', async function() {
+    try {
+        const authToken = localStorage.getItem('authToken');
+        if (!authToken) {
+            console.error('No authentication token found');
+            return;
+        }
+
+        // Fetch allowed pages from backend
+        const response = await fetch(`${SERVER_URL}/api/allowed-pages`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${authToken}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch allowed pages');
+        }
+
+        const data = await response.json();
+        
+        if (data.success) {
+            // Process navigation items based on allowed pages
+            processNavigationItems(data.allowedPages, data.navigationItems);
+        }
+    } catch (error) {
+        console.error('Error fetching allowed pages:', error);
+        // In case of error, you might want to show a default set of navigation items
+        // or handle it according to your application's requirements
+    }
+});
+
+function processNavigationItems(allowedPages, navigationItems) {
+    // Process header navigation items
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+        const href = item.getAttribute('href');
+        if (href) {
+            const pageName = href; // Get the page name without extension
+            
+            // Check if this category has an accessible page
+            if (navigationItems[pageName]) {
+                // Set the href to the first accessible page in this category
+                item.setAttribute('href', `${navigationItems[pageName]}.html`);
+                item.style.display = 'flex';
+            } else {
+                item.style.display = 'none';
+            }
+        }
+    });
+    
+    // Process hamburger menu navigation items
+    const hamburgerItems = document.querySelectorAll('.navi-block-items');
+    hamburgerItems.forEach(item => {
+        const href = item.getAttribute('href');
+        if (href) {
+            const pageName = href; // Get the page name without extension
+            
+            // Check if this category has an accessible page
+            if (navigationItems[pageName]) {
+                // Set the href to the first accessible page in this category
+                item.setAttribute('href', `${navigationItems[pageName]}.html`);
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        }
+    });
+    
+    // Process sidebar navigation items (use the allowedPages array)
+    const sidebarItems = document.querySelectorAll('.complaints-option');
+    sidebarItems.forEach(item => {
+        const href = item.getAttribute('href');
+        if (href) {
+            const pageName = getPageNameFromHref(href);
+            if (allowedPages.includes(pageName) || item.classList.contains('active')) {
+                item.style.display = 'flex';
+            } else {
+                item.style.display = 'none';
+            }
+        }
+    });
+}
+
+function getPageNameFromHref(href) {
+    if (!href) return '';
+    
+    // Extract page name from href (e.g., "dashboard.html" -> "dashboard")
+    const pageWithExtension = href.split('/').pop();
+    return pageWithExtension.split('.')[0];
+}
+</script>
+
+
+  <script>
+
+    let USER_ID = localStorage.getItem('UserId');
+    
+  document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById("user-id").textContent = USER_ID;
+    localStorage.removeItem('UserId');
+  });
+
+    // Notification functionality
+    function showNotification(message, type = 'success') {
+      const notification = document.getElementById('notification');
+      const notificationText = document.getElementById('notification-text');
+      
+      notificationText.textContent = message;
+      notification.className = `notification ${type} show`;
+      
+      setTimeout(() => {
+        notification.classList.remove('show');
+      }, 3000);
+    }
+
+    //Logout functionality
+    
+  document.addEventListener('DOMContentLoaded', function() {
+
+    // DOM Elements
+    const logoutBtn = document.getElementById('logout-btn');
+    
+    logoutBtn.addEventListener('click', async () => {
+      try {
+        const authToken = localStorage.getItem('authToken');
+        const response = await fetch(SERVER_URL+'/logout', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${authToken}`,'Content-Type': 'application/json' }
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          document.getElementById("user-id").textContent = 'Unknown';
+          console.log('Logout success:', data);
+          alert('Logged out successfully!');
+          showNotification('Logged out successfully');
+          
+          // 👇 you can add more procedural lines here
+          // e.g., redirect:
+          setTimeout(() => {
+            window.location.href = 'login.html';
+          }, 500); // 1000 ms = 1 sec
+
+        } else {
+          console.error('Logout failed:', data);
+          showNotification('Logout failed', 'error');
+          //alert('Logout failed!');
+        }
+
+      } catch (error) {
+        console.error('Error:', error);
+        showNotification('Error: ' + error || 'Something went wrong', 'error');
+        //alert('Something went wrong!');
+      }
+    });
+    
+  });
+    
+    // Modal functionality
+    const modal = document.getElementById('reportModal');
+    const csvExportBtn = document.getElementById('closeModal');
+    const exportBtn = document.getElementById('export-csv');
+    const modalExportBtn = document.getElementById('modalExportBtn');
+    
+    /*/ Search functionality
+    const searchInput = document.getElementById('search-input');
+    const tableBody = document.getElementById('reportTableBody');*/
+    const rows = tableBody.getElementsByTagName('tr');
+    
+    searchInput.addEventListener('input', () => {
+      const searchText = searchInput.value.toLowerCase();
+      
+      for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+        const cells = row.getElementsByTagName('td');
+        let found = false;
+        
+        for (let j = 0; j < cells.length; j++) {
+          const cellText = cells[j].textContent.toLowerCase();
+          if (cellText.includes(searchText)) {
+            found = true;
+            break;
+          }
+        }
+        
+        if (found) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      }
+    });
+    
+    // Show notification on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      showNotification('Rating report loaded successfully');
+    });
+  </script>
+  <script>
+    // Add this script to your HTML file or include it separately
+
+// Configuration
+const ITEMS_PER_PAGE_OPTIONS = [10, 25, 50, 100];
+let currentPage = 1;
+let totalPages = 1;
+let itemsPerPage = 25;
+let allData = [];
+
+// DOM Elements
+const tableBody = document.getElementById('reportTableBody');
+const paginationContainer = document.querySelector('.pagination');
+const showingEntriesText = document.querySelector('.showing-entries');
+const entriesSelect = document.getElementById('entries-select');
+const searchInput = document.getElementById('search-input');
+
+// Add event delegation for complaint links
+document.addEventListener('click', function(e) {
+  if (e.target.classList.contains('complaint-link')) {
+    e.preventDefault();
+    const complaintId = e.target.getAttribute('data-id');
+    handleComplaintClick(complaintId);
+  }
+});
+
+// Initialize the page
+document.addEventListener('DOMContentLoaded', () => {
+    fetchData();
+    
+    // Event listeners
+    entriesSelect.addEventListener('change', handleItemsPerPageChange);
+    searchInput.addEventListener('input', handleSearch);
+});
+
+// Initialize entries dropdown
+function initializeEntriesDropdown() {
+    ITEMS_PER_PAGE_OPTIONS.forEach(option => {
+        const optionElement = document.createElement('option');
+        optionElement.value = option;
+        optionElement.textContent = option;
+        if (option === itemsPerPage) {
+            optionElement.selected = true;
+        }
+        entriesSelect.appendChild(optionElement);
+    });
+}
+
+// Fetch data from backend
+async function fetchData() {
+    try {
+        const authToken = localStorage.getItem('authToken');
+        const response = await fetch(`${SERVER_URL}/ratings`, {
+                    method: 'GET',
+                    headers: { 'Authorization': `Bearer ${authToken}`,'Content-Type': 'application/json' }
+                  });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        allData = data;
+        totalPages = Math.ceil(allData.length / itemsPerPage);
+        renderTable();
+        updatePagination();
+        updateShowingEntriesText();
+        
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        showNotification('Failed to load rating data', 'error');
+        allData = [];
+        renderTable(); // This will show empty table
+    }
+}
+
+// Render table with current page data
+function renderTable() {
+    tableBody.innerHTML = '';
+    
+    if (allData.length === 0) {
+        // Show empty state
+        const emptyRow = document.createElement('tr');
+        emptyRow.innerHTML = `
+            <td colspan="11" style="text-align: center; padding: 20px;">
+                No rating data available
+            </td>
+        `;
+        tableBody.appendChild(emptyRow);
+        return;
+    }
+    
+    // Calculate start and end indices for current page
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = Math.min(startIndex + itemsPerPage, allData.length);
+    
+    // Create table rows
+    for (let i = startIndex; i < endIndex; i++) {
+        const item = allData[i];
+        const row = document.createElement('tr');
+        
+        // Format rating with stars
+        const ratingStars = generateStarRating(item.rating);
+        
+        // Inside your renderTable function, modify the complaint number cell
+        row.innerHTML = `
+        <td>${i + 1}</td>
+        <td>${formatDate(item.date)}</td>
+        <td>
+            <a href="#" class="complaint-link" data-id="${item.complaintNumber}">
+            ${item.complaintNumber}
+            </a>
+        </td>
+        <td>${item.user}</td>
+        <td>${item.number}</td>
+        <td>${item.type}</td>
+        <td>${item.category}</td>
+        <td>${item.colony}</td>
+        <td>${item.building}</td>
+        <td><div class="rating">${ratingStars}${item.rating}</div></td>
+        <td class="review-cell">${item.review}</td>
+        `;
+        
+        tableBody.appendChild(row);
+    }
+}
+
+// Generate star rating HTML
+function generateStarRating(rating) {
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 >= 0.5;
+    let starsHtml = '';
+    
+    // Add full stars
+    for (let i = 0; i < fullStars; i++) {
+        starsHtml += '<i class="fas fa-star"></i>';
+    }
+    
+    // Add half star if needed
+    if (hasHalfStar) {
+        starsHtml += '<i class="fas fa-star-half-alt"></i>';
+    }
+    
+    // Add empty stars
+    const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+    for (let i = 0; i < emptyStars; i++) {
+        starsHtml += '<i class="far fa-star"></i>';
+    }
+    
+    return starsHtml;
+}
+
+// Format date (you might need to adjust this based on your date format)
+function formatDate(dateString) {
+    // Simple formatting - adjust as needed
+    return new Date(dateString).toLocaleDateString();
+}
+
+// Update pagination controls
+function updatePagination() {
+    paginationContainer.innerHTML = '';
+    
+    // Previous button
+    const prevButton = createPaginationButton('<i class="fas fa-chevron-left"></i>', 
+        currentPage > 1, () => goToPage(currentPage - 1));
+    paginationContainer.appendChild(prevButton);
+    
+    // Always show first page
+    paginationContainer.appendChild(createPaginationButton('1', currentPage === 1, () => goToPage(1)));
+    
+    // Calculate page range with ellipsis
+    let startPage = Math.max(2, currentPage - 2);
+    let endPage = Math.min(totalPages - 1, currentPage + 2);
+    
+    // Add ellipsis after first page if needed
+    if (startPage > 2) {
+        paginationContainer.appendChild(createEllipsis());
+    }
+    
+    // Add page numbers
+    for (let i = startPage; i <= endPage; i++) {
+        if (i !== 1 && i !== totalPages) { // Skip first and last as they're always shown
+            paginationContainer.appendChild(createPaginationButton(
+                i.toString(), currentPage === i, () => goToPage(i)
+            ));
+        }
+    }
+    
+    // Add ellipsis before last page if needed
+    if (endPage < totalPages - 1) {
+        paginationContainer.appendChild(createEllipsis());
+    }
+    
+    // Always show last page if there is more than one page
+    if (totalPages > 1) {
+        paginationContainer.appendChild(createPaginationButton(
+            totalPages.toString(), currentPage === totalPages, () => goToPage(totalPages)
+        ));
+    }
+    
+    // Next button
+    const nextButton = createPaginationButton('<i class="fas fa-chevron-right"></i>', 
+        currentPage < totalPages, () => goToPage(currentPage + 1));
+    paginationContainer.appendChild(nextButton);
+}
+
+// Create a pagination button
+function createPaginationButton(text, isActive, onClick) {
+    const button = document.createElement('button');
+    button.className = `pagination-btn ${isActive ? 'active' : ''}`;
+    button.innerHTML = text;
+    button.addEventListener('click', onClick);
+    return button;
+}
+
+// Create ellipsis for pagination
+function createEllipsis() {
+    const ellipsis = document.createElement('span');
+    ellipsis.className = 'pagination-ellipsis';
+    ellipsis.textContent = '...';
+    ellipsis.style.padding = '0 5px';
+    return ellipsis;
+}
+
+// Go to specific page
+function goToPage(page) {
+    if (page < 1 || page > totalPages) return;
+    
+    currentPage = page;
+    renderTable();
+    updatePagination();
+    updateShowingEntriesText();
+}
+
+// Handle items per page change
+function handleItemsPerPageChange() {
+    itemsPerPage = parseInt(entriesSelect.value);
+    currentPage = 1;
+    totalPages = Math.ceil(allData.length / itemsPerPage);
+    renderTable();
+    updatePagination();
+    updateShowingEntriesText();
+}
+
+// Update "Showing X to Y of Z entries" text
+function updateShowingEntriesText() {
+    const startIndex = (currentPage - 1) * itemsPerPage + 1;
+    const endIndex = Math.min(currentPage * itemsPerPage, allData.length);
+    
+    showingEntriesText.textContent = `Showing ${startIndex} to ${endIndex} of ${allData.length} entries`;
+}
+
+// Handle search
+function handleSearch() {
+    const searchTerm = searchInput.value.toLowerCase();
+    
+    if (searchTerm === '') {
+        // If search is cleared, show all data
+        fetchData();
+        return;
+    }
+    
+    // Filter data based on search term
+    const filteredData = allData.filter(item => 
+        item.user.toLowerCase().includes(searchTerm) ||
+        item.complaintNumber.toLowerCase().includes(searchTerm) ||
+        item.type.toLowerCase().includes(searchTerm) ||
+        item.category.toLowerCase().includes(searchTerm) ||
+        item.colony.toLowerCase().includes(searchTerm) ||
+        item.building.toLowerCase().includes(searchTerm) ||
+        item.review.toLowerCase().includes(searchTerm)
+    );
+    
+    // Update with filtered data
+    const tempData = allData;
+    allData = filteredData;
+    currentPage = 1;
+    totalPages = Math.ceil(allData.length / itemsPerPage);
+    renderTable();
+    updatePagination();
+    updateShowingEntriesText();
+    
+    // Restore original data for future searches
+    allData = tempData;
+}
+
+// Notification function (already in your code, but included for completeness)
+function showNotification(message, type = 'success') {
+    const notification = document.getElementById('notification');
+    const notificationText = document.getElementById('notification-text');
+    
+    notificationText.textContent = message;
+    notification.className = `notification ${type} show`;
+    
+    setTimeout(() => {
+        notification.classList.remove('show');
+    }, 3000);
+}
+  </script>
+
+  <script>
+    //JS to complaint details navigation
+
+async function handleComplaintClick(complaintId) {
+  try {
+    const authToken = localStorage.getItem('authToken');
+    
+    // Show loading state if needed
+    showNotification('Loading complaint details...', 'info', 2000);
+    
+    // Send complaint ID to encryption API
+    const response = await fetch(`${SERVER_URL}/api/encrypt-id`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${authToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ complaint_id: complaintId })
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to encrypt complaint ID');
+    }
+    
+    const data = await response.json();
+    
+    if (data.success && data.encrypted_id) {
+      // Redirect to complaint details page with encrypted ID
+      showNotification('Navigating to complaint details...', 'success', 2000);
+      window.location.href = `complaint-details.html?${data.encrypted_id}`;
+      console.log(`Redirecting to complaint-details?${data.encrypted_id}`);
+
+    } else {
+      throw new Error(data.message || 'Failed to encrypt ID');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    showNotification('Failed to open complaint details: ' + error.message, 'error', 3000);
+  }
+}
+  </script>
+  <script>
+  // Add this function to handle CSV export
+  function exportToCSV() {
+    if (allData.length === 0) {
+      showNotification('No data available to export', 'warning');
+      return;
+    }
+
+    try {
+      // Create CSV header
+      const headers = ['#', 'Date', 'Complain No.', 'User', 'Number', 'Type', 'Category', 'Colony', 'Building/Houses', 'Rating', 'Review'];
+      
+      // Create CSV content
+      let csvContent = headers.join(',') + '\n';
+      
+      // Add all data rows
+      allData.forEach((item, index) => {
+        const row = [
+          index + 1,
+          formatDate(item.date),
+          item.complaintNumber,
+          `"${item.user.replace(/"/g, '""')}"`, // Escape quotes in CSV
+          item.number,
+          item.type,
+          item.category,
+          item.colony,
+          item.building,
+          item.rating,
+          `"${item.review.replace(/"/g, '""')}"` // Escape quotes in CSV
+        ];
+        csvContent += row.join(',') + '\n';
+      });
+      
+      // Create download link
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      const date = new Date().toISOString().slice(0, 10);
+      
+      link.setAttribute('href', url);
+      link.setAttribute('download', `rating_report_${date}.csv`);
+      link.style.visibility = 'hidden';
+      
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      showNotification('CSV exported successfully', 'success');
+    } catch (error) {
+      console.error('Error exporting CSV:', error);
+      showNotification('Failed to export CSV', 'error');
+    }
+  }
+
+  // Add event listener to the export button
+  document.addEventListener('DOMContentLoaded', () => {
+    const exportBtn = document.getElementById('export-csv');
+    if (exportBtn) {
+      exportBtn.addEventListener('click', exportToCSV);
+    }
+    
+    // Rest of your initialization code
+    initializeEntriesDropdown();
+    fetchData();
+    
+    // Event listeners
+    entriesSelect.addEventListener('change', handleItemsPerPageChange);
+    searchInput.addEventListener('input', handleSearch);
+  });
+</script>
+  <script src="chat-bot.js"></script>
+</body>
+</html>

@@ -1,0 +1,3385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="server-url.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      if (!document.querySelector('link[href*="font-awesome"]')) {
+        const faLink = document.createElement('link');
+        faLink.rel = 'stylesheet';
+        faLink.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css';
+        document.head.appendChild(faLink);
+      }
+    });
+  </script>
+
+  <script>
+    const page = 'launch-complaints';
+  </script>
+
+  <script src="verification.js"></script>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="logo.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MES CMS - Launch Complaints</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+
+    /* Header Styles */
+
+
+    
+    /* Variables */
+
+    /* Notification Styles */
+    .notification-area {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1100;
+      max-width: 350px;
+      width: 100%;
+    }
+
+    .notification {
+      padding: 15px 20px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+      animation: slideIn 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+    }
+
+    .notification::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 4px;
+      width: 100%;
+      background: rgba(255,255,255,0.5);
+      animation: progress 3s linear;
+    }
+
+    .notification.success {
+      background: #4CAF50;
+    }
+
+    .notification.error {
+      background: #F44336;
+    }
+
+    .notification.warning {
+      background: #FF9800;
+    }
+
+    .notification.info {
+      background: #2196F3;
+    }
+
+    @keyframes progress {
+      from { width: 100%; }
+      to { width: 0%; }
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    /* Complaints Section */
+    .complaints-section-container {
+      display: grid;
+      grid-template-columns: 250px 1fr;
+      gap: 30px;
+      min-height: 600px;
+    }
+    
+    .complaints-sidebar {
+      background: var(--card-bg);
+      border-radius: 18px;
+      padding: 25px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+    
+    .complaints-option {
+      padding: 18px 20px;
+      margin-bottom: 15px;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(248, 249, 250, 0.7);
+    }
+    
+    .complaints-option:hover {
+      background: var(--nav-hover);
+    }
+    
+    .complaints-option.active {
+      background: var(--nav-active);
+      color: var(--primary);
+      box-shadow: 0 5px 15px rgba(136, 28, 28, 0.1);
+    }
+    
+    .complaints-option i {
+      font-size: 20px;
+    }
+    
+    .complaints-content {
+      background: var(--card-bg);
+      border-radius: 18px;
+      padding: 30px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    #all-complaints, #natures, #delay-complaints {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .history-button {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 12px 20px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 900;
+      transition: all 0.3s ease;
+      opacity: 0;
+      transform: translateY(20px);
+      pointer-events: none;
+    }
+
+    .history-button.visible {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .history-button:hover {
+      background-color: #9e1e1e;
+      transform: translateY(-2px);
+    }
+
+    /* History Panel Styles */
+    .history-panel {
+      position: fixed;
+      top: 0;
+      right: -40vw; /* Start off-screen */
+      width: 40vw;
+      height: 100vh;
+      background: white;
+      box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+      z-index: 1000;
+      transition: right 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .history-panel.active {
+      right: 0;
+    }
+
+    .history-header {
+      padding: 15px 20px;
+      background-color: var(--primary);
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .history-header h3 {
+      font-size: 18px;
+      margin: 0;
+    }
+
+    .history-close {
+      display: flex;
+      flex-direction: row-reverse;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    .history-content {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    /* Complaints History Table Styles */
+    .complaints-history-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      border-radius: 5px;
+      overflow: hidden;
+      background: white;
+      font-size: 13px;
+      overflow-x: auto;
+      border: 1px solid #ffc4c4; /* Add outer border instead of individual cell borders */
+    }
+
+    .complaints-history-table th {
+      background: rgba(136, 28, 28, 0.1);
+      color: var(--primary);
+      font-weight: 700;
+      padding: 10px 12px;
+      text-align: center;
+      font-size: 14px;
+      border: 1px solid #ffc4c4; /* vertical line color */
+    }
+    
+    .complaints-history-table td {
+      padding: 8px 12px;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      vertical-align: middle;
+      border: 1px solid #ffc4c4; /* vertical line color */
+      cursor: default;
+      vertical-align: top;
+      height: 60px;
+    }
+    
+    .complaints-history-table tr:hover:not(tfoot tr) {
+      background: rgba(136, 28, 28, 0.05);
+    }
+
+    /* Overlay for when history panel is open */
+    .history-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .history-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      
+      .history-close {
+        display: flex;
+        flex-direction: row-reverse;
+      }
+
+      .history-panel {
+        width: 85%;
+        right: -85%;
+      }
+
+      .complaints-history-table td {
+        padding: 5px;
+        font-size: 12px;
+      }
+      
+      .history-button {
+        bottom: 20px;
+        right: 20px;
+        padding: 10px 16px;
+        font-size: 14px;
+        width: 100px;
+      }
+
+      .history-close {
+        height: 30px;
+        width: 30px;
+        display: flex;
+        flex-direction: row-reverse;
+      }
+    }
+
+    /* Improved Launch Complaint Form */
+    .launch-complaint-form {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      max-width: auto;
+      margin: 0 0;
+    }
+
+    .complaint-header {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--primary);
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 8px;
+      margin-bottom: 10px;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 15px;
+      width: 50vw;
+    }
+
+    .form-group {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .form-group.full-width {
+      flex: 0 0 100%;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 13px;
+      color: #555;
+      font-weight: 500;
+    }
+
+    input[type="text"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+      background-color: #f9f9f9;
+      transition: all 0.2s;
+    }
+
+    input[type="text"]:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      background-color: #fff;
+      box-shadow: 0 0 0 2px rgba(136, 28, 28, 0.1);
+    }
+
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+      width: 50vw;
+    }
+
+
+    button {
+      padding: 10px 18px;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    button:hover {
+      background-color: #9e1e1e;
+    }
+
+    button:active {
+      transform: translateY(1px);
+    }
+
+    .search-button {
+      flex: 0 0 80px;
+    }
+
+    .assign-button {
+      flex: 0 0 80px;
+    }
+
+    .select-button {
+      flex: 0 0 80px;
+    }
+
+    .launch-button {
+      align-self: flex-start;
+      padding: 10px 25px;
+    }
+
+
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .form-row {
+        flex-direction: column;
+        gap: 15px;
+        width: 100%;
+      }
+      
+      button {
+        width: 100%;
+      }
+      
+      .search-button,
+      .assign-button,
+      .select-button {
+        flex: 1;
+      }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 992px) {
+      .complaints-section-container {
+        grid-template-columns: 1fr;
+      }
+
+      .form-row {
+        width: 100%;
+      }
+      
+      .complaints-sidebar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      
+      .complaints-option {
+        margin-bottom: 0;
+        flex: 1;
+        min-width: 150px;
+      }
+      
+      textarea {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .nav-bar {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .form-row {
+        width: 100%;
+      }
+      
+      .nav-item {
+        padding: 15px;
+        font-size: 15px;
+      }
+
+      textarea {
+        width: 100%;
+      }
+    }
+
+    
+    /* ===== NEW MODAL STYLES ===== */
+    /* Modal Backdrop */
+    .modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-backdrop.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    /* Main Modal Container */
+    .modal-container {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      width: 90%;
+      max-width: 500px;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transform: translateY(-20px);
+      transition: transform 0.3s ease;
+    }
+
+    .modal-backdrop.active .modal-container {
+      transform: translateY(0);
+    }
+
+    /* Modal Header */
+    .modal-header {
+      padding: 15px 20px;
+      background-color: var(--primary);
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h3 {
+      font-size: 18px;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 20px;
+      cursor: pointer;
+      padding: 5px;
+    }
+
+    /* Modal Body */
+    .modal-body {
+      padding: 20px;
+      overflow-y: auto;
+      flex-grow: 1;
+    }
+
+    /* Form Styles */
+    .modal-form-group {
+      margin-bottom: 15px;
+    }
+
+    .modal-form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+      color: var(--dark);
+    }
+
+    .modal-form-control {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .modal-form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    /* Modal Footer */
+    .modal-footer {
+      padding: 15px 20px;
+      background-color: #f8f9fa;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      border-top: 1px solid #ddd;
+    }
+
+    /* Button Styles */
+    .modal-btn {
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .modal-btn-primary {
+      background-color: var(--primary);
+      color: white;
+      border: 1px solid var(--primary);
+    }
+
+    .modal-btn-primary:hover {
+      background-color: var(--secondary);
+    }
+
+    .modal-btn-outline {
+      background-color: transparent;
+      border: 1px solid var(--gray);
+      color: var(--dark);
+    }
+
+    .modal-btn-outline:hover {
+      background-color: #f0f0f0;
+    }
+
+    /* Error Message */
+    .error-message {
+      color: var(--error);
+      font-size: 14px;
+      margin-top: 5px;
+      display: none;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+      .modal-container {
+        width: 95%;
+      }
+    }
+
+
+
+
+
+
+
+
+    /* ===== Address Modal Styles ===== */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.modal-backdrop.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.modal-container {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  max-width: 700px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform: translateY(-20px);
+  transition: transform 0.3s ease;
+}
+
+.modal-backdrop.active .modal-container {
+  transform: translateY(0);
+}
+
+.modal-header {
+  padding: 15px 20px;
+  background-color: var(--primary);
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h3 {
+  font-size: 18px;
+  margin: 0;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.modal-body {
+  padding: 20px;
+  overflow-y: auto;
+  flex-grow: 1;
+}
+
+.section-title {
+  font-size: 16px;
+  color: var(--primary);
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.search-container {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.search-input {
+  flex: 1;
+  position: relative;
+}
+
+.search-input i {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--gray);
+}
+
+.search-input input {
+  padding-left: 35px;
+  width: 100%;
+  padding: 10px 12px 10px 35px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  background-color: #f9f9f9;
+  transition: all 0.2s;
+}
+
+.search-input input:focus {
+  outline: none;
+  border-color: var(--primary);
+  background-color: #fff;
+  box-shadow: 0 0 0 2px rgba(136, 28, 28, 0.1);
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.checkbox-container input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--primary);
+}
+
+.table-container {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  overflow: hidden;
+  max-height: 250px;
+  overflow-y: auto;
+  position: relative;
+}
+
+.address-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.address-table thead {
+  background-color: var(--primary);
+  color: white;
+  position: sticky;
+  top: 0;
+}
+
+.address-table th {
+  padding: 12px 15px;
+  text-align: left;
+  font-weight: 600;
+}
+
+.address-table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.address-table tbody tr {
+  transition: background-color 0.2s;
+  cursor: pointer;
+}
+
+.address-table tbody tr:hover {
+  background-color: var(--nav-hover);
+}
+
+.address-table tbody tr.selected {
+  background-color: var(--nav-active);
+}
+
+.new-building-form {
+  display: none;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background-color: #f9f9f9;
+  margin-top: 10px;
+}
+
+.new-building-form label {
+  margin-top: 15px;
+}
+
+label {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.new-building-form.active {
+  display: block;
+}
+
+.modal-footer {
+  padding: 15px 20px;
+  background-color: #f8f9fa;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  border-top: 1px solid #ddd;
+}
+
+.btn {
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  color: white;
+  border: 1px solid var(--primary);
+}
+
+.btn-primary:hover {
+  background-color: #9e1e1e;
+}
+
+.btn-outline {
+  background-color: transparent;
+  border: 1px solid var(--gray);
+  color: var(--dark);
+}
+
+.btn-outline:hover {
+  background-color: #f0f0f0;
+}
+
+.error-message {
+  color: var(--danger);
+  font-size: 14px;
+  margin-top: 5px;
+  text-align: center;
+  padding: 10px;
+}
+
+.no-records {
+  text-align: center;
+  padding: 20px;
+  color: var(--gray);
+  font-style: italic;
+}
+
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top: 4px solid var(--primary);
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 20px auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+
+
+
+    /* Color Variables */
+    :root {
+      --primary: #8c1c1c;
+      --primary-light: #a83232;
+      --secondary: #6c757d;
+      --light: #f8f9fa;
+      --dark: #212529;
+      --gray: #e9ecef;
+      --border: #ced4da;
+      --error: #dc3545;
+    }
+
+    /* Modal Styles */
+    .skillman-modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .skillman-modal-backdrop.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .skillman-modal-container {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+      width: 95%;
+      max-width: 600px;
+      height: 700px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transform: translateY(-20px);
+      transition: transform 0.3s ease;
+    }
+
+    .skillman-modal-backdrop.active .skillman-modal-container {
+      transform: translateY(0);
+    }
+
+    /* Modal Header */
+    .skillman-modal-header {
+      padding: 16px 20px;
+      background-color: var(--primary);
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .skillman-modal-header h3 {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 22px;
+      cursor: pointer;
+      padding: 2px;
+      line-height: 1;
+    }
+
+    /* Modal Body */
+    .skillman-modal-body {
+      padding: 20px;
+      overflow-y: visible;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Priority Section - Original Radio Buttons */
+    .priority-section {
+      margin-bottom: 24px;
+    }
+
+    .priority-section label {
+      display: block;
+      margin-bottom: 3px;
+      font-weight: 600;
+      color: var(--dark);
+      font-size: 14px;
+    }
+
+    .priority-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 30px;
+      margin-top: 15px;
+    }
+
+    .priority-option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .priority-option input[type="radio"] {
+      accent-color: var(--primary);
+    }
+
+    #priority-label {
+      font-size: 15px;
+      font-weight: bold;
+      color: var(--primary);
+    }
+
+    /* Dropdown Styles */
+    .dropdown {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .dropdown-toggle {
+      width: 100%;
+      padding: 12px 15px;
+      background-color: white;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: border-color 0.2s;
+    }
+
+    .dropdown-toggle:hover {
+      border-color: var(--primary);
+    }
+
+    .dropdown-toggle i {
+      transition: transform 0.2s;
+    }
+
+    .dropdown-toggle.active i {
+      transform: rotate(180deg);
+    }
+
+    .dropdown-menu {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      max-height: 300px;
+      background-color: white;
+      border: 1px solid var(--border);
+      border-radius: 0 0 6px 6px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      z-index: 10;
+      display: none;
+      margin-top: -1px;
+      overflow: hidden;
+    }
+
+    .dropdown-menu.active {
+      display: block;
+    }
+
+    .dropdown-search {
+      padding: 10px 15px;
+      border-bottom: 1px solid var(--gray);
+      position: sticky;
+      top: 0;
+      background: white;
+      z-index: 11;
+    }
+
+    .dropdown-search input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+    }
+
+    .dropdown-search input:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    .dropdown-items {
+      max-height: 250px;
+      overflow-y: auto;
+    }
+
+    .dropdown-item {
+      padding: 10px 15px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .dropdown-item:hover {
+      background-color: var(--gray);
+    }
+
+    .dropdown-item.selected {
+      background-color: rgba(140, 28, 28, 0.1);
+    }
+
+    .skillman-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .skillman-name {
+      font-weight: 600;
+    }
+
+    .skillman-details {
+      display: flex;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--secondary);
+    }
+
+    /* Helper Skillman Section */
+    .helper-section {
+      margin-top: 30px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .helper-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .helper-header label {
+      font-weight: 600;
+      color: var(--dark);
+    }
+
+    .helper-tag-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      min-height: 50px;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background-color: white;
+    }
+
+    .helper-tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 12px;
+      background-color: var(--gray);
+      border-radius: 16px;
+      font-size: 14px;
+      height: fit-content;
+    }
+
+    .helper-tag button {
+      background: none;
+      border: none;
+      margin-left: 6px;
+      color: var(--secondary);
+      cursor: pointer;
+      padding: 0;
+      line-height: 1;
+    }
+
+    .helper-tag button:hover {
+      color: var(--error);
+    }
+
+    .empty-helpers {
+      color: var(--secondary);
+      font-style: italic;
+    }
+
+    /* Modal Footer */
+    .modal-footer {
+      padding: 16px 20px;
+      background-color: #f8f9fa;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-outline {
+      background-color: transparent;
+      border: 1px solid var(--secondary);
+      color: var(--secondary);
+    }
+
+    .btn-outline:hover {
+      background-color: #f0f0f0;
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: white;
+      border: 1px solid var(--primary);
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-light);
+    }
+
+    #primarySkillmanText, #helperSkillmanText {
+      color: rgb(172, 172, 172);
+    }
+
+    .hamburger {
+      display: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      .complaints-content {
+        padding: 15px;
+      }
+      .logo {
+        flex-direction: column;
+      }
+
+      .priority-options {
+        flex-direction: column;
+        gap: 10px;
+      }
+      
+      .skillman-modal-body {
+        padding: 16px;
+      }
+      
+      .skillman-details {
+        flex-direction: column;
+        gap: 2px;
+      }
+      
+      .modal-container {
+        height: 90vh;
+      }
+    }
+
+    .line {
+      background-color: rgb(202, 202, 202); 
+      height: 1px; 
+      margin-top:20px;
+      margin-bottom:10px;
+    }
+
+
+    /* Responsive header */
+    
+
+  </style>
+  <link rel="stylesheet" href="common-styles.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Notification Container (place this in your HTML) -->
+  <div class="notification-area" id="notification-area"></div>
+  
+  <!-- ===== NEW MODAL HTML ===== -->
+  <div class="modal-backdrop" id="customerModal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3><i class="fas fa-user-plus"></i> Add New Customer</h3>
+        <button class="close-btn" id="closeModalBtn">&times;</button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="modal-form-group">
+          <label for="customer-name">Customer Name *</label>
+          <input type="text" id="customer-name" class="modal-form-control" placeholder="Enter customer name" required>
+          <div id="name-error" class="error-message">Please enter customer name</div>
+        </div>
+        
+        <div class="modal-form-group">
+          <label for="customer-email">Email (Optional)</label>
+          <input type="email" id="customer-email" class="modal-form-control" placeholder="Enter email address">
+          <div id="email-error" class="error-message">Please enter a valid email address</div>
+        </div>
+        
+        <div class="modal-form-group">
+          <label for="customer-phone">Phone Number *</label>
+          <input type="tel" id="customer-phone" class="modal-form-control" placeholder="Enter phone number" required>
+          <div id="phone-error" class="error-message">Please enter a valid phone number</div>
+        </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button class="modal-btn modal-btn-outline" id="cancelModalBtn">Cancel</button>
+        <button class="modal-btn modal-btn-primary" id="saveCustomerBtn">Save Customer</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Assign Address Modal -->
+  <div class="modal-backdrop" id="addressModal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3><i class="fas fa-map-marker-alt"></i> Assign Address</h3>
+        <button class="close-btn" id="closeAddressModalBtn">&times;</button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="address-section">
+          <h4 class="section-title"><i class="fas fa-map-marker-alt"></i> Address Information</h4>
+          
+          <div class="search-container">
+            <div class="search-input">
+              <i class="fas fa-search"></i>
+              <input type="text" class="form-control" id="building-search" placeholder="Search building by name">
+            </div>
+            <div class="checkbox-container">
+              <input type="checkbox" id="new-building">
+              <label for="new-building">New Building</label>
+            </div>
+          </div>
+          
+          <div class="new-building-form" id="newBuildingForm">
+            <div class="form-group">
+              <label for="house-building-no">House/Building No.</label>
+              <input type="text" class="form-control" id="house-building-no" placeholder="Enter house/building number">
+            </div>
+            
+            <div class="form-group">
+              <label for="colony">Colony</label>
+              <select class="form-control" id="colony">
+                <option value="">Loading colonies...</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="apartment-type">Apartment#/Type</label>
+              <select class="form-control" id="apartment-type">
+                <option value="">Loading apartment types...</option>
+              </select>
+            </div>
+
+            <!-- Inside your modal where new building fields are shown -->
+            <div class="form-group">
+              <label for="area">Area</label>
+              <select id="area" class="form-control">
+                <option value="">Select Area</option>
+                <option value="B&R-I">B&R-I</option>
+                <option value="B&R-II">B&R-II</option>
+                <option value="B&R-III">B&R-III</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="residentialStatus">Residential Status</label>
+              <select id="residentialStatus" class="form-control">
+                <option value="">Select Status</option>
+                <option value="Resdl">Resdl</option>
+                <option value="Non-Resdl">Non-Resdl</option>
+              </select>
+            </div>
+
+
+          </div>
+          
+          <div class="table-container" id="addressTableContainer">
+            <table class="address-table">
+              <thead>
+                <tr>
+                  <th>Customer</th>
+                  <th>House/Building No.</th>
+                  <th>Colony</th>
+                  <th>Apartment#/Type</th>
+                </tr>
+              </thead>
+              <tbody id="address-table-body">
+                <!-- Table rows will be generated by JavaScript -->
+              </tbody>
+            </table>
+            <div id="loading-spinner" class="spinner" style="display: none;"></div>
+            <div id="error-message" class="error-message" style="display: none;"></div>
+            <div id="no-records" class="no-records" style="display: none;">No records found</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button class="btn btn-outline" id="cancelAddressBtn">Cancel</button>
+        <button class="btn btn-primary" id="saveAddressBtn">Assign Building</button>
+      </div>
+    </div>
+  </div>
+
+
+
+
+
+  
+<!-- Modal Structure -->
+<div class="skillman-modal-backdrop" id="modalBackdrop">
+  <div class="skillman-modal-container">
+    <!-- Modal Header -->
+    <div class="skillman-modal-header">
+      <h3><i class="fas fa-user-cog"></i> Assign Skillman to Complaint</h3>
+      <button class="close-btn" id="closeBtn">&times;</button>
+    </div>
+    
+    <!-- Modal Body -->
+    <div class="skillman-modal-body">
+      <!-- Priority Section with Original Radio Buttons -->
+      <div class="priority-section">
+        <label id="priority-label">Priority</label>
+        <div class="priority-options">
+          <div class="priority-option">
+            <input type="radio" id="immediate" name="priority" value="immediate" checked>
+            <label for="immediate">Immediate (2Hrs)</label>
+          </div>
+          <div class="priority-option">
+            <input type="radio" id="urgent" name="priority" value="urgent">
+            <label for="urgent">Urgent (6Hrs)</label>
+          </div>
+          <div class="priority-option">
+            <input type="radio" id="routine" name="priority" value="routine">
+            <label for="routine">Routine (24Hrs)</label>
+          </div>
+          <div class="priority-option">
+            <input type="radio" id="deferred" name="priority" value="deferred">
+            <label for="deferred">Deferred</label>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Primary Skillman Dropdown -->
+      <div class="dropdown" id="primarySkillmanDropdown">
+        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: black">Primary Skillman</label>
+        <button class="dropdown-toggle" id="primarySkillmanToggle">
+          <span id="primarySkillmanText" >Select a skillman</span>
+          <i class="fas fa-chevron-down"></i>
+        </button>
+        <div class="dropdown-menu" id="primarySkillmanMenu">
+          <div class="dropdown-search">
+            <input type="text" placeholder="Search skillman..." id="primarySkillmanSearch">
+          </div>
+          <div class="dropdown-items" id="primarySkillmanItems">
+            <!-- Items will be populated by JavaScript -->
+          </div>
+        </div>
+      </div>
+      
+      <!-- Helper Skillman Section -->
+      <div class="helper-section">
+        <div class="helper-header">
+          <label>Helper Skillman</label>
+          <small>Add multiple if needed</small>
+        </div>
+        
+        <div class="dropdown" id="helperSkillmanDropdown">
+          <button class="dropdown-toggle" id="helperSkillmanToggle">
+            <span id="helperSkillmanText" >Add helper skillman</span>
+            <i class="fas fa-chevron-down"></i>
+          </button>
+          <div class="dropdown-menu" id="helperSkillmanMenu">
+            <div class="dropdown-search">
+              <input type="text" placeholder="Search helper..." id="helperSkillmanSearch">
+            </div>
+            <div class="dropdown-items" id="helperSkillmanItems">
+              <!-- Items will be populated by JavaScript -->
+            </div>
+          </div>
+        </div>
+        
+        <div class="helper-tag-container" id="helperTags">
+          <div class="empty-helpers">No helpers added yet</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Modal Footer -->
+    <div class="modal-footer">
+      <button class="btn btn-outline" id="cancelBtn">Cancel</button>
+      <button class="btn btn-primary" id="assignBtn">Assign Skillman</button>
+    </div>
+  </div>
+</div>
+
+
+
+  <div class="history-overlay" id="historyOverlay"></div>
+  
+  <button class="history-button" id="historyButton">
+    <i class="fas fa-history"></i> History
+  </button>
+  
+  <div class="history-panel" id="historyPanel">
+    <div class="history-header">
+      <h3><i class="fas fa-history"></i> Complaint History</h3>
+      <button class="history-close" id="historyClose">&times;</button>
+    </div>
+    <div class="history-content">
+      <table class="complaints-history-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Date</th>
+            <th>Location</th>
+            <th>Nature</th>
+            <th>Nature Type</th>
+            <th>Skillman</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="historyTableBody">
+          <!-- History data will be populated here -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+  
+
+
+  <!--Header Section-->
+  <header>
+    <div class="logo">
+      <div class="logo-image">
+        <img src="logo.jpg" alt="logo image">
+      </div>
+      <h2>MES CMS</h2>
+    </div>
+
+    <div class="user">
+      <h2 id="user-id">Unknown</h2>
+      <button class="logout-btn" id="logout-btn">Logout</button>
+      <div class="hamburger">
+        <i class="fas fa-bars" id="hamburger-btn"></i>
+        <div class="navigation-block">
+          <a href="dashboard" class="navi-block-items">Dashboard</a>
+          <div href="complaints" class="navi-block-items active">Complaints</div>
+          <a href="users" class="navi-block-items">Users</a>
+          <a href="reporting" class="navi-block-items">Reporting</a>
+          <a href="admin" class="navi-block-items">Admin</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="nav-bar">
+    <div class="nav-container">
+      <a href="dashboard" class="nav-item">
+        <i class="fas fa-chart-line"></i>
+        Dashboard
+      </a>
+      <div class="nav-item active">
+        <i class="fas fa-ticket-alt"></i>
+        Complaints
+      </div>
+      <a href="users" class="nav-item">
+        <i class="fas fa-users"></i>
+        Users
+      </a>
+      <a href="reporting" class="nav-item">
+        <i class="fas fa-file-alt"></i>
+        Reporting
+      </a>
+      <a href="admin" class="nav-item">
+        <i class="fas fa-user-tie"></i>
+        Admin
+      </a>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="complaints-section-container">
+      <div class="complaints-sidebar">
+        <div class="complaints-option active" data-panel="launch-complaints">
+          <i class="fas fa-rocket"></i>
+          Launch Complaints
+        </div>
+        <a href="all-complaints.html" class="complaints-option" id="all-complaints">
+          <i class="fas fa-list"></i>
+          All Complaints
+        </a>
+        <a href="delay-complaints.html" class="complaints-option" id="delay-complaints">
+          <i class="fas fa-hourglass-half"></i>
+          Delay Complaints
+        </a>
+        <a href="natures.html" class="complaints-option" id="natures">
+          <i class="fas fa-chart-pie"></i>
+          Natures
+        </a>
+      </div>
+    
+      <div class="complaints-content">
+        <form class="launch-complaint-form">
+          <h2 class="complaint-header">Launch Complaint</h2>
+          
+          <div class="form-row">
+            <div class="form-group" style="flex: 1 1 70%">
+              <label for="customer-search">Search customer by name or phone number</label>
+              <input type="text" id="customer-search" placeholder="Enter name or phone">
+            </div>
+            <div class="form-group" style="align-self: flex-end">
+              <button type="button" class="search-button">Find</button>
+            </div>
+          </div>
+
+
+          <!--to show user status-->
+          <div id="user-status" style="margin-top: 8px; font-weight: bold;"></div>
+
+          
+          <div class="form-row">
+            <div class="form-group" style="flex: 1 1 70%">
+              <label for="location">Location</label>
+              <select id="location" disabled>
+                <option value="">Select Location</option>
+                <!-- Options would be added dynamically -->
+              </select>
+            </div>
+            <div class="form-group" style="align-self: flex-end">
+              <button type="button" class="assign-button" disabled>Assign</button>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="category">Category</label>
+              <select id="category">
+                <option value="">Select Category</option>
+                <!-- Options would be added dynamically -->
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="category-type">Category Type</label>
+              <select id="category-type">
+                <option value="">Select Type</option>
+                <!-- Options would be added dynamically -->
+              </select>
+            </div>
+          </div>
+          
+          <div class="form-group full-width">
+            <label for="description">About Complaint</label>
+            <textarea id="description" placeholder="Enter complaint details"></textarea>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group" style="flex: 1 1 70%">
+              <label for="skillman">Skillman</label>
+              <input type="text" id="skillman" disabled>
+            </div>
+            <div class="form-group" style="align-self: flex-end">
+              <button type="button" class="select-button" id="select-button">Select</button>
+            </div>
+          </div>
+          <div class="line"></div>
+          <button type="submit" class="launch-button"">
+            <i class="fas fa-rocket"></i> | Launch Complaint</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+<script>
+  const hamburgerBtn = document.getElementById("hamburger-btn");
+  const navBlock = document.querySelector(".navigation-block");
+
+  // Toggle navigation on hamburger click
+  hamburgerBtn.addEventListener("click", (e) => {
+    e.stopPropagation(); // Prevent click from bubbling to document
+    navBlock.classList.toggle("active");
+  });
+
+  // Close navigation when clicking outside
+  document.addEventListener("click", (e) => {
+    // Check if click is outside the navigation block and hamburger button
+    if (!navBlock.contains(e.target) && e.target !== hamburgerBtn) {
+      navBlock.classList.remove("active");
+    }
+  });
+
+  // Optional: Prevent clicks inside navigation from closing it
+  navBlock.addEventListener("click", (e) => {
+    e.stopPropagation();
+  });
+</script>
+
+
+<script>
+// Add this script to control navigation visibility based on backend permissions
+document.addEventListener('DOMContentLoaded', async function() {
+    try {
+        const authToken = localStorage.getItem('authToken');
+        if (!authToken) {
+            console.error('No authentication token found');
+            return;
+        }
+
+        // Fetch allowed pages from backend
+        const response = await fetch(`${SERVER_URL}/api/allowed-pages`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${authToken}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch allowed pages');
+        }
+
+        const data = await response.json();
+        
+        if (data.success) {
+            // Process navigation items based on allowed pages
+            processNavigationItems(data.allowedPages, data.navigationItems);
+        }
+    } catch (error) {
+        console.error('Error fetching allowed pages:', error);
+        // In case of error, you might want to show a default set of navigation items
+        // or handle it according to your application's requirements
+    }
+});
+
+function processNavigationItems(allowedPages, navigationItems) {
+    // Process header navigation items
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+        const href = item.getAttribute('href');
+        if (href) {
+            const pageName = href; // Get the page name without extension
+            
+            // Check if this category has an accessible page
+            if (navigationItems[pageName]) {
+                // Set the href to the first accessible page in this category
+                item.setAttribute('href', `${navigationItems[pageName]}.html`);
+                item.style.display = 'flex';
+            } else {
+                item.style.display = 'none';
+            }
+        }
+    });
+    
+    // Process hamburger menu navigation items
+    const hamburgerItems = document.querySelectorAll('.navi-block-items');
+    hamburgerItems.forEach(item => {
+        const href = item.getAttribute('href');
+        if (href) {
+            const pageName = href; // Get the page name without extension
+            
+            // Check if this category has an accessible page
+            if (navigationItems[pageName]) {
+                // Set the href to the first accessible page in this category
+                item.setAttribute('href', `${navigationItems[pageName]}.html`);
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        }
+    });
+    
+    // Process sidebar navigation items (use the allowedPages array)
+    const sidebarItems = document.querySelectorAll('.complaints-option');
+    sidebarItems.forEach(item => {
+        const href = item.getAttribute('href');
+        if (href) {
+            const pageName = getPageNameFromHref(href);
+            if (allowedPages.includes(pageName) || item.classList.contains('active')) {
+                item.style.display = 'flex';
+            } else {
+                item.style.display = 'none';
+            }
+        }
+    });
+}
+
+function getPageNameFromHref(href) {
+    if (!href) return '';
+    
+    // Extract page name from href (e.g., "dashboard.html" -> "dashboard")
+    const pageWithExtension = href.split('/').pop();
+    return pageWithExtension.split('.')[0];
+}
+</script>
+
+  <script>
+          
+    
+    let USER_ID = localStorage.getItem('UserId');
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById("user-id").textContent = USER_ID;
+      localStorage.removeItem('UserId');
+    });
+    
+    // Javascript for notification area
+    /**
+ * Show a notification message
+ * @param {string} message - The message to display
+ * @param {string} type - Type of notification (success, error, warning, info)
+ * @param {number} duration - Duration in milliseconds (default: 5000)
+ */
+function showNotification(message, type = 'success', duration = 3000) {
+  const notificationArea = document.getElementById('notification-area');
+  
+  // Create notification element
+  const notification = document.createElement('div');
+  notification.className = `notification ${type}`;
+  
+  // Set icon based on type
+  let icon;
+  switch(type) {
+    case 'success': icon = 'fa-check-circle'; break;
+    case 'error': icon = 'fa-exclamation-circle'; break;
+    case 'warning': icon = 'fa-exclamation-triangle'; break;
+    default: icon = 'fa-info-circle';
+  }
+  
+  notification.innerHTML = `
+    <i class="fas ${icon}"></i>
+    ${message}
+  `;
+  
+  // Add to notification area
+  notificationArea.appendChild(notification);
+  
+  // Auto-remove after duration
+  setTimeout(() => {
+    notification.style.opacity = '0';
+    setTimeout(() => notification.remove(), 300);
+  }, duration);
+}
+ 
+
+  document.addEventListener('DOMContentLoaded', function() {
+
+    // DOM Elements
+    const logoutBtn = document.getElementById('logout-btn');
+    
+    logoutBtn.addEventListener('click', async () => {
+      try {
+        const authToken = localStorage.getItem('authToken');
+        const response = await fetch(SERVER_URL+'/logout', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${authToken}`,'Content-Type': 'application/json' }
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          document.getElementById('user-id').textContent = 'Unknown';
+          console.log('Logout success:', data);
+          //alert('Logged out successfully!');
+          // 👇 you can add more procedural lines here
+          // e.g., redirect:
+          showNotification('Logging out');
+          localStorage.removeItem('authToken');
+          setTimeout(() => {
+            window.location.href = 'login.html';
+          }, 500); // 1000 ms = 1 sec
+        } else {
+          console.error('Logout failed:', data);
+          alert('Logout failed!');
+        }
+
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Something went wrong!');
+      }
+    });
+    
+  });
+
+
+
+    let currentAddressData = [];
+    let customerId = null; // To store the selected customer ID
+  // Assign Address Modal Functionality
+  document.addEventListener('DOMContentLoaded', function() {
+    // DOM Elements
+    const addressModal = document.getElementById('addressModal');
+    const assignBtn = document.querySelector('.assign-button');
+    const closeAddressModalBtn = document.getElementById('closeAddressModalBtn');
+    const cancelAddressBtn = document.getElementById('cancelAddressBtn');
+    const saveAddressBtn = document.getElementById('saveAddressBtn');
+    const newBuildingCheckbox = document.getElementById('new-building');
+    const newBuildingForm = document.getElementById('newBuildingForm');
+    const addressTableBody = document.getElementById('address-table-body');
+    const buildingSearch = document.getElementById('building-search');
+    const loadingSpinner = document.getElementById('loading-spinner');
+    const errorMessage = document.getElementById('error-message');
+    const noRecords = document.getElementById('no-records');
+    const houseBuildingNo = document.getElementById('house-building-no');
+    const colonySelect = document.getElementById('colony');
+    const apartmentTypeSelect = document.getElementById('apartment-type');
+    //added
+    const areaSelect = document.getElementById('area');
+    const residentialStatusSelect = document.getElementById('residentialStatus');
+
+
+    // Open modal when Assign button is clicked
+    assignBtn.addEventListener('click', function() {
+      openAddressModal();
+    });
+
+    // Modal state management
+    function openAddressModal() {
+      addressModal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+      fetchAddressData();
+    }
+
+    function closeAddressModal() {
+      addressModal.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    // Function to fetch address data
+function fetchAddressData() {
+  const authToken = localStorage.getItem('authToken');
+  loadingSpinner.style.display = 'block';
+  addressTableBody.innerHTML = '';
+  errorMessage.style.display = 'none';
+  noRecords.style.display = 'none';
+  
+  fetch(SERVER_URL+'/api/addresses',
+    {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      loadingSpinner.style.display = 'none';
+      currentAddressData = data; // Store the data for searching
+      if (data && data.length > 0) {
+        renderAddressTable(data);
+        //console.log('Address data fetched:', data);
+      } else {
+        noRecords.style.display = 'block';
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      loadingSpinner.style.display = 'none';
+      errorMessage.style.display = 'block';
+      errorMessage.textContent = 'Error loading address data';
+      showNotification('Error loading address data', 'error');
+    });
+}
+
+// Add this after your other event listeners in the address modal section
+buildingSearch.addEventListener('input', function() {
+  const searchTerm = this.value.trim().toLowerCase();
+  
+  if (searchTerm === '') {
+    // If search is empty, show all data
+    renderAddressTable(currentAddressData);
+    return;
+  }
+  
+  // Filter addresses where building number includes the search term
+  const filteredData = currentAddressData.filter(address => {
+    const buildingNo = address.buildingNo ? address.buildingNo.toLowerCase() : '';
+    return buildingNo.includes(searchTerm);
+  });
+  
+  renderAddressTable(filteredData);
+});
+
+    // Function to fetch colonies
+    function fetchColonies() {
+      const authToken = localStorage.getItem('authToken');
+      colonySelect.innerHTML = '<option value="">Loading colonies...</option>';
+      fetch(SERVER_URL+'/api/get-colonies-for-launch-complaints', {
+                headers: {
+                    'Authorization': `Bearer ${authToken}`,
+                    'Content-Type': 'application/json'
+                }})
+        .then(response => response.json())
+        .then(data => {
+          colonySelect.innerHTML = '<option value="">Select Colony</option>';
+          data.forEach(colony => {
+            const option = document.createElement('option');
+            option.value = colony.id;
+            option.textContent = colony.name;
+            colonySelect.appendChild(option);
+          });
+        });
+    }
+
+    // Function to fetch apartment types
+    function fetchApartmentTypes() {
+      const authToken = localStorage.getItem('authToken');
+      apartmentTypeSelect.innerHTML = '<option value="">Loading apartment types...</option>';
+      fetch(SERVER_URL+'/api/apartment-types', {
+                headers: {
+                    'Authorization': `Bearer ${authToken}`,
+                    'Content-Type': 'application/json'
+                }})
+        .then(response => response.json())
+        .then(data => {
+          apartmentTypeSelect.innerHTML = '<option value="">Select Apartment Type</option>';
+          data.forEach(type => {
+            const option = document.createElement('option');
+            option.value = type.id;
+            option.textContent = type.name;
+            apartmentTypeSelect.appendChild(option);
+          });
+        });
+    }
+
+    // Function to render address table
+function renderAddressTable(data) {
+  addressTableBody.innerHTML = '';
+  
+  if (data.length === 0) {
+    noRecords.style.display = 'block';
+    return;
+  }
+  
+  noRecords.style.display = 'none';
+  
+  data.forEach((address, index) => {
+    const row = document.createElement('tr');
+    if (index === 0) row.classList.add('selected');
+    
+    row.innerHTML = `
+      <td>${address.customer || 'N/A'}</td>
+      <td>${address.buildingNo || 'N/A'}</td>
+      <td>${address.colony || 'N/A'}</td>
+      <td>${address.apartment || 'N/A'}</td>
+    `;
+    
+    row.addEventListener('click', function() {
+      document.querySelectorAll('.address-table tbody tr').forEach(r => {
+        r.classList.remove('selected');
+      });
+      this.classList.add('selected');
+    });
+    
+    addressTableBody.appendChild(row);
+  });
+}
+
+    // New Building checkbox
+    newBuildingCheckbox.addEventListener('change', function() {
+      if (this.checked) {
+        newBuildingForm.classList.add('active');
+        addressTableContainer.style.display = 'none';
+        fetchColonies();
+        fetchApartmentTypes();
+      } else {
+        newBuildingForm.classList.remove('active');
+        addressTableContainer.style.display = 'block';
+      }
+    });
+
+    // Close modal when clicking outside
+    addressModal.addEventListener('click', function(e) {
+      if (e.target === addressModal) {
+        closeAddressModal();
+      }
+    });
+
+    // Close modal buttons
+    closeAddressModalBtn.addEventListener('click', closeAddressModal);
+    cancelAddressBtn.addEventListener('click', closeAddressModal);
+
+    // Save button
+// Save button functionality
+saveAddressBtn.addEventListener('click', async function () {
+  // Get customer info from search field
+  const customerInfo = getCustomerInfo();
+  
+  if (!customerInfo) {
+    //alert('Please search for a customer first');
+    showNotification('Please search for a customer first', 'error');
+    return;
+  }
+
+  if (newBuildingCheckbox.checked) {
+    // Handle new building case
+    const buildingNo = houseBuildingNo.value.trim();
+    const colony = colonySelect.value;
+    const apartmentType = apartmentTypeSelect.value;
+    const area = areaSelect.value;
+    const residentialStatus = residentialStatusSelect.value;
+
+    // Validate all required fields
+    if (!buildingNo || !colony || !apartmentType || !area || !residentialStatus) {
+      //alert('Please fill in all new building fields');
+      showNotification('Please fill in all new building fields', 'error');
+      return;
+    }
+
+    // Prepare payload for new building
+    const payload = {
+      customer: customerInfo,
+      type: 'new',
+      buildingNo,
+      colony,
+      apartmentType,
+      area,
+      residentialStatus
+    };
+
+    try {
+      const authToken = localStorage.getItem('authToken');
+      // Send data to backend
+      const response = await fetch(SERVER_URL+'/api/assign-location', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to assign location');
+        showNotification('Failed to assign location', 'error');
+      }
+
+      const data = await response.json();
+      console.log('API Response:', data); // Add this for debugging
+
+      // Populate location dropdown with response
+      if (data.locations && data.locations.length > 0) {
+        populateLocationSelect(data.locations);
+      } else {
+        //alert('No locations returned from server');
+        showNotification('No locations returned from server', 'warning');
+      }
+      
+      closeAddressModal();
+    } catch (err) {
+      console.error('Failed to assign new building:', err);
+      //alert('Error assigning new building. Please try again.');
+      showNotification('Error assigning new building. Please try again.', 'error');
+    }
+
+  } else {
+    // Handle existing address selection
+    const selectedRow = document.querySelector('.address-table tbody tr.selected');
+    
+    if (!selectedRow) {
+      //alert('Please select an address from the table');
+      showNotification('Please select an address from the table', 'error');
+      return;
+    }
+
+    // Prepare payload for existing address
+    const payload = {
+      customer: customerInfo,
+      type: 'existing',
+      buildingNo: selectedRow.cells[1].textContent.trim(),
+      colony: selectedRow.cells[2].textContent.trim(),
+      apartment: selectedRow.cells[3].textContent.trim()
+    };
+
+    try {
+      const authToken = localStorage.getItem('authToken');
+      // Send data to backend
+      const response = await fetch(SERVER_URL+'/api/assign-location', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to assign location');
+        showNotification('Failed to assign location', 'error');
+      }
+
+      const data = await response.json();
+      console.log('API Response:', data); // Add this for debugging
+
+      // Populate location dropdown with response
+      if (data.locations && data.locations.length > 0) {
+        populateLocationSelect(data.locations);
+      } else {
+        //alert('No locations returned from server');
+        showNotification('No locations returned from server', 'warning');
+      }
+      
+      closeAddressModal();
+    } catch (err) {
+      console.error('Failed to assign existing address:', err);
+      //alert('Error assigning address. Please try again.');
+      showNotification('Error assigning address. Please try again.', 'error');
+    }
+  }
+});
+
+// Helper function to get customer info from search field
+function getCustomerInfo() {
+  const searchInput = document.getElementById('customer-search');
+  return searchInput.value.trim();
+}
+
+// Helper function to populate location dropdown
+function populateLocationSelect(locations) {
+  const locationSelect = document.getElementById('location');
+  locationSelect.innerHTML = '<option value="">Select Location</option>';
+  
+  locations.forEach(loc => {
+    const option = document.createElement('option');
+    option.value = loc.id;
+    // Use loc.label if it exists, otherwise fall back to buildingNo and colony
+    option.textContent = loc.label || `${loc.buildingNo || ''}, ${loc.colony || ''}`.trim();
+    locationSelect.appendChild(option);
+  });
+  
+  locationSelect.disabled = false;
+  
+  // Also enable the assign button if it was disabled
+  const assignButton = document.querySelector('.assign-button');
+  if (assignButton) {
+    assignButton.disabled = false;
+  }
+}
+
+
+// Category and Category Type Combobox Population
+const categorySelect = document.getElementById('category');
+const categoryTypeSelect = document.getElementById('category-type');
+
+// Fetch categories from API
+async function fetchCategories() {
+    try {
+      const authToken = localStorage.getItem('authToken');
+        const response = await fetch(SERVER_URL+'/api/categories', {
+        headers: { 
+          'Authorization': `Bearer ${authToken}`, 
+          'Content-Type': 'application/json' }
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch categories');
+            showNotification('Failed to fetch categories', 'error');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching categories:', error);
+        showNotification('Error fetching categories:'+ error, 'error')
+        return [];
+    }
+}
+
+// Fetch category types based on selected category ID
+async function fetchCategoryTypes(categoryId) {
+    try {
+      const authToken = localStorage.getItem('authToken');
+        const response = await fetch(SERVER_URL+`/api/categories/${categoryId}/types`, {
+        headers: { 
+          'Authorization': `Bearer ${authToken}`, 
+          'Content-Type': 'application/json' }
+        });
+        if (!response.ok) {
+            throw new Error('Failed to fetch category types');
+            showNotification('Failed to fetch category types', 'error')
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching category types:', error);
+        showNotification('Error fetching category types:'+ error, 'error')
+        return [];
+    }
+}
+
+// Populate category dropdown
+async function populateCategories() {
+    categorySelect.innerHTML = '<option value="">Loading categories...</option>';
+    
+    try {
+        const categories = await fetchCategories();
+        categorySelect.innerHTML = '<option value="">Select Category</option>';
+        
+        categories.forEach(category => {
+            const option = document.createElement('option');
+            option.value = category.id; // This is the row number from ROW_NUMBER()
+            option.textContent = category.name; // This is "subdivision->nature" format
+            categorySelect.appendChild(option);
+        });
+    } catch (error) {
+        categorySelect.innerHTML = '<option value="">Error loading categories</option>';
+        console.error('Error populating categories:', error);
+        showNotification('Error populating categories:'+ error, 'error')
+    }
+}
+
+// Populate category types dropdown based on selected category
+async function populateCategoryTypes(categoryId) {
+    categoryTypeSelect.innerHTML = '<option value="">Loading types...</option>';
+    categoryTypeSelect.disabled = true;
+    
+    if (!categoryId) {
+        categoryTypeSelect.innerHTML = '<option value="">Select Type</option>';
+        return;
+    }
+    
+    try {
+        const categoryTypes = await fetchCategoryTypes(categoryId);
+        categoryTypeSelect.innerHTML = '<option value="">Select Type</option>';
+        
+        categoryTypes.forEach(type => {
+            const option = document.createElement('option');
+            option.value = type.id;
+            option.textContent = type.name;
+            categoryTypeSelect.appendChild(option);
+        });
+        
+        categoryTypeSelect.disabled = false;
+    } catch (error) {
+        categoryTypeSelect.innerHTML = '<option value="">Error loading types</option>';
+        console.error('Error populating category types:', error);
+        showNotification('Error populating category types:'+ error);
+    }
+}
+
+// Event listener for category selection change
+categorySelect.addEventListener('change', function() {
+    populateCategoryTypes(this.value);
+});
+
+// Initialize categories when page loads
+populateCategories();
+
+// Disable category type select initially
+categoryTypeSelect.disabled = true;
+
+  });
+
+
+
+
+// Add Enter key navigation in modal fields
+document.getElementById('customer-name').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('customer-email').focus();
+    }
+});
+
+document.getElementById('customer-email').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('customer-phone').focus();
+    }
+});
+
+document.getElementById('customer-phone').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        // Validate and save if valid
+        if (validateForm()) {
+            document.getElementById('saveCustomerBtn').click();
+        }
+    }
+});
+
+// Helper function to validate form (reusing your existing function)
+function validateForm() {
+    let isValid = true;
+    hideAllErrors();
+    
+    if (!document.getElementById('customer-name').value.trim()) {
+        document.getElementById('name-error').style.display = 'block';
+        isValid = false;
+    }
+    
+    const email = document.getElementById('customer-email').value;
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        document.getElementById('email-error').style.display = 'block';
+        isValid = false;
+    }
+    
+    const phone = document.getElementById('customer-phone').value.trim();
+    if (!phone) {
+        document.getElementById('phone-error').textContent = 'Please enter phone number';
+        document.getElementById('phone-error').style.display = 'block';
+        isValid = false;
+    } else if (!/^[0-9+\- ]+$/.test(phone)) {
+        document.getElementById('phone-error').textContent = 'Please enter a valid phone number';
+        document.getElementById('phone-error').style.display = 'block';
+        isValid = false;
+    }
+    
+    return isValid;
+}
+
+function hideAllErrors() {
+    document.getElementById('name-error').style.display = 'none';
+    document.getElementById('email-error').style.display = 'none';
+    document.getElementById('phone-error').style.display = 'none';
+}
+
+
+
+// User's History
+
+    const historyButton = document.getElementById('historyButton');
+    const historyPanel = document.getElementById('historyPanel');
+    const historyOverlay = document.getElementById('historyOverlay');
+    const historyClose = document.getElementById('historyClose');
+    const historyTableBody = document.getElementById('historyTableBody');
+    const userStatus = document.getElementById('user-status');
+
+    // Show history button when user is found
+    function showHistoryButton() {
+      historyButton.classList.add('visible');
+    }
+
+    // Hide history button
+    function hideHistoryButton() {
+      historyButton.classList.remove('visible');
+    }
+
+    // Toggle history panel
+    function toggleHistoryPanel() {
+      historyPanel.classList.toggle('active');
+      historyOverlay.classList.toggle('active');
+    }
+
+    // Close history panel
+    function closeHistoryPanel() {
+      historyPanel.classList.remove('active');
+      historyOverlay.classList.remove('active');
+    }
+
+    // Fetch and display complaint history
+    async function fetchComplaintHistory(customerId) {
+      try {
+        const authToken = localStorage.getItem('authToken');
+        const response = await fetch(`${SERVER_URL}/api/customers/${customerId}/complaints`, {
+          headers: {
+            'Authorization': `Bearer ${authToken}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch complaint history');
+        }
+
+        const complaints = await response.json();
+        populateHistoryTable(complaints);
+      } catch (error) {
+        console.error('Error fetching complaint history:', error);
+        historyTableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 20px; color: var(--gray);">Error loading complaint history</td></tr>`;
+      }
+    }
+
+    // Populate history table with data
+    function populateHistoryTable(complaints) {
+      if (!complaints || complaints.length === 0) {
+        historyTableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 20px; color: var(--gray);">No complaint history found</td></tr>`;
+        return;
+      }
+
+      historyTableBody.innerHTML = '';
+      complaints.forEach(complaint => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${complaint.id || 'N/A'}</td>
+          <td>${complaint.date ? new Date(complaint.date).toLocaleDateString() : 'N/A'}</td>
+          <td>${complaint.location || 'N/A'}</td>
+          <td>${complaint.nature || 'N/A'}</td>
+          <td>${complaint.natureType || 'N/A'}</td>
+          <td>${complaint.skillman || 'N/A'}</td>
+          <td>${complaint.status || 'N/A'}</td>
+        `;
+        historyTableBody.appendChild(row);
+      });
+    }
+
+    // Event Listeners
+    historyButton.addEventListener('click', toggleHistoryPanel);
+    historyClose.addEventListener('click', closeHistoryPanel);
+    historyOverlay.addEventListener('click', closeHistoryPanel);
+    ////////////////////////////////////////////////////////////
+
+ 
+
+  // Modal functionality with API integration
+  document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('customerModal');
+    const closeBtn = document.getElementById('closeModalBtn');
+    const cancelBtn = document.getElementById('cancelModalBtn');
+    const saveBtn = document.getElementById('saveCustomerBtn');
+    const findBtn = document.querySelector('.search-button');
+    
+    const customerName = document.getElementById('customer-name');
+    const customerEmail = document.getElementById('customer-email');
+    const customerPhone = document.getElementById('customer-phone');
+    const customerSearch = document.getElementById('customer-search'); // Search input
+    
+    const nameError = document.getElementById('name-error');
+    const emailError = document.getElementById('email-error');
+    const phoneError = document.getElementById('phone-error');
+
+        // Add Enter key functionality
+    customerSearch.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            findBtn.click();
+        }
+    });
+
+    // Open modal when Find button is clicked
+// Open modal when Find button is clicked
+findBtn.addEventListener('click', async function () {
+  const searchTerm = customerSearch.value.trim();
+  const locationSelect = document.getElementById('location');
+  const assignButton = document.querySelector('.assign-button');
+  const userStatus = document.getElementById('user-status');
+
+  if (!searchTerm) {
+    //alert('Please enter a name or phone number.');
+    showNotification('Please enter a name or phone number.', 'error');
+    return;
+  }
+
+  // Clear previous UI state and reset customerId
+  customerId = null;
+  userStatus.textContent = '';
+  locationSelect.innerHTML = '<option value="">Select Location</option>';
+  locationSelect.disabled = true;
+  assignButton.disabled = true;
+
+try {
+  const authToken = localStorage.getItem('authToken');
+  
+  const response = await fetch(SERVER_URL+`/api/customers/search?q=${encodeURIComponent(searchTerm)}`, {
+    headers: {
+      'Authorization': `Bearer ${authToken}`,
+      'Content-Type': 'application/json'
+    }
+  });
+  
+  if (!response.ok) {
+    throw new Error('Failed to search customer');
+    showNotification('Failed to search customer', 'error');
+    hideHistoryButton();
+  }
+
+  const result = await response.json();
+  console.log('Search result:', result); // For debugging
+
+  if (result && result.exists) {
+    // ✅ User exists
+    customerId = result.customer.id; // Store the customer ID
+    console.log('Stored customer ID:', customerId); // Optional debug log
+    showNotification('Customer search successful', 'success');
+    
+    userStatus.textContent = '✅ User found';
+    userStatus.style.color = 'green';
+    showHistoryButton();
+    fetchComplaintHistory(customerId);
+
+    // Populate location dropdown
+    if (result.locations && result.locations.length > 0) {
+      populateLocationSelect(result.locations);
+    } else {
+      locationSelect.innerHTML = '<option value="">No locations found</option>';
+    }
+
+    // Enable location and assign button
+    locationSelect.disabled = false;
+    assignButton.disabled = false;
+  } else {
+    // ❌ User not found - open modal
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    hideHistoryButton();
+    if (/\d/.test(customerSearch.value)) {
+      customerPhone.value = customerSearch.value;
+    } else {
+      customerName.value = customerSearch.value;
+    }
+
+  }
+} catch (error) {
+  console.error('Search error:', error);
+  userStatus.textContent = '❌ Error searching user';
+  userStatus.style.color = 'red';
+  locationSelect.innerHTML = '<option value="">Error loading locations</option>';
+}
+});
+
+
+    // API functions
+    async function saveCustomer(customerData) {
+      try {
+        const authToken = localStorage.getItem('authToken');
+        // Replace with your actual API endpoint
+        const response = await fetch(SERVER_URL+'/api/customers', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${authToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(customerData)
+        });
+
+        const result = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(result.message || 'Failed to save customer');
+          showNotification(result.message || 'Failed to save customer', 'error');
+        }
+        
+        return result;
+      } catch (error) {
+        console.error('Error:', error);
+        throw error;
+        showNotification(error, 'error');
+      }
+    }
+
+
+    // Save customer with API call
+    saveBtn.addEventListener('click', async function() {
+      if (!validateForm()) return;
+      
+      const customerData = {
+        name: customerName.value.trim(),
+        email: customerEmail.value.trim(),
+        phone: customerPhone.value.trim()
+      };
+      
+      // Show loading state
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+      
+      try {
+        const result = await saveCustomer(customerData);
+        //alert(result.messages || 'Customer saved successfully!');
+        // Replacement notification code
+        showNotification(result.message || 'Customer saved successfully!', 'success');
+        
+        // Update the search field with the new customer's info
+        customerSearch.value = customerData.name;
+        
+        closeModal();
+      } catch (error) {
+        //alert(error.message || 'Failed to save customer. Please try again.');
+        showNotification(error.message || 'Failed to save customer. Please try again.', 'error');
+      } finally {
+        // Reset button state
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Save Customer';
+      }
+    });
+
+    // (Rest of your existing modal functions remain the same)
+    function closeModal() {
+      modal.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    function resetForm() {
+      customerName.value = '';
+      customerEmail.value = '';
+      customerPhone.value = '';
+      hideAllErrors();
+    }
+    
+    function hideAllErrors() {
+      nameError.style.display = 'none';
+      emailError.style.display = 'none';
+      phoneError.style.display = 'none';
+    }
+    
+    function validateForm() {
+      let isValid = true;
+      hideAllErrors();
+      
+      if (!customerName.value.trim()) {
+        nameError.style.display = 'block';
+        isValid = false;
+      }
+      
+      if (customerEmail.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail.value)) {
+        emailError.style.display = 'block';
+        isValid = false;
+      }
+      
+      if (!customerPhone.value.trim()) {
+        phoneError.textContent = 'Please enter phone number';
+        phoneError.style.display = 'block';
+        isValid = false;
+      } else if (!/^[0-9+\- ]+$/.test(customerPhone.value)) {
+        phoneError.textContent = 'Please enter a valid phone number';
+        phoneError.style.display = 'block';
+        isValid = false;
+      }
+      
+      return isValid;
+    }
+
+    // (Rest of your existing event listeners remain the same)
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) {
+        closeModal();
+      }
+    });
+
+    closeBtn.addEventListener('click', closeModal);
+    cancelBtn.addEventListener('click', closeModal);
+
+    customerName.addEventListener('blur', validateName);
+    customerEmail.addEventListener('blur', validateEmail);
+    customerPhone.addEventListener('blur', validatePhone);
+
+    function validateName() {
+      if (!customerName.value.trim()) {
+        nameError.style.display = 'block';
+      } else {
+        nameError.style.display = 'none';
+      }
+    }
+    
+    function validateEmail() {
+      if (customerEmail.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail.value)) {
+        emailError.style.display = 'block';
+      } else {
+        emailError.style.display = 'none';
+      }
+    }
+    
+    function validatePhone() {
+      if (!customerPhone.value.trim()) {
+        phoneError.textContent = 'Please enter phone number';
+        phoneError.style.display = 'block';
+      } else if (!/^[0-9+\- ]+$/.test(customerPhone.value)) {
+        phoneError.textContent = 'Please enter a valid phone number';
+        phoneError.style.display = 'block';
+      } else {
+        phoneError.style.display = 'none';
+      }
+    }
+  });
+
+
+
+function getCustomerInfo() {
+  const searchInput = document.getElementById('customer-search');
+  const searchValue = searchInput.value.trim();
+  return searchValue;
+}
+
+
+function populateLocationSelect(locations) {
+  const locationSelect = document.getElementById('location');
+  locationSelect.innerHTML = '<option value="">Select Location</option>';
+  locations.forEach(loc => {
+    const option = document.createElement('option');
+    option.value = loc.id;
+    option.textContent = loc.name;
+    locationSelect.appendChild(option);
+  });
+  locationSelect.disabled = false;
+}
+
+function populateLocationSelect(locations) {
+  const locationSelect = document.getElementById('location');
+  locationSelect.innerHTML = '<option value="">Select Location</option>';
+  
+  if (!locations || !Array.isArray(locations)) {
+    console.error('Invalid locations data:', locations);
+    locationSelect.innerHTML = '<option value="">Error loading locations</option>';
+    return;
+  }
+
+  locations.forEach(loc => {
+    const option = document.createElement('option');
+    option.value = loc.id;
+    
+    // Use the label if provided, otherwise construct from available data
+    if (loc.label) {
+      option.textContent = loc.label;
+    } else if (loc.buildingNo && loc.colony) {
+      option.textContent = `${loc.buildingNo}, ${loc.colony}`;
+    } else {
+      option.textContent = `Location ID: ${loc.id}`;
+    }
+    
+    locationSelect.appendChild(option);
+  });
+  
+  locationSelect.disabled = false;
+  
+  // Enable assign button if it exists
+  const assignButton = document.querySelector('.assign-button');
+  if (assignButton) {
+    assignButton.disabled = false;
+  }
+}
+ 
+
+document.addEventListener('DOMContentLoaded', function() {
+    // DOM Elements
+    const modalBackdrop = document.getElementById('modalBackdrop');
+    const closeBtn = document.getElementById('closeBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const assignBtn = document.getElementById('assignBtn');
+    const demoShowModal = document.getElementById('select-button');
+    const skillmanInput = document.getElementById('skillman');
+    
+    // Dropdown Elements
+    const primaryDropdown = {
+      toggle: document.getElementById('primarySkillmanToggle'),
+      menu: document.getElementById('primarySkillmanMenu'),
+      search: document.getElementById('primarySkillmanSearch'),
+      items: document.getElementById('primarySkillmanItems'),
+      text: document.getElementById('primarySkillmanText')
+    };
+    
+    const helperDropdown = {
+      toggle: document.getElementById('helperSkillmanToggle'),
+      menu: document.getElementById('helperSkillmanMenu'),
+      search: document.getElementById('helperSkillmanSearch'),
+      items: document.getElementById('helperSkillmanItems'),
+      text: document.getElementById('helperSkillmanText')
+    };
+    
+    const helperTags = document.getElementById('helperTags');
+    
+    // Data
+    let allSkillmen = [];
+    let selectedPrimary = null;
+    let selectedHelpers = [];
+    
+    // Initialize
+    function init() {
+      fetchSkillmen();
+      setupEventListeners();
+    }
+    
+    // Fetch skillmen from backend API
+    async function fetchSkillmen() {
+      try {
+        const authToken = localStorage.getItem('authToken');
+        // Show loading state
+        primaryDropdown.items.innerHTML = '<div class="dropdown-item">Loading skillmen...</div>';
+        helperDropdown.items.innerHTML = '<div class="dropdown-item">Loading skillmen...</div>';
+        
+        const response = await fetch(SERVER_URL+'/api/skillmen', {
+          headers: {
+            'Authorization': `Bearer ${authToken}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch skillmen');
+          showNotification('Failed to fetch skillmen', 'error');
+        }
+        
+        const data = await response.json();
+        
+        // Transform backend data to match our frontend structure
+        allSkillmen = data.map(skillman => ({
+          id: skillman.id || skillman._id,
+          name: skillman.name,
+          phone: skillman.phoneNumber,
+          location: skillman.area,
+          skill: skillman.designation
+        }));
+        
+        renderDropdowns();
+      } catch (error) {
+        console.error('Error fetching skillmen:', error);
+        // Show error state
+        primaryDropdown.items.innerHTML = '<div class="dropdown-item error">Error loading skillmen</div>';
+        helperDropdown.items.innerHTML = '<div class="dropdown-item error">Error loading skillmen</div>';
+        
+        // Fallback to empty array
+        allSkillmen = [];
+      }
+    }
+    
+    // Render dropdown items
+    function renderDropdowns() {
+      renderPrimaryDropdown();
+      renderHelperDropdown();
+    }
+    
+    function renderPrimaryDropdown(searchTerm = '') {
+      primaryDropdown.items.innerHTML = '';
+      
+      const filtered = filterSkillmen(searchTerm);
+      
+      if (filtered.length === 0) {
+        primaryDropdown.items.innerHTML = '<div class="dropdown-item">No skillmen found</div>';
+      } else {
+        filtered.forEach(skillman => {
+          const item = document.createElement('div');
+          item.className = 'dropdown-item' + 
+            (selectedPrimary && selectedPrimary.id === skillman.id ? ' selected' : '');
+          
+          // Format: Name (Phone), Location, Skill
+          item.innerHTML = `
+            <div class="skillman-info">
+              <div class="skillman-name">${skillman.name}</div>
+              <div class="skillman-details">
+                <span>${skillman.phone}</span>
+                <span>${skillman.location}</span>
+                <span>${skillman.skill}</span>
+              </div>
+            </div>
+          `;
+          
+          item.addEventListener('click', () => {
+            selectPrimarySkillman(skillman);
+            toggleDropdown(primaryDropdown);
+          });
+          primaryDropdown.items.appendChild(item);
+        });
+      }
+    }
+    
+    function renderHelperDropdown(searchTerm = '') {
+      helperDropdown.items.innerHTML = '';
+      
+      const filtered = filterSkillmen(searchTerm).filter(skillman => 
+        !selectedHelpers.some(h => h.id === skillman.id)
+      );
+      
+      if (filtered.length === 0) {
+        helperDropdown.items.innerHTML = '<div class="dropdown-item">No helpers found</div>';
+      } else {
+        filtered.forEach(skillman => {
+          const item = document.createElement('div');
+          item.className = 'dropdown-item';
+          
+          // Same format for helpers
+          item.innerHTML = `
+            <div class="skillman-info">
+              <div class="skillman-name">${skillman.name}</div>
+              <div class="skillman-details">
+                <span>${skillman.phone}</span>
+                <span>${skillman.location}</span>
+                <span>${skillman.skill}</span>
+              </div>
+            </div>
+          `;
+          
+          item.addEventListener('click', () => {
+            addHelperSkillman(skillman);
+            toggleDropdown(helperDropdown);
+          });
+          helperDropdown.items.appendChild(item);
+        });
+      }
+    }
+    
+    function filterSkillmen(searchTerm) {
+      if (!searchTerm) return allSkillmen;
+      const term = searchTerm.toLowerCase();
+      return allSkillmen.filter(skillman => 
+        skillman.name.toLowerCase().includes(term) ||
+        (skillman.phone && skillman.phone.toLowerCase().includes(term)) ||
+        (skillman.location && skillman.location.toLowerCase().includes(term)) ||
+        (skillman.skill && skillman.skill.toLowerCase().includes(term))
+      );
+    }
+    
+    // Selection functions
+    function selectPrimarySkillman(skillman) {
+      selectedPrimary = skillman;
+      primaryDropdown.text.textContent = `${skillman.name} (${skillman.phone}), ${skillman.location}, ${skillman.skill}`;
+      renderHelperDropdown();
+    }
+    
+    function addHelperSkillman(skillman) {
+      if (!selectedHelpers.some(h => h.id === skillman.id)) {
+        selectedHelpers.push(skillman);
+        renderHelperTags();
+      }
+    }
+    
+    function removeHelperSkillman(skillmanId) {
+      selectedHelpers = selectedHelpers.filter(h => h.id !== skillmanId);
+      renderHelperTags();
+    }
+    
+    function renderHelperTags() {
+      helperTags.innerHTML = '';
+      
+      if (selectedHelpers.length === 0) {
+        helperTags.innerHTML = '<div class="empty-helpers">No helpers added yet</div>';
+      } else {
+        selectedHelpers.forEach(skillman => {
+          const tag = document.createElement('div');
+          tag.className = 'helper-tag';
+          tag.innerHTML = `
+            ${skillman.name} (${skillman.phone}), ${skillman.location}, ${skillman.skill}
+            <button type="button" data-id="${skillman.id}">
+              <i class="fas fa-times"></i>
+            </button>
+          `;
+          tag.querySelector('button').addEventListener('click', (e) => {
+            e.stopPropagation();
+            removeHelperSkillman(skillman.id);
+          });
+          helperTags.appendChild(tag);
+        });
+      }
+    }
+    
+    // Dropdown toggle function
+    function toggleDropdown(dropdown) {
+      const isActive = dropdown.menu.classList.contains('active');
+      
+      // Close all dropdowns first
+      document.querySelectorAll('.dropdown-menu').forEach(menu => {
+        menu.classList.remove('active');
+      });
+      document.querySelectorAll('.dropdown-toggle').forEach(toggle => {
+        toggle.classList.remove('active');
+      });
+      
+      // Toggle this dropdown if it wasn't active
+      if (!isActive) {
+        dropdown.menu.classList.add('active');
+        dropdown.toggle.classList.add('active');
+        
+        // Focus search input when opening
+        if (dropdown.search) {
+          setTimeout(() => dropdown.search.focus(), 10);
+        }
+      }
+    }
+    
+    // Close dropdowns when clicking outside
+    function closeAllDropdowns() {
+      document.querySelectorAll('.dropdown-menu').forEach(menu => {
+        menu.classList.remove('active');
+      });
+      document.querySelectorAll('.dropdown-toggle').forEach(toggle => {
+        toggle.classList.remove('active');
+      });
+    }
+    
+    // Setup event listeners
+    function setupEventListeners() {
+      // Dropdown toggles
+      primaryDropdown.toggle.addEventListener('click', () => toggleDropdown(primaryDropdown));
+      helperDropdown.toggle.addEventListener('click', () => toggleDropdown(helperDropdown));
+      
+      // Search inputs
+      primaryDropdown.search.addEventListener('input', (e) => {
+        renderPrimaryDropdown(e.target.value);
+      });
+      
+      helperDropdown.search.addEventListener('input', (e) => {
+        renderHelperDropdown(e.target.value);
+      });
+      
+      // Close dropdowns when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.dropdown')) {
+          closeAllDropdowns();
+        }
+      });
+      
+      // Modal controls
+      closeBtn.addEventListener('click', closeModal);
+      cancelBtn.addEventListener('click', closeModal);
+      demoShowModal.addEventListener('click', openModal);
+
+
+      
+assignBtn.addEventListener('click', async () => {
+    const priority = document.querySelector('input[name="priority"]:checked').value;
+    const assignmentData = {
+        priority,
+        primarySkillman: selectedPrimary,  // Can be null
+        helperSkillmen: selectedHelpers
+    };
+    
+    try {
+        // Format the skillman information for display
+        let skillmanDisplayText = `Priority: ${formatPriority(priority)}\n`;
+        
+        if (selectedPrimary) {
+            skillmanDisplayText += `⏐ Primary: ${selectedPrimary.name} (${selectedPrimary.phone})`;
+        }
+        
+        if (selectedHelpers.length > 0) {
+            skillmanDisplayText += `\n ⏐ Helpers: ${selectedHelpers.map(h => `${h.name} (${h.phone})`).join(', ')}`;
+        }
+        
+        // Update the skillman input field with the formatted text
+        if (skillmanInput) {
+            skillmanInput.value = skillmanDisplayText;
+        }
+        
+        // Store the assignment data for later use (e.g., complaint launching)
+        window.currentAssignment = assignmentData;
+        
+        closeModal();
+    } catch (error) {
+        console.error('Error:', error);
+        //alert('Error processing assignment. Please try again.');
+        showNotification('Error processing assignment. Please try again.', 'error');
+    }
+});
+
+// Helper function to format priority for display
+function formatPriority(priority) {
+    const priorityMap = {
+        'immediate': 'Immediate (2Hrs)',
+        'urgent': 'Urgent (6Hrs)',
+        'routine': 'Routine (24Hrs)',
+        'deferred': 'Deferred'
+    };
+    return priorityMap[priority] || priority;
+}
+    }
+    
+    // Modal functions
+    function openModal() {
+      modalBackdrop.classList.add('active');
+      document.body.style.overflow = 'hidden';
+      // Refresh skillmen data when modal opens
+      fetchSkillmen();
+    }
+    
+    function closeModal() {
+      modalBackdrop.classList.remove('active');
+      document.body.style.overflow = '';
+      resetForm();
+    }
+    
+    function resetForm() {
+      selectedPrimary = null;
+      selectedHelpers = [];
+      primaryDropdown.text.textContent = 'Select a skillman';
+      helperDropdown.text.textContent = 'Add helper skillman';
+      renderHelperTags();
+      document.getElementById('immediate').checked = true;
+      closeAllDropdowns();
+    }
+    
+    // Initialize the app
+    init();
+});
+
+
+// Get the launch complaint form// Get the launch complaint form
+const launchForm = document.querySelector('.launch-complaint-form');
+
+if (launchForm) {
+    launchForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        // Get all the form data
+        const customerSearch = document.getElementById('customer-search').value.trim();
+        const location = document.getElementById('location').value;
+        const categorySelect = document.getElementById('category');
+        const categoryTypeSelect = document.getElementById('category-type');
+        const description = document.getElementById('description').value.trim();
+        
+        // Validate required fields
+        if (!customerId || !location || !categorySelect.value || !categoryTypeSelect.value || !description) {
+            //alert('Please fill in all required fields');
+            showNotification('Please fill in all required fields', 'error');
+            return;
+        }
+        
+        // Get the selected category and category type text
+        const categoryText = categorySelect.options[categorySelect.selectedIndex].text;
+        const categoryTypeText = categoryTypeSelect.options[categoryTypeSelect.selectedIndex].text;
+        
+        // Prepare the complaint data with both IDs and text values
+        const complaintData = {
+            customerId: customerId,
+            locationId: location,
+            category: {
+                id: categorySelect.value,
+                name: categoryText
+            },
+            categoryType: {
+                id: categoryTypeSelect.value,
+                name: categoryTypeText
+            },
+            description: description,
+            priority: window.currentAssignment?.priority || 'routine', // Default to routine if no assignment
+            receiver: {
+                id: complaintReceiverId,
+                name: complaintReceiverName
+            },
+            // Only include primarySkillmanId if it exists
+            ...(window.currentAssignment?.primarySkillman && {
+                primarySkillmanId: window.currentAssignment.primarySkillman.id
+            }),
+            // Only include helpers if they exist
+            ...(window.currentAssignment?.helperSkillmen?.length > 0 && {
+                helperSkillmenIds: window.currentAssignment.helperSkillmen.map(h => h.id)
+            })
+        };
+
+        // Log the complete data being sent
+        console.log('========== COMPLAINT DATA BEING SENT TO SERVER ==========');
+        console.log('Customer:', customerSearch);
+        console.log('Location ID:', location);
+        console.log('Category:', complaintData.category);
+        console.log('Category Type:', complaintData.categoryType);
+        console.log('Description:', description);
+        console.log('Priority:', complaintData.priority);
+        console.log('Receiver:', complaintData.receiver);
+        
+        if (window.currentAssignment?.primarySkillman) {
+            console.log('Primary Skillman:', {
+                id: window.currentAssignment.primarySkillman.id,
+                name: window.currentAssignment.primarySkillman.name,
+                phone: window.currentAssignment.primarySkillman.phone
+            });
+        } else {
+            console.log('Primary Skillman: None assigned');
+        }
+        
+        if (window.currentAssignment?.helperSkillmen?.length > 0) {
+            console.log('Helper Skillmen:', window.currentAssignment.helperSkillmen.map(h => ({
+                id: h.id,
+                name: h.name,
+                phone: h.phone
+            })));
+        } else {
+            console.log('Helper Skillmen: None assigned');
+        }
+        
+        console.log('Full complaintData object:', JSON.stringify(complaintData, null, 2));
+        console.log('========================================================');
+        
+        try {
+            // Show loading state
+            const launchButton = document.querySelector('.launch-button');
+            launchButton.disabled = true;
+            launchButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Launching...';
+            
+            // Log the fetch request details
+            console.log('Sending request to:', SERVER_URL+'/complaints');
+            console.log('Request method: POST');
+            console.log('Request headers:', {
+                'Content-Type': 'application/json'
+            }); 
+
+            const authToken = localStorage.getItem('authToken');
+            // Send complaint to backend
+            const response = await fetch(SERVER_URL+'/complaints', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${authToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(complaintData)
+            });
+            
+            // Log response status
+            console.log('Response status:', response.status, response.statusText);
+            
+            if (!response.ok) {
+                const errorResponse = await response.text();
+                console.error('Error response from server:', errorResponse);
+                showNotification('Error response from server:'+ errorResponse, 'error');
+                throw new Error('Failed to launch complaint');
+                showNotification('Failed to launch complaint', 'error');
+            }
+            
+            const result = await response.json();
+            console.log('Successful response from server:', result);
+            //alert('Complaint launched successfully!');
+            showNotificationAndRefreshPage('Complaint launched successfully!', 'success');
+
+            //window.location.reload(); // Reload to reset the state
+            // Reset the form
+            launchForm.reset();
+            
+        } catch (error) {
+            console.error('Error launching complaint:', error);
+            console.error('Error stack:', error.stack);
+            //alert(error.message || 'Failed to launch complaint. Please try again.');
+            showNotification(error.message || 'Failed to launch complaint. Please try again.', 'error');
+        } finally {
+            // Reset button state
+            const launchButton = document.querySelector('.launch-button');
+            if (launchButton) {
+                launchButton.disabled = false;
+                launchButton.textContent = 'Launch Complaint';
+            }
+        }
+    });
+}
+
+
+
+function showNotificationAndRefreshPage(message, type = 'success', duration = 3000) {
+  const notificationArea = document.getElementById('notification-area');
+  
+  // Create notification element
+  const notification = document.createElement('div');
+  notification.className = `notification ${type}`;
+  
+  // Set icon based on type
+  let icon;
+  switch(type) {
+    case 'success': icon = 'fa-check-circle'; break;
+    case 'error': icon = 'fa-exclamation-circle'; break;
+    case 'warning': icon = 'fa-exclamation-triangle'; break;
+    default: icon = 'fa-info-circle';
+  }
+  
+  notification.innerHTML = `
+    <i class="fas ${icon}"></i>
+    ${message}
+  `;
+  
+  // Add to notification area
+  notificationArea.appendChild(notification);
+  
+  // Auto-remove after duration
+  setTimeout(() => {
+    notification.style.opacity = '0';
+    setTimeout(() => notification.remove(), 3000);
+  }, duration);
+
+  // Refresh the page after showing notification
+  //window.location.reload();
+}
+
+
+
+showNotification('Form loaded successfully', 'success', 1000);
+</script>
+  <script src="chat-bot.js"></script>
+</body>
+</html>

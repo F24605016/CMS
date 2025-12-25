@@ -1,0 +1,1853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="server-url.js"></script>
+  <script>
+    const page = 'skillman';
+  </script>
+  <script src="verification.js"></script>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="logo.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MES CMS - Users</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+ 
+
+    /* Notification Area */
+    .notification-area {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1100;
+      max-width: 350px;
+      width: 100%;
+    }
+    
+    .notification {
+      padding: 15px 20px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+      animation: slideIn 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .notification::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 4px;
+      width: 100%;
+      background: rgba(255,255,255,0.5);
+      animation: progress 3s linear;
+    }
+    
+    @keyframes progress {
+      from { width: 100%; }
+      to { width: 0%; }
+    }
+    
+    .notification.success {
+      background: #4caf50;
+    }
+    
+    .notification.error {
+      background: #f44336;
+    }
+    
+    .notification.warning {
+      background: #ff9800;
+    }
+    
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    /* Modal overlay */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 700px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      transform: translateY(-20px);
+      transition: transform 0.3s ease;
+    }
+
+    .modal-overlay.active .modal-content {
+      transform: translateY(0);
+    }
+
+    .modal-header {
+      background: #881c1c;
+      color: white;
+      padding: 20px;
+      border-radius: 10px 10px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h3 {
+      font-size: 1.5rem;
+    }
+
+    .close-modal {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .close-modal:hover {
+      transform: rotate(90deg);
+    }
+
+    .modal-body {
+      padding: 25px;
+    }
+
+    .dual-buttons-for-designation {
+      display:flex;
+      flex-direction: row;
+    }
+    
+
+    /* Additional styles */
+    .users-section-container {
+      display: grid;
+      grid-template-columns: 250px 1fr;
+      gap: 30px;
+      min-height: 600px;
+    }
+    
+    .users-sidebar {
+      background: white;
+      border-radius: 8px;
+      padding: 25px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .users-option {
+      padding: 18px 20px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #f8f9fa;
+    }
+    
+    .users-option:hover {
+      background: rgba(0,0,0,0.05);
+    }
+    
+    .users-option.active {
+      background: rgba(0,0,0,0.1);
+      color: rgb(136, 28, 28);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .users-option i {
+      font-size: 20px;
+    }
+    
+    .users-content {
+      background: white;
+      border-radius: 8px;
+      padding: 30px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .users-panel {
+      display: none;
+    }
+    
+    .users-panel.active {
+      display: block;
+      animation: fadeIn 0.4s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+    }
+    
+    .panel-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: rgb(136, 28, 28);
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #212529;
+    }
+    
+    .form-control {
+      width: 100%;
+      padding: 14px 18px;
+      border-radius: 8px;
+      border: 1px solid rgba(0,0,0,0.1);
+      background: #f8f9fa;
+      font-size: 16px;
+      transition: all 0.3s;
+    }
+    
+    .form-control:focus {
+      outline: none;
+      border-color: rgb(136, 28, 28);
+      box-shadow: 0 0 0 3px rgba(136, 28, 28, 0.2);
+    }
+    
+    .btn {
+      padding: 14px 28px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .btn-primary {
+      background: rgb(136, 28, 28);
+      color: white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .btn-primary:hover {
+      background: #a52a2a;
+      transform: translateY(-3px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .btn-secondary:hover {
+      background: #5a6268;
+      transform: translateY(-3px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    
+    .btn-danger {
+      background: #f44336;
+      color: white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .btn-danger:hover {
+      background: #d32f2f;
+      transform: translateY(-3px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    
+    .search-box {
+      display: flex;
+      margin-bottom: 30px;
+    }
+    
+    .search-box input {
+      flex: 1;
+      border-radius: 8px 0 0 8px;
+    }
+    
+    .search-box button {
+      border-radius: 0 8px 8px 0;
+    }
+    
+    .action-btn {
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgb(136, 28, 28);
+      color: white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .action-btn:hover {
+      background: #a52a2a;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    
+    .users-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    
+    .users-table th {
+      background: rgba(136, 28, 28, 0.1);
+      color: rgb(136, 28, 28);
+      font-weight: 700;
+      padding: 16px;
+      text-align: center;
+    }
+    
+    .users-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      height: 60px;
+      border-left: 1px solid #f3f3f3; /* vertical line color */
+    }
+    
+    .users-table tr:hover {
+      background: rgba(136, 28, 28, 0.05);
+    }
+    
+    /* Optimized table column widths */
+    .users-table th:nth-child(1),
+    .users-table td:nth-child(1) {
+      width: 5%;
+    }
+    .users-table th:nth-child(2),
+    .users-table td:nth-child(2) {
+      width: 20%;
+    }
+    .users-table th:nth-child(3),
+    .users-table td:nth-child(3) {
+      width: 15%;
+    }
+    .users-table th:nth-child(4),
+    .users-table td:nth-child(4) {
+      width: 20%;
+    }
+    .users-table th:nth-child(5),
+    .users-table td:nth-child(5) {
+      width: 20%;
+    }
+    .users-table th:nth-child(6),
+    .users-table td:nth-child(6) {
+      width: 10%;
+    }
+    .users-table th:nth-child(7),
+    .users-table td:nth-child(7) {
+      width: 10%;
+    }
+
+    /*For designation table*/
+    #designation-table th:nth-child(1),
+    #designation-table td:nth-child(1) {
+      width: 80%;
+    }
+
+    .modal-body h4 {
+      margin-bottom: 10px;
+      font-size: 20px;
+      color: var(--primary-color);
+    }
+    
+    .edit-btn {
+      padding: 8px 15px;
+      border-radius: 8px;
+      background: rgba(136, 28, 28, 0.1);
+      color: rgb(136, 28, 28);
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-weight: 600;
+    }
+    
+    .edit-btn:hover {
+      background: rgb(136, 28, 28);
+      color: white;
+    }
+    
+    .status-badge {
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    
+    .status-active {
+      background: rgba(40, 167, 69, 0.15);
+      color: #28a745;
+    }
+    
+    .status-inactive {
+      background: rgba(220, 53, 69, 0.15);
+      color: #dc3545;
+    }
+    
+    .no-data {
+      text-align: center;
+      padding: 40px;
+      color: #6c757d;
+      font-size: 18px;
+    }
+    
+    .no-data i {
+      font-size: 48px;
+      margin-bottom: 15px;
+      color: #ced4da;
+    }
+
+    #all-users-option, #colonies-option {
+      text-decoration: none;
+      color: inherit;
+    }
+    
+    .dual-buttons {
+      display: flex;
+      gap: 15px;
+    }
+    
+    .pagination {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
+      padding: 10px 0;
+    }
+    
+    .pagination-controls {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .pagination-btn {
+      padding: 8px 15px;
+      border-radius: 5px;
+      background: #f8f9fa;
+      border: 1px solid #dee2e6;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .pagination-btn:hover {
+      background: #e9ecef;
+    }
+    
+    .pagination-btn.active {
+      background: rgb(136, 28, 28);
+      color: white;
+      border-color: rgb(136, 28, 28);
+    }
+    
+    .entries-select {
+      padding: 8px 15px;
+      border-radius: 5px;
+      border: 1px solid #dee2e6;
+      background: white;
+    }
+    
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .form-actions {
+      display: flex;
+      gap: 15px;
+      margin-top: 20px;
+    }
+    
+    .status-toggle {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 30px;
+    }
+    
+    .status-toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 30px;
+    }
+    
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 22px;
+      width: 22px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    
+    input:checked + .toggle-slider {
+      background-color: rgb(216, 0, 0);
+    }
+    
+    input:checked + .toggle-slider:before {
+      transform: translateX(30px);
+    }
+    
+    .toggle-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    @media (max-width: 992px) {
+      .users-section-container {
+        grid-template-columns: 1fr;
+      }
+      
+      .users-sidebar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      
+      .users-option {
+        margin-bottom: 0;
+        flex: 1;
+        min-width: 150px;
+      }
+      
+      .dual-buttons {
+        flex-direction: column;
+        gap: 10px;
+      }
+      
+      .modal-content {
+        width: 95%;
+      }
+    }
+
+    @media (max-width: 768px) {
+ 
+      .users-option {
+        padding: 12px 15px;
+        font-size: 14px;
+      }
+      
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+      
+      /* Responsive table adjustments */
+      .users-table th:nth-child(4),
+      .users-table td:nth-child(4) {
+        display: none;
+      }
+    }
+    
+    /* Edit designation modal */
+    .designation-edit-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1001;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+    
+    .designation-edit-modal.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .designation-edit-content {
+      background: white;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 400px;
+      padding: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      transform: translateY(-20px);
+      transition: transform 0.3s ease;
+    }
+    
+    .designation-edit-modal.active .designation-edit-content {
+      transform: translateY(0);
+    }
+
+    .delete-btn {
+      color: #dc3545;
+      cursor: pointer;
+      border: none;
+      background: none;
+    }
+    
+    
+    
+    @media (max-width: 500px) {
+      .logo {
+        flex-direction: column;
+      }
+    }
+
+    .hamburger {
+      display: none;
+    }
+
+  
+  </style>
+  <link rel="stylesheet" href="common-styles.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Notification Area -->
+  <div class="notification-area" id="notification-area"></div>
+  
+  <!-- Skillman Modal -->
+  <div class="modal-overlay" id="skillman-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="skillman-modal-title">Add New Skill Man</h3>
+        <button class="close-modal" id="close-skillman-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="skillman-name">Name *</label>
+            <input type="text" id="skillman-name" class="form-control" placeholder="Enter full name" required>
+          </div>
+          <div class="form-group">
+            <label for="skillman-email">Email</label>
+            <input type="email" id="skillman-email" class="form-control" placeholder="Enter email">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="skillman-phone">Phone Number *</label>
+            <input type="tel" id="skillman-phone" class="form-control" placeholder="Enter phone number" required>
+          </div>
+          <div class="form-group">
+            <label for="skillman-subdivision">Subdivision *</label>
+            <select id="skillman-subdivision" class="form-control" required>
+              <option value="">Select Subdivision</option>
+              <option value="B&R-I">B&R-I</option>
+              <option value="B&R-II">B&R-II</option>
+              <option value="B&R-III">B&R-III</option>
+              <option value="E&M-I">E&M-I</option>
+              <option value="E&M-II">E&M-II</option>
+              <option value="-">-</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="skillman-designation">Designation *</label>
+            <select id="skillman-designation" class="form-control" required>
+              <option value="">Select Designation</option>
+              <!-- Designation options will be added dynamically -->
+            </select>
+          </div>
+          <div class="form-group" id="status-toggle-container">
+            <label>Status</label>
+            <div class="toggle-label">
+              <span>Inactive</span>
+              <label class="status-toggle">
+                <input type="checkbox" id="skillman-status" checked>
+                <span class="toggle-slider"></span>
+              </label>
+              <span>Active</span>
+            </div>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-primary" id="save-skillman-btn">
+            <i class="fas fa-save"></i>
+            Save Skill Man
+          </button>
+          <button type="button" class="btn btn-secondary" id="cancel-skillman">
+            <i class="fas fa-times"></i>
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Designation Modal -->
+  <div class="modal-overlay" id="designation-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Designations</h3>
+        <button class="close-modal" id="close-designation-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <h4 style="margin-bottom: 20px;">Add New Designation</h4>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="designation-name">Designation Name *</label>
+            <input type="text" id="designation-name" class="form-control" placeholder="Enter designation name" required>
+          </div>
+          <div class="form-group" style="align-self: flex-end;">
+            <button class="btn btn-primary" id="add-designation-btn">
+              <i class="fas fa-plus"></i>
+              Add Designation
+            </button>
+          </div>
+        </div>
+        
+        <div style="margin: 30px 0 20px;">
+          <h4>Existing Designations</h4>
+        </div>
+        
+        <!-- Designation Table -->
+        <div class="table-container">
+          <table class="users-table" id="designation-table">
+            <thead>
+              <tr>
+                <th>Designation</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="designation-table-body">
+              <!-- Designations will be generated here -->
+            </tbody>
+          </table>
+        </div>
+        <div id="designation-no-data" class="no-data" style="display: none;">
+          <i class="fas fa-tag"></i>
+          <p>No designations found</p>
+        </div>
+        
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Edit Designation Modal -->
+  <div class="designation-edit-modal" id="designation-edit-modal">
+    <div class="designation-edit-content">
+      <div class="modal-header">
+        <h3>Edit Designation</h3>
+        <button class="close-modal" id="close-edit-designation-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="edit-designation-name">Designation Name *</label>
+          <input type="text" id="edit-designation-name" class="form-control" required>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-primary" id="save-edit-designation">
+            <i class="fas fa-save"></i>
+            Save Changes
+          </button>
+          <button class="btn btn-secondary" id="cancel-edit-designation">
+            <i class="fas fa-times"></i>
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <header>
+    <div class="logo">
+      <div class="logo-image">
+        <img src="logo.jpg" alt="logo image">
+      </div>
+      <h2>MES CMS</h2>
+    </div>
+
+    <div class="user">
+      <h2 id="user-id">Unknown</h2>
+      <button class="logout-btn" id="logout-btn">Logout</button>
+      <div class="hamburger">
+        <i class="fas fa-bars" id="hamburger-btn"></i>
+        <div class="navigation-block">
+          <a href="dashboard" class="navi-block-items">Dashboard</a>
+          <a href="complaints" class="navi-block-items">Complaints</a>
+          <div href="users" class="navi-block-items">Users</div>
+          <a href="reporting" class="navi-block-items">Reporting</a>
+          <a href="admin" class="navi-block-items">Admin</a>
+        </div>
+        </div>
+      </div>
+  </header>
+
+  <div class="nav-bar">
+    <div class="nav-container">
+      <a href="dashboard" class="nav-item">
+        <i class="fas fa-chart-line"></i>
+        Dashboard
+      </a>
+      <a href="complaints" class="nav-item">
+        <i class="fas fa-ticket-alt"></i>
+        Complaints
+      </a>
+      <div class="nav-item active" id="active">
+        <i class="fas fa-users"></i>
+        Users
+      </div>
+      <a href="reporting" class="nav-item">
+        <i class="fas fa-file-alt"></i>
+        Reporting
+      </a>
+      <a href="admin" class="nav-item">
+        <i class="fas fa-user-tie"></i>
+        Admin
+      </a>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- Users Section -->
+    <div class="users-section-container">
+      <div class="users-sidebar">
+        <a href="all-users.html" class="users-option" data-panel="all-users-panel" id="all-users-option">
+          <i class="fas fa-users"></i>
+          All Users
+        </a>
+        <a href="colonies.html" class="users-option" data-panel="colonies-panel" id="colonies-option">
+          <i class="fas fa-building"></i>
+          Colonies
+        </a>
+        <div class="users-option active" data-panel="skillman-panel">
+          <i class="fas fa-tools"></i>
+          Skill Man
+        </div>
+      </div>
+      
+      <div class="users-content">
+        <!-- Skill Man Panel -->
+        <div id="skillman-panel" class="users-panel active">
+          <div class="panel-header">
+            <h2 class="panel-title">Skill Man Management</h2>
+            <div class="dual-buttons">
+              <button class="action-btn" id="show-skillman-modal-btn">
+                <i class="fas fa-plus"></i>
+                Add Skill Man
+              </button>
+              <button class="action-btn" id="show-designation-modal-btn">
+                <i class="fas fa-plus"></i>
+                Add Designation
+              </button>
+            </div>
+          </div>
+          
+          <!-- Search Box -->
+          <div class="search-box">
+            <input type="text" id="skillman-search" class="form-control" placeholder="Search by name, email, phone, or designation">
+            <button class="btn btn-primary" id="search-skillman-btn">
+              <i class="fas fa-search"></i>
+              Search
+            </button>
+          </div>
+          
+          <!-- Pagination Controls for Skillman -->
+          <div class="pagination">
+            <div class="entries-per-page">
+              <span>Show</span>
+              <select class="entries-select" id="skillman-entries-per-page">
+                <option value="5">5</option>
+                <option value="10" selected>10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+              </select>
+              <span>entries</span>
+            </div>
+            <div class="pagination-controls" id="skillman-pagination-controls">
+              <!-- Pagination buttons will be generated here -->
+            </div>
+          </div>
+          
+          <!-- Skill Man Table -->
+          <div class="table-container">
+            <table class="users-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Name</th>
+                  <th>Phone</th>
+                  <th>Email</th>
+                  <th>Designation</th>
+                  <th>Subdivision</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="skillman-table-body">
+                <!-- Skillmen will be generated here -->
+              </tbody>
+            </table>
+          </div>
+          <div id="skillman-no-data" class="no-data" style="display: none;">
+            <i class="fas fa-tools"></i>
+            <p>No skillmen found</p>
+            <button style="display: none;" class="btn btn-primary" id="add-first-skillman" style="margin-top: 15px;">
+              <i class="fas fa-plus"></i>
+              Add Your First Skillman
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+  const hamburgerBtn = document.getElementById("hamburger-btn");
+  const navBlock = document.querySelector(".navigation-block");
+
+  // Toggle navigation on hamburger click
+  hamburgerBtn.addEventListener("click", (e) => {
+    e.stopPropagation(); // Prevent click from bubbling to document
+    navBlock.classList.toggle("active");
+  });
+
+  // Close navigation when clicking outside
+  document.addEventListener("click", (e) => {
+    // Check if click is outside the navigation block and hamburger button
+    if (!navBlock.contains(e.target) && e.target !== hamburgerBtn) {
+      navBlock.classList.remove("active");
+    }
+  });
+
+  // Optional: Prevent clicks inside navigation from closing it
+  navBlock.addEventListener("click", (e) => {
+    e.stopPropagation();
+  });
+</script>
+
+
+<script>
+// Add this script to control navigation visibility based on backend permissions
+document.addEventListener('DOMContentLoaded', async function() {
+    try {
+        const authToken = localStorage.getItem('authToken');
+        if (!authToken) {
+            console.error('No authentication token found');
+            return;
+        }
+
+        // Fetch allowed pages from backend
+        const response = await fetch(`${SERVER_URL}/api/allowed-pages`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${authToken}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch allowed pages');
+        }
+
+        const data = await response.json();
+        
+        if (data.success) {
+            // Process navigation items based on allowed pages
+            processNavigationItems(data.allowedPages, data.navigationItems);
+        }
+    } catch (error) {
+        console.error('Error fetching allowed pages:', error);
+        // In case of error, you might want to show a default set of navigation items
+        // or handle it according to your application's requirements
+    }
+});
+
+function processNavigationItems(allowedPages, navigationItems) {
+    // Process header navigation items
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+        const href = item.getAttribute('href');
+        if (href) {
+            const pageName = href; // Get the page name without extension
+            
+            // Check if this category has an accessible page
+            if (navigationItems[pageName]) {
+                // Set the href to the first accessible page in this category
+                item.setAttribute('href', `${navigationItems[pageName]}.html`);
+                item.style.display = 'flex';
+            } else {
+                item.style.display = 'none';
+            }
+        }
+    });
+    
+    // Process hamburger menu navigation items
+    const hamburgerItems = document.querySelectorAll('.navi-block-items');
+    hamburgerItems.forEach(item => {
+        const href = item.getAttribute('href');
+        if (href) {
+            const pageName = href; // Get the page name without extension
+            
+            // Check if this category has an accessible page
+            if (navigationItems[pageName]) {
+                // Set the href to the first accessible page in this category
+                item.setAttribute('href', `${navigationItems[pageName]}.html`);
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        }
+    });
+    
+    // Process sidebar navigation items (use the allowedPages array)
+    const sidebarItems = document.querySelectorAll('.users-option');
+    sidebarItems.forEach(item => {
+        const href = item.getAttribute('href');
+        if (href) {
+            const pageName = getPageNameFromHref(href);
+            if (allowedPages.includes(pageName) || item.classList.contains('active')) {
+                item.style.display = 'flex';
+            } else {
+                item.style.display = 'none';
+            }
+        }
+    });
+}
+
+function getPageNameFromHref(href) {
+    if (!href) return '';
+    
+    // Extract page name from href (e.g., "dashboard.html" -> "dashboard")
+    const pageWithExtension = href.split('/').pop();
+    return pageWithExtension.split('.')[0];
+}
+</script>
+
+
+<script>
+  
+    let USER_ID = localStorage.getItem('UserId');
+    
+  document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById("user-id").textContent = USER_ID;
+    localStorage.removeItem('UserId');
+  });
+
+  
+    
+  document.addEventListener('DOMContentLoaded', function() {
+
+    // DOM Elements
+    const logoutBtn = document.getElementById('logout-btn');
+    
+    logoutBtn.addEventListener('click', async () => {
+      try {
+        const authToken = localStorage.getItem('authToken');
+        const response = await fetch(SERVER_URL+'/logout', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${authToken}`,'Content-Type': 'application/json' }
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          document.getElementById("user-id").textContent = 'Unknown';
+          console.log('Logout success:', data);
+          alert('Logged out successfully!');
+          
+          // 👇 you can add more procedural lines here
+          // e.g., redirect:
+          setTimeout(() => {
+            window.location.href = 'login.html';
+          }, 1000); // 1000 ms = 1 sec
+
+        } else {
+          console.error('Logout failed:', data);
+          alert('Logout failed!');
+        }
+
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Something went wrong!');
+      }
+    });
+    
+  });
+    
+    // State Management
+    let skillmen = [];
+    let filteredSkillmen = [];
+    let designations = [];
+    let currentSkillmanPage = 1;
+    let skillmanEntriesPerPage = 10;
+    let totalSkillmen = 0;
+    
+    // DOM Elements
+    const notificationArea = document.getElementById('notification-area');
+    
+    // Notification Function
+    function showNotification(message, type = 'success') {
+      const notification = document.createElement('div');
+      notification.className = `notification ${type}`;
+      notification.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+        ${message}
+      `;
+      notificationArea.appendChild(notification);
+      
+      // Auto remove after 5 seconds
+      setTimeout(() => {
+        notification.style.opacity = '0';
+        setTimeout(() => notification.remove(), 300);
+      }, 500);
+    }
+    
+    // API Functions
+    
+    // Fetch Skillmen
+    async function fetchSkillmen(page = 1, limit = 10, search = '') {
+      try {
+        const authToken = localStorage.getItem('authToken');
+        showNotification('Loading skillmen data...', 'warning');
+        const response = await fetch(`${SERVER_URL}/skillmen?page=${page}&limit=${limit}&search=${encodeURIComponent(search)}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch skillmen: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        skillmen = data.skillmen;
+        totalSkillmen = data.total;
+        renderSkillmenTable();
+        updateSkillmanPagination();
+        showNotification('Skillmen data loaded successfully');
+      } catch (error) {
+        console.error('Error fetching skillmen:', error);
+        showNotification(`Error: ${error.message}`, 'error');
+      }
+    }
+
+    // Search functionality
+    function handleSkillmanSearch() {
+      const term = document.getElementById('skillman-search').value.trim();
+      currentSkillmanPage = 1; // Reset to first page when searching
+      fetchSkillmen(currentSkillmanPage, skillmanEntriesPerPage, term);
+    }
+
+    document.getElementById('search-skillman-btn').addEventListener('click', handleSkillmanSearch);
+
+    // Add event listener for Enter key in search input
+    document.getElementById('skillman-search').addEventListener('keyup', function(e) {
+      if (e.key === 'Enter') {
+        handleSkillmanSearch();
+      }
+    });
+    
+    // Add Skillman
+    async function addSkillman(skillmanData) {
+      try {
+        const authToken = localStorage.getItem('authToken');
+        const response = await fetch(`${SERVER_URL}/skillmen`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`
+          },
+          body: JSON.stringify(skillmanData)
+        });
+        
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || 'Failed to add skillman');
+        }
+        
+        const result = await response.json();
+        showNotification('Skillman added successfully');
+        await fetchSkillmen(currentSkillmanPage, skillmanEntriesPerPage);
+        return result;
+      } catch (error) {
+        console.error('Error adding skillman:', error);
+        showNotification(`Error: ${error.message}`, 'error');
+        throw error;
+      }
+    }
+    
+    // Update Skillman
+    async function updateSkillman(id, skillmanData) {
+      try {
+        const authToken = localStorage.getItem('authToken');
+        const response = await fetch(`${SERVER_URL}/skillmen/${id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`
+          },
+          body: JSON.stringify(skillmanData)
+        });
+        
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || 'Failed to update skillman');
+        }
+        
+        const result = await response.json();
+        showNotification('Skillman updated successfully');
+        await fetchSkillmen(currentSkillmanPage, skillmanEntriesPerPage);
+        return result;
+      } catch (error) {
+        console.error('Error updating skillman:', error);
+        showNotification(`Error: ${error.message}`, 'error');
+        throw error;
+      }
+    }
+    
+    // Fetch Designations
+    async function fetchDesignations() {
+      try {
+        const authToken = localStorage.getItem('authToken');
+        const response = await fetch(`${SERVER_URL}/designations`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`
+          }});
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch designations: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        designations = data;
+        renderDesignationTable();
+        populateDesignationDropdowns();
+        return data;
+      } catch (error) {
+        console.error('Error fetching designations:', error);
+        showNotification(`Error: ${error.message}`, 'error');
+        return [];
+      }
+    }
+    
+    // Add Designation
+    async function addDesignation(designationData) {
+      try {
+        const authToken = localStorage.getItem('authToken');
+        const response = await fetch(`${SERVER_URL}/designations`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`
+          },
+          body: JSON.stringify(designationData)
+        });
+        
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || 'Failed to add designation');
+        }
+        
+        const result = await response.json();
+        showNotification('Designation added successfully');
+        await fetchDesignations();
+        return result;
+      } catch (error) {
+        console.error('Error adding designation:', error);
+        showNotification(`Error: ${error.message}`, 'error');
+        throw error;
+      }
+    }
+    
+    // Update Designation
+    async function updateDesignation(oldName, newName) {
+      try {
+        const authToken = localStorage.getItem('authToken');
+        const response = await fetch(`${SERVER_URL}/designations/${encodeURIComponent(oldName)}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`
+          },
+          body: JSON.stringify({ name: newName })
+        });
+        
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || 'Failed to update designation');
+        }
+        
+        const result = await response.json();
+        showNotification('Designation updated successfully');
+        await fetchDesignations();
+        return result;
+      } catch (error) {
+        console.error('Error updating designation:', error);
+        showNotification(`Error: ${error.message}`, 'error');
+        throw error;
+      }
+    }
+    
+    // Delete Designation
+    async function deleteDesignation(name) {
+      try {
+        const authToken = localStorage.getItem('authToken');
+        const response = await fetch(`${SERVER_URL}/designations/${encodeURIComponent(name)}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`
+          }
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to delete designation');
+        }
+        
+        showNotification(`Designation "${name}" deleted successfully`);
+        await fetchDesignations();
+      } catch (error) {
+        console.error('Error deleting designation:', error);
+        throw error;
+      }
+    }
+    
+    // UI Rendering Functions
+    
+    // Render Skillmen Table
+    function renderSkillmenTable() {
+      const tableBody = document.getElementById('skillman-table-body');
+      const noDataContainer = document.getElementById('skillman-no-data');
+      
+      if (skillmen.length === 0) {
+        tableBody.innerHTML = '';
+        noDataContainer.style.display = 'block';
+        return;
+      }
+      
+      noDataContainer.style.display = 'none';
+      
+      let html = '';
+      const startIndex = (currentSkillmanPage - 1) * skillmanEntriesPerPage;
+      
+      skillmen.forEach((skillman, index) => {
+        html += `
+          <tr>
+            <td>${startIndex + index + 1}</td>
+            <td>${skillman.name}</td>
+            <td>${skillman.phoneNumber}</td>
+            <td>${skillman.email || 'N/A'}</td>
+            <td>${skillman.designation}</td>
+            <td>${skillman.subdivision}</td>
+            <td><span class="status-badge ${skillman.status === 'Active' ? 'status-active' : 'status-inactive'}">${skillman.status}</span></td>
+            <td>
+              <button class="edit-btn" data-id="${skillman.id}" data-type="skillman">
+                <i class="fas fa-edit"></i>
+                Edit
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+      
+      tableBody.innerHTML = html;
+    }
+    
+    // Update Skillman Pagination
+    function updateSkillmanPagination() {
+      const paginationControls = document.getElementById('skillman-pagination-controls');
+      const totalPages = Math.ceil(totalSkillmen / skillmanEntriesPerPage);
+      
+      let html = '';
+      
+      if (totalPages > 1) {
+        // Previous button
+        html += `<button class="pagination-btn" ${currentSkillmanPage === 1 ? 'disabled' : ''} id="skillman-prev-page">
+          <i class="fas fa-chevron-left"></i>
+        </button>`;
+        
+        // Page numbers
+        for (let i = 1; i <= totalPages; i++) {
+          html += `<button class="pagination-btn ${i === currentSkillmanPage ? 'active' : ''}" data-page="${i}">${i}</button>`;
+        }
+        
+        // Next button
+        html += `<button class="pagination-btn" ${currentSkillmanPage === totalPages ? 'disabled' : ''} id="skillman-next-page">
+          <i class="fas fa-chevron-right"></i>
+        </button>`;
+      }
+      
+      paginationControls.innerHTML = html;
+    }
+    
+    // Populate Designation Dropdowns
+    function populateDesignationDropdowns() {
+      const designationDropdown = document.getElementById('skillman-designation');
+      designationDropdown.innerHTML = '<option value="">Select Designation</option>';
+      
+      designations.forEach(designation => {
+        const option = document.createElement('option');
+        option.value = designation.name;
+        option.textContent = designation.name;
+        designationDropdown.appendChild(option);
+      });
+    }
+    
+    // Render Designation Table
+    function renderDesignationTable() {
+      const tableBody = document.getElementById('designation-table-body');
+      const noDataContainer = document.getElementById('designation-no-data');
+      
+      if (designations.length === 0) {
+        tableBody.innerHTML = '';
+        noDataContainer.style.display = 'block';
+        return;
+      }
+      
+      noDataContainer.style.display = 'none';
+      
+      let html = '';
+      
+      designations.forEach(designation => {
+        html += `
+          <tr>
+            <td>${designation.name}</td>
+            <td class="dual-buttons-for-designation">
+              <button class="edit-btn" data-name="${designation.name}" data-type="designation" style="margin-right: 8px;">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="delete-btn" data-name="${designation.name}" data-type="designation">
+                <i class="fas fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+      
+      tableBody.innerHTML = html;
+    }
+    
+    // Event Listeners
+    document.addEventListener('DOMContentLoaded', async function() {
+      /*/ Fetch initial data
+      await fetchSkillmen();
+      await fetchDesignations();*/
+      // Fetch initial data with empty search
+      await fetchSkillmen(1, skillmanEntriesPerPage, '');
+      await fetchDesignations();
+      
+      // Logout button
+      document.querySelector('.logout-btn').addEventListener('click', function() {
+        showNotification('Logging out... Redirecting to login page.', 'success');
+        setTimeout(() => {
+          alert('You have been logged out');
+        }, 1500);
+      });
+      
+      // Users sidebar navigation
+      const usersOptions = document.querySelectorAll('.users-option');
+      const usersPanels = document.querySelectorAll('.users-panel');
+      
+      usersOptions.forEach(option => {
+        option.addEventListener('click', function() {
+          // Remove active class from all options and panels
+          usersOptions.forEach(opt => opt.classList.remove('active'));
+          usersPanels.forEach(panel => panel.classList.remove('active'));
+          
+          // Add active class to clicked option
+          this.classList.add('active');
+          
+          // Show corresponding panel
+          const panelId = this.getAttribute('data-panel');
+          document.getElementById(panelId).classList.add('active');
+        });
+      });
+      
+      // Open skillman modal
+      document.getElementById('show-skillman-modal-btn').addEventListener('click', function() {
+        document.getElementById('skillman-modal-title').textContent = 'Add New Skill Man';
+        document.getElementById('save-skillman-btn').textContent = 'Add Skill Man';
+        document.getElementById('skillman-name').value = '';
+        document.getElementById('skillman-email').value = '';
+        document.getElementById('skillman-phone').value = '';
+        document.getElementById('skillman-subdivision').value = '';
+        document.getElementById('skillman-designation').value = '';
+        document.getElementById('skillman-status').checked = true;
+        populateDesignationDropdowns();
+        document.getElementById('skillman-modal').classList.add('active');
+      });
+      
+      // Add first skillman button
+      document.getElementById('add-first-skillman').addEventListener('click', function() {
+        document.getElementById('show-skillman-modal-btn').click();
+      });
+      
+      // Close skillman modal
+      document.getElementById('close-skillman-modal').addEventListener('click', function() {
+        document.getElementById('skillman-modal').classList.remove('active');
+      });
+      
+      document.getElementById('cancel-skillman').addEventListener('click', function() {
+        document.getElementById('skillman-modal').classList.remove('active');
+      });
+      
+      // Open designation modal
+      document.getElementById('show-designation-modal-btn').addEventListener('click', function() {
+        document.getElementById('designation-name').value = '';
+        document.getElementById('designation-modal').classList.add('active');
+      });
+      
+      // Close designation modal
+      document.getElementById('close-designation-modal').addEventListener('click', function() {
+        document.getElementById('designation-modal').classList.remove('active');
+      });
+      
+      // Search functionality
+      document.getElementById('search-skillman-btn').addEventListener('click', function() {
+        const term = document.getElementById('skillman-search').value.toLowerCase();
+        if (!term) {
+          fetchSkillmen(currentSkillmanPage, skillmanEntriesPerPage);
+          return;
+        }
+        
+        filteredSkillmen = skillmen.filter(skillman => 
+          skillman.name.toLowerCase().includes(term) ||
+          (skillman.email && skillman.email.toLowerCase().includes(term)) ||
+          skillman.phoneNumber.toLowerCase().includes(term) ||
+          skillman.designation.toLowerCase().includes(term)
+        );
+        
+        renderSkillmenTable();
+      });
+      
+      // Add new skillman
+      document.getElementById('save-skillman-btn').addEventListener('click', async function() {
+        const name = document.getElementById('skillman-name').value;
+        const email = document.getElementById('skillman-email').value;
+        const phone = document.getElementById('skillman-phone').value;
+        const subdivision = document.getElementById('skillman-subdivision').value;
+        const designation = document.getElementById('skillman-designation').value;
+        const status = document.getElementById('skillman-status').checked ? 'Active' : 'Inactive';
+        
+        if (!name || !phone || !subdivision || !designation) {
+          showNotification('Please fill all required fields', 'error');
+          return;
+        }
+        
+        const skillmanData = {
+          name,
+          email: email || null,
+          phone,
+          designation,
+          subdivision,
+          status
+        };
+        
+        if (document.getElementById('skillman-modal').dataset.editId) {
+          await updateSkillman(document.getElementById('skillman-modal').dataset.editId, skillmanData);
+        } else {
+          await addSkillman(skillmanData);
+        }
+        document.getElementById('skillman-modal').classList.remove('active');
+      });
+      
+      // Add new designation
+      document.getElementById('add-designation-btn').addEventListener('click', async function() {
+        const name = document.getElementById('designation-name').value;
+        
+        if (!name) {
+          showNotification('Please enter a designation name', 'error');
+          return;
+        }
+        
+        await addDesignation({ name });
+        document.getElementById('designation-name').value = '';
+      });
+      
+      // Edit skillman button functionality
+      document.addEventListener('click', function(e) {
+        if (e.target.closest('.edit-btn') && e.target.closest('.edit-btn').dataset.type === 'skillman') {
+          const button = e.target.closest('.edit-btn');
+          const id = parseInt(button.dataset.id);
+          const skillman = skillmen.find(s => s.id === id);
+          
+          if (skillman) {
+            document.getElementById('skillman-modal-title').textContent = 'Edit Skill Man';
+            document.getElementById('save-skillman-btn').textContent = 'Update Skill Man';
+            document.getElementById('skillman-name').value = skillman.name;
+            document.getElementById('skillman-email').value = skillman.email || '';
+            document.getElementById('skillman-phone').value = skillman.phoneNumber;
+            document.getElementById('skillman-subdivision').value = skillman.subdivision;
+            populateDesignationDropdowns();
+            document.getElementById('skillman-designation').value = skillman.designation;
+            document.getElementById('skillman-status').checked = skillman.status === 'Active';
+            
+            document.getElementById('skillman-modal').dataset.editId = id;
+            document.getElementById('skillman-modal').classList.add('active');
+          }
+        }
+      });
+      
+      // Edit designation
+      document.addEventListener('click', function(e) {
+        const editBtn = e.target.closest('.edit-btn');
+        if (editBtn && editBtn.dataset.type === 'designation') {
+          const name = editBtn.dataset.name;
+          document.getElementById('edit-designation-name').value = name;
+          document.getElementById('designation-edit-modal').dataset.name = name;
+          document.getElementById('designation-edit-modal').classList.add('active');
+        }
+      });
+
+
+      
+      // Close edit designation modal
+      document.getElementById('close-edit-designation-modal').addEventListener('click', function() {
+        document.getElementById('designation-edit-modal').classList.remove('active');
+      });
+      
+      document.getElementById('cancel-edit-designation').addEventListener('click', function() {
+        document.getElementById('designation-edit-modal').classList.remove('active');
+      });
+      
+      // Save edited designation
+      document.getElementById('save-edit-designation').addEventListener('click', async function() {
+        const oldName = document.getElementById('designation-edit-modal').dataset.name;
+        const newName = document.getElementById('edit-designation-name').value;
+        
+        if (!newName) {
+          showNotification('Designation name is required', 'error');
+          return;
+        }
+        
+        if (oldName === newName) {
+          showNotification('No changes detected', 'warning');
+          return;
+        }
+        
+        try {
+          await updateDesignation(oldName, newName);
+          document.getElementById('designation-edit-modal').classList.remove('active');
+        } catch (error) {
+          showNotification(`Error: ${error.message}`, 'error');
+        }
+      });
+      
+      // Delete designation
+      document.addEventListener('click', async function(e) {
+        const deleteBtn = e.target.closest('.delete-btn');
+        if (deleteBtn && deleteBtn.dataset.type === 'designation') {
+          const name = deleteBtn.dataset.name;
+          
+          if (confirm(`Are you sure you want to delete the designation "${name}"?`)) {
+            try {
+              await deleteDesignation(name);
+            } catch (error) {
+              showNotification(error.message, 'error');
+            }
+          }
+        }
+      });
+      
+      // Entries per page change (skillman)
+      // Entries per page change (skillman)
+      document.getElementById('skillman-entries-per-page').addEventListener('change', function() {
+        skillmanEntriesPerPage = parseInt(this.value);
+        currentSkillmanPage = 1;
+        fetchSkillmen(currentSkillmanPage, skillmanEntriesPerPage, document.getElementById('skillman-search').value.trim());
+      });
+      
+      // Skillman pagination controls
+      document.addEventListener('click', function(e) {
+        if (e.target.closest('#skillman-prev-page')) {
+          if (currentSkillmanPage > 1) {
+            currentSkillmanPage--;
+            fetchSkillmen(currentSkillmanPage, skillmanEntriesPerPage, document.getElementById('skillman-search').value.trim());
+          }
+        }
+        
+        if (e.target.closest('#skillman-next-page')) {
+          const totalPages = Math.ceil(totalSkillmen / skillmanEntriesPerPage);
+          if (currentSkillmanPage < totalPages) {
+            currentSkillmanPage++;
+            fetchSkillmen(currentSkillmanPage, skillmanEntriesPerPage, document.getElementById('skillman-search').value.trim());
+          }
+        }
+        
+        if (e.target.closest('.pagination-btn[data-page]')) {
+          currentSkillmanPage = parseInt(e.target.closest('.pagination-btn').dataset.page);
+          fetchSkillmen(currentSkillmanPage, skillmanEntriesPerPage, document.getElementById('skillman-search').value.trim());
+        }
+      });
+      
+      // Navigation tab functionality
+      window.showNavTab = function(tabName) {
+        // Remove active class from all nav items
+        document.querySelectorAll('.nav-item').forEach(item => {
+          item.classList.remove('active');
+        });
+        
+        // Add active class to clicked nav item
+        const activeTab = document.querySelector(`.nav-item[onclick="showNavTab('${tabName}')"]`);
+        if (activeTab) {
+          activeTab.classList.add('active');
+        }
+        
+        // Show notification for demonstration
+        showNotification(`Redirecting to ${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`, 'success');
+      };
+    });
+  </script>
+  <script>
+// Update Skillman Pagination with ellipsis
+function updateSkillmanPagination() {
+  const paginationControls = document.getElementById('skillman-pagination-controls');
+  const totalPages = Math.ceil(totalSkillmen / skillmanEntriesPerPage);
+  
+  let html = '';
+  
+  if (totalPages > 1) {
+    // Previous button
+    html += `<button class="pagination-btn" ${currentSkillmanPage === 1 ? 'disabled' : ''} id="skillman-prev-page">
+      <i class="fas fa-chevron-left"></i>
+    </button>`;
+    
+    // Always show first page
+    html += `<button class="pagination-btn ${1 === currentSkillmanPage ? 'active' : ''}" data-page="1">1</button>`;
+    
+    // Calculate start and end pages with ellipsis logic
+    let startPage, endPage;
+    
+    if (totalPages <= 5) {
+      // Show all pages if 5 or fewer
+      startPage = 2;
+      endPage = totalPages - 1;
+    } else {
+      // Determine which pages to show with ellipsis
+      if (currentSkillmanPage <= 3) {
+        // Near the beginning
+        startPage = 2;
+        endPage = 4;
+        html += `<span class="pagination-ellipsis">...</span>`;
+      } else if (currentSkillmanPage >= totalPages - 2) {
+        // Near the end
+        startPage = totalPages - 3;
+        endPage = totalPages - 1;
+        html += `<span class="pagination-ellipsis">...</span>`;
+      } else {
+        // In the middle
+        startPage = currentSkillmanPage - 1;
+        endPage = currentSkillmanPage + 1;
+        html += `<span class="pagination-ellipsis">...</span>`;
+      }
+    }
+    
+    // Add page numbers
+    for (let i = startPage; i <= endPage; i++) {
+      html += `<button class="pagination-btn ${i === currentSkillmanPage ? 'active' : ''}" data-page="${i}">${i}</button>`;
+    }
+    
+    // Add ellipsis and last page if needed
+    if (totalPages > 5 && currentSkillmanPage < totalPages - 2) {
+      html += `<span class="pagination-ellipsis">...</span>`;
+    }
+    
+    // Always show last page if there's more than 1 page
+    if (totalPages > 1) {
+      html += `<button class="pagination-btn ${totalPages === currentSkillmanPage ? 'active' : ''}" data-page="${totalPages}">${totalPages}</button>`;
+    }
+    
+    // Next button
+    html += `<button class="pagination-btn" ${currentSkillmanPage === totalPages ? 'disabled' : ''} id="skillman-next-page">
+      <i class="fas fa-chevron-right"></i>
+    </button>`;
+  }
+  
+  paginationControls.innerHTML = html;
+}
+
+// Add CSS for ellipsis
+const style = document.createElement('style');
+style.textContent = `
+  .pagination-ellipsis {
+    padding: 8px 5px;
+    color: #6c757d;
+  }
+`;
+document.head.appendChild(style);
+</script>
+  <script src="chat-bot.js"></script>
+</body>
+</html>

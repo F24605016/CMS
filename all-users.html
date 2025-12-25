@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="server-url.js"></script>
+  <script>
+    const page = 'all-users';
+  </script>
+  <script src="verification.js"></script>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="logo.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MES CMS - All Users</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+
+    .users-section-container {
+      display: grid;
+      grid-template-columns: 250px 1fr;
+      gap: 30px;
+      min-height: 600px;
+    }
+    
+    .users-sidebar {
+      background: white;
+      border-radius: 8px;
+      padding: 25px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    
+    .users-option {
+      padding: 18px 20px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #f8f9fa;
+    }
+    
+    .users-option:hover {
+      background: rgba(0,0,0,0.05);
+    }
+    
+    .users-option.active {
+      background: rgba(136, 28, 28, 0.1);
+      color: rgb(136, 28, 28);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .users-option i {
+      font-size: 20px;
+    }
+    
+    .users-content {
+      background: white;
+      border-radius: 8px;
+      padding: 30px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+    }
+    
+    .panel-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: rgb(136, 28, 28);
+    }
+    
+    .search-box {
+      display: flex;
+      margin-bottom: 30px;
+    }
+    
+    .search-box input {
+      flex: 1;
+      border-radius: 8px 0 0 8px;
+      padding: 14px 18px;
+      border: 1px solid rgba(0,0,0,0.1);
+      background: #f8f9fa;
+      font-size: 16px;
+      transition: all 0.3s;
+    }
+    
+    .search-box input:focus {
+      outline: none;
+      border-color: rgb(136, 28, 28);
+      box-shadow: 0 0 0 3px rgba(136, 28, 28, 0.2);
+    }
+    
+    .search-box button {
+      border-radius: 0 8px 8px 0;
+      padding: 14px 28px;
+      border-radius: 0 8px 8px 0;
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgb(136, 28, 28);
+      color: white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .search-box button:hover {
+      background: #a52a2a;
+    }
+    
+    .users-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border-radius: 8px;
+      overflow-x: hidden;
+    }
+    
+    .users-table th {
+      background: rgba(136, 28, 28, 0.1);
+      color: rgb(136, 28, 28);
+      font-weight: 700;
+      padding: 7px;
+      text-align: center;
+      height: 20px;
+    }
+    
+    .users-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      border-left: 1px solid #f3f3f3; /* vertical line color */
+      text-align: center;
+    }
+    
+    .users-table tr:hover {
+      background: rgba(136, 28, 28, 0.05);
+    }
+    
+    .no-data {
+      text-align: center;
+      padding: 40px;
+      color: #6c757d;
+      font-size: 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .no-data i {
+      font-size: 72px;
+      margin-bottom: 20px;
+      color: #ced4da;
+    }
+    
+    .no-data h3 {
+      font-size: 24px;
+      margin-bottom: 15px;
+      color: #495057;
+    }
+    
+    .no-data p {
+      font-size: 16px;
+      max-width: 500px;
+      line-height: 1.6;
+    }
+    
+    .retry-btn {
+      margin-top: 20px;
+      padding: 10px 25px;
+      background: rgb(136, 28, 28);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .retry-btn:hover {
+      background: #a52a2a;
+      transform: translateY(-2px);
+    }
+
+    /* Pagination Styles */
+    .table-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 20px 0;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+    
+    .entries-selector {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      color: #555;
+    }
+    
+    .entries-selector select {
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid rgba(0,0,0,0.1);
+      background: #f8f9fa;
+      font-size: 14px;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+    
+    .entries-selector select:focus {
+      outline: none;
+      border-color: rgb(136, 28, 28);
+      box-shadow: 0 0 0 2px rgba(136, 28, 28, 0.2);
+    }
+    
+    .pagination {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .pagination-btn {
+      padding: 8px 15px;
+      border-radius: 6px;
+      background: #f8f9fa;
+      color: #333;
+      border: 1px solid rgba(0,0,0,0.1);
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: 600;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .pagination-btn:hover:not(:disabled) {
+      background: rgba(136, 28, 28, 0.1);
+      color: rgb(136, 28, 28);
+      border-color: rgba(136, 28, 28, 0.2);
+    }
+    
+    .pagination-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .page-numbers {
+      display: flex;
+      gap: 5px;
+    }
+    
+    .page-btn {
+      min-width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f8f9fa;
+      border: 1px solid rgba(0,0,0,0.1);
+      color: #333;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    
+    .page-btn:hover {
+      background: rgba(136, 28, 28, 0.1);
+      color: rgb(136, 28, 28);
+      border-color: rgba(136, 28, 28, 0.2);
+    }
+    
+    .page-btn.active {
+      background: rgb(136, 28, 28);
+      color: white;
+      border-color: rgb(136, 28, 28);
+    }
+
+    /* Loading spinner */
+    .spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      border-left: 4px solid rgb(136, 28, 28);
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+      display: none;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    /* Notification */
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 15px 25px;
+      border-radius: 8px;
+      color: white;
+      font-weight: 600;
+      box-shadow: 0 2px 15px rgba(0,0,0,0.15);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transform: translateX(110%);
+      transition: transform 0.3s ease;
+    }
+    
+    .notification.show {
+      transform: translateX(0);
+    }
+    
+    .notification.success {
+      background: #4caf50;
+    }
+    
+    .notification.error {
+      background: #f44336;
+    }
+    
+    .notification.info {
+      background: #2196f3;
+    }
+    
+    .notification i {
+      font-size: 20px;
+    }
+
+    #colonies-ref, #skillman-ref {
+      text-decoration: none;
+      color: inherit;
+    }
+
+
+    @media (max-width: 992px) {
+      .users-section-container {
+        grid-template-columns: 1fr;
+      }
+      
+      .users-sidebar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      
+      .users-option {
+        margin-bottom: 0;
+        flex: 1;
+        min-width: 150px;
+      }
+      
+      .table-controls {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .users-option {
+        padding: 12px 15px;
+        font-size: 14px;
+      }
+      
+      .page-numbers {
+        flex-wrap: wrap;
+      }
+      
+      .panel-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+      }
+    }
+    
+
+@media (max-width: 500px) {
+  .logo {
+    flex-direction: column;
+  }
+
+  .panel-title {
+    font-size: medium;
+  }
+}
+
+    .hamburger {
+      display: none;
+    }
+    /* Responsive header */
+    @media (max-width: 768px) {
+      .report-type .report-option {
+        padding: 10px 20px;
+        font-size: 15px;
+      }
+
+      .btn {
+        font-size: 15px;
+      }
+
+      .report-header h1 {
+        font-size: 20px;
+      }
+    }
+
+  </style>
+  <link rel="stylesheet" href="common-styles.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Notification -->
+  <div class="notification" id="notification">
+      <i class="fas fa-info-circle"></i>
+      <span id="notification-text">Operation completed successfully</span>
+  </div>
+  
+  <header>
+    <div class="logo">
+      <div class="logo-image">
+        <img src="logo.jpg" alt="logo image">
+      </div>
+      <h2>MES CMS</h2>
+    </div>
+
+    <div class="user">
+      <h2 id="user-id">Unknown</h2>
+      <button class="logout-btn" id="logout-btn">Logout</button>
+      <div class="hamburger">
+        <i class="fas fa-bars" id="hamburger-btn"></i>
+        <div class="navigation-block">
+          <a href="dashboard" class="navi-block-items">Dashboard</a>
+          <a href="complaints" class="navi-block-items">Complaints</a>
+          <div class="navi-block-items active">Users</div>
+          <a href="reporting" class="navi-block-items">Reporting</a>
+          <a href="admin" class="navi-block-items">Admin</a>
+        </div>
+        </div>
+      </div>
+  </header>
+
+  <div class="nav-bar">
+    <div class="nav-container">
+      <a href="dashboard" class="nav-item" onclick="showNavTab('dashboard')">
+        <i class="fas fa-chart-line"></i>
+        Dashboard
+      </a>
+      <a href="complaints" class="nav-item" onclick="showNavTab('complaints')">
+        <i class="fas fa-ticket-alt"></i>
+        Complaints
+      </a>
+      <div class="nav-item active" id="active">
+        <i class="fas fa-users"></i>
+        Users
+      </div>
+      <a href="reporting" class="nav-item" onclick="showNavTab('reporting')">
+        <i class="fas fa-file-alt"></i>
+        Reporting
+      </a>
+      <a href="admin" class="nav-item" onclick="showNavTab('admin')">
+        <i class="fas fa-user-tie"></i>
+        Admin
+      </a>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- Users Section -->
+    <div class="users-section-container">
+      <div class="users-sidebar">
+        <div class="users-option active" data-panel="all-users-panel" id="all-users-option">
+          <i class="fas fa-users"></i>
+          All Users
+        </div>
+        <a href="colonies.html" class="users-option" data-panel="colonies-panel" id="colonies-ref">
+          <i class="fas fa-building"></i>
+          Colonies
+        </a>
+        <a href="skillman.html" class="users-option" data-panel="skillman-panel" id="skillman-ref">
+          <i class="fas fa-tools"></i>
+          Skill Man
+        </a>
+      </div>
+      
+      <div class="users-content">
+        <!-- All Users Panel -->
+        <div id="all-users-panel" class="users-panel active">
+          <div class="panel-header">
+            <h2 class="panel-title">All Users</h2>
+          </div>
+          
+          <!-- Search Box -->
+          <!--div class="search-box">
+            <input type="text" id="users-search" class="form-control" placeholder="Search by name, email, or phone">
+            <button class="btn" id="search-users-btn">
+              <i class="fas fa-search"></i>
+              Search
+            </button>
+          </div-->
+          
+          <!-- Loading Spinner -->
+          <div class="spinner" id="loading-spinner"></div>
+          
+          <!-- Table Controls -->
+          <div class="table-controls">
+            <div class="entries-selector">
+              <span>Show</span>
+              <select id="entries-per-page">
+                <option value="10">10</option>
+                <option value="30" selected>30</option>
+                <option value="100">100</option>
+              </select>
+              <span>entries</span>
+            </div>
+            <div class="pagination">
+              <button class="pagination-btn" id="prev-page" disabled>
+                <i class="fas fa-chevron-left"></i>
+                Previous
+              </button>
+              <div class="page-numbers" id="page-numbers"></div>
+              <button class="pagination-btn" id="next-page">
+                Next
+                <i class="fas fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+          
+          <!-- Users Table -->
+          <div class="table-container">
+            <table class="users-table" id="users-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Name</th>
+                  <th>Phone</th>
+                  <th>Email</th>
+                </tr>
+              </thead>
+              <tbody id="users-table-body">
+                <!-- Users will be generated here -->
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- No Data Message -->
+          <div id="users-no-data" class="no-data" style="display: none;">
+            <i class="fas fa-users-slash"></i>
+            <h3>No User Data Available</h3>
+            <p>We couldn't retrieve any user data from the server. This could be due to a network issue or the backend service being unavailable.</p>
+            <p>Please check your connection and try again.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const hamburgerBtn = document.getElementById("hamburger-btn");
+  const navBlock = document.querySelector(".navigation-block");
+
+  // Toggle navigation on hamburger click
+  hamburgerBtn.addEventListener("click", (e) => {
+    e.stopPropagation(); // Prevent click from bubbling to document
+    navBlock.classList.toggle("active");
+  });
+
+  // Close navigation when clicking outside
+  document.addEventListener("click", (e) => {
+    // Check if click is outside the navigation block and hamburger button
+    if (!navBlock.contains(e.target) && e.target !== hamburgerBtn) {
+      navBlock.classList.remove("active");
+    }
+  });
+
+  // Optional: Prevent clicks inside navigation from closing it
+  navBlock.addEventListener("click", (e) => {
+    e.stopPropagation();
+  });
+</script>
+
+
+<script>
+// Add this script to control navigation visibility based on backend permissions
+document.addEventListener('DOMContentLoaded', async function() {
+    try {
+        const authToken = localStorage.getItem('authToken');
+        if (!authToken) {
+            console.error('No authentication token found');
+            return;
+        }
+
+        // Fetch allowed pages from backend
+        const response = await fetch(`${SERVER_URL}/api/allowed-pages`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${authToken}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch allowed pages');
+        }
+
+        const data = await response.json();
+        
+        if (data.success) {
+            // Process navigation items based on allowed pages
+            processNavigationItems(data.allowedPages, data.navigationItems);
+        }
+    } catch (error) {
+        console.error('Error fetching allowed pages:', error);
+        // In case of error, you might want to show a default set of navigation items
+        // or handle it according to your application's requirements
+    }
+});
+
+function processNavigationItems(allowedPages, navigationItems) {
+    // Process header navigation items
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+        const href = item.getAttribute('href');
+        if (href) {
+            const pageName = href; // Get the page name without extension
+            
+            // Check if this category has an accessible page
+            if (navigationItems[pageName]) {
+                // Set the href to the first accessible page in this category
+                item.setAttribute('href', `${navigationItems[pageName]}.html`);
+                item.style.display = 'flex';
+            } else {
+                item.style.display = 'none';
+            }
+        }
+    });
+    
+    // Process hamburger menu navigation items
+    const hamburgerItems = document.querySelectorAll('.navi-block-items');
+    hamburgerItems.forEach(item => {
+        const href = item.getAttribute('href');
+        if (href) {
+            const pageName = href; // Get the page name without extension
+            
+            // Check if this category has an accessible page
+            if (navigationItems[pageName]) {
+                // Set the href to the first accessible page in this category
+                item.setAttribute('href', `${navigationItems[pageName]}.html`);
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        }
+    });
+    
+    // Process sidebar navigation items (use the allowedPages array)
+    const sidebarItems = document.querySelectorAll('.users-option');
+    sidebarItems.forEach(item => {
+        const href = item.getAttribute('href');
+        if (href) {
+            const pageName = getPageNameFromHref(href);
+            if (allowedPages.includes(pageName) || item.classList.contains('active')) {
+                item.style.display = 'flex';
+            } else {
+                item.style.display = 'none';
+            }
+        }
+    });
+}
+
+function getPageNameFromHref(href) {
+    if (!href) return '';
+    
+    // Extract page name from href (e.g., "dashboard.html" -> "dashboard")
+    const pageWithExtension = href.split('/').pop();
+    return pageWithExtension.split('.')[0];
+}
+</script>
+
+
+  <script>
+
+    
+    let USER_ID = localStorage.getItem('UserId');
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById("user-id").textContent = USER_ID;
+      localStorage.removeItem('UserId');
+    });
+    // Notification system
+    function showNotification(message, type) {
+      const notification = document.getElementById('notification');
+      const text = document.getElementById('notification-text');
+      
+      text.textContent = message;
+      notification.className = 'notification ' + type;
+      notification.classList.add('show');
+      
+      setTimeout(() => {
+        notification.classList.remove('show');
+      }, 3000);
+    }
+
+    
+  document.addEventListener('DOMContentLoaded', function() {
+
+    // DOM Elements
+    const logoutBtn = document.getElementById('logout-btn');
+    
+    logoutBtn.addEventListener('click', async () => {
+      try {
+        const authToken = localStorage.getItem('authToken');
+        const response = await fetch(SERVER_URL+'/logout', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${authToken}`,'Content-Type': 'application/json' }
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          console.log('Logout success:', data);
+          //alert('Logged out successfully!');
+          // 👇 you can add more procedural lines here
+          // e.g., redirect:
+          showNotification('Logging out');
+          localStorage.removeItem('authToken');
+          setTimeout(() => {
+            window.location.href = 'login.html';
+          }, 1000); // 1000 ms = 1 sec
+        } else {
+          console.error('Logout failed:', data);
+          alert('Logout failed!');
+        }
+
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Something went wrong!');
+      }
+    });
+    
+  });
+
+    // Pagination variables
+    let currentPage = 1;
+    let entriesPerPage = 30;
+    let allUsers = [];
+    let filteredUsers = [];
+    let searchTerm = '';
+
+    // Function to generate users table rows
+    function generateUsersTable(users) {
+      if (users.length === 0) {
+        return '';
+      }
+      
+      // Calculate start index for current page
+      const startIndex = (currentPage - 1) * entriesPerPage;
+      const paginatedUsers = users.slice(startIndex, startIndex + entriesPerPage);
+      
+      return paginatedUsers.map((user, index) => `
+        <tr>
+          <td>${startIndex + index + 1}</td>
+          <td>${user.name}</td>
+          <td>${user.phone}</td>
+          <td>${user.email}</td>
+        </tr>
+      `).join('');
+    }
+    
+    // Function to update pagination controls
+    function updatePaginationControls(totalItems) {
+      const totalPages = Math.ceil(totalItems / entriesPerPage);
+      const pageNumbersContainer = document.getElementById('page-numbers');
+      const prevButton = document.getElementById('prev-page');
+      const nextButton = document.getElementById('next-page');
+      
+      // Update previous button
+      prevButton.disabled = currentPage === 1;
+      
+      // Update next button
+      nextButton.disabled = currentPage === totalPages || totalPages === 0;
+      
+      // Generate page numbers
+      pageNumbersContainer.innerHTML = '';
+      
+      // Always show first page
+      if (totalPages > 0) {
+        const firstPageBtn = document.createElement('button');
+        firstPageBtn.className = `page-btn ${currentPage === 1 ? 'active' : ''}`;
+        firstPageBtn.textContent = '1';
+        firstPageBtn.addEventListener('click', () => goToPage(1));
+        pageNumbersContainer.appendChild(firstPageBtn);
+      }
+      
+      // Calculate range of pages to display
+      let startPage = Math.max(2, currentPage - 2);
+      let endPage = Math.min(totalPages - 1, currentPage + 2);
+      
+      // Add ellipsis if needed
+      if (startPage > 2) {
+        const ellipsis = document.createElement('span');
+        ellipsis.textContent = '...';
+        ellipsis.style.padding = '0 10px';
+        pageNumbersContainer.appendChild(ellipsis);
+      }
+      
+      // Add middle pages
+      for (let i = startPage; i <= endPage; i++) {
+        if (i > 1 && i < totalPages) {
+          const pageBtn = document.createElement('button');
+          pageBtn.className = `page-btn ${currentPage === i ? 'active' : ''}`;
+          pageBtn.textContent = i;
+          pageBtn.addEventListener('click', () => goToPage(i));
+          pageNumbersContainer.appendChild(pageBtn);
+        }
+      }
+      
+      // Add ellipsis if needed
+      if (endPage < totalPages - 1 && totalPages > 3) {
+        const ellipsis = document.createElement('span');
+        ellipsis.textContent = '...';
+        ellipsis.style.padding = '0 10px';
+        pageNumbersContainer.appendChild(ellipsis);
+      }
+      
+      // Always show last page if there is more than one page
+      if (totalPages > 1) {
+        const lastPageBtn = document.createElement('button');
+        lastPageBtn.className = `page-btn ${currentPage === totalPages ? 'active' : ''}`;
+        lastPageBtn.textContent = totalPages;
+        lastPageBtn.addEventListener('click', () => goToPage(totalPages));
+        pageNumbersContainer.appendChild(lastPageBtn);
+      }
+    }
+    
+    // Function to go to a specific page
+    function goToPage(page) {
+      currentPage = page;
+      renderUsersTable();
+    }
+    
+    // Function to render the table with pagination
+    function renderUsersTable() {
+      // Apply search filter if there's a search term
+      if (searchTerm) {
+        filteredUsers = allUsers.filter(user => 
+          user.name.toLowerCase().includes(searchTerm) ||
+          user.phone.toLowerCase().includes(searchTerm) ||
+          user.email.toLowerCase().includes(searchTerm)
+        );
+      } else {
+        filteredUsers = [...allUsers];
+      }
+      
+      // Update table
+      document.getElementById('users-table-body').innerHTML = generateUsersTable(filteredUsers);
+      
+      // Update pagination controls
+      updatePaginationControls(filteredUsers.length);
+      
+      // Show/hide no data message
+      if (filteredUsers.length === 0) {
+        document.getElementById('users-no-data').style.display = 'flex';
+        document.getElementById('users-table').style.display = 'none';
+      } else {
+        document.getElementById('users-no-data').style.display = 'none';
+        document.getElementById('users-table').style.display = 'table';
+      }
+    }
+    
+    // Function to fetch users from backend
+    function fetchUsers() {
+      const spinner = document.getElementById('loading-spinner');
+      spinner.style.display = 'block';
+      document.getElementById('users-no-data').style.display = 'none';
+      
+      const authToken = localStorage.getItem('authToken');
+
+      // API call to backend at port 3000
+      fetch(SERVER_URL+'/getUsers', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`
+          }
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`Server returned ${response.status} ${response.statusText}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          allUsers = data;
+          renderUsersTable();
+          spinner.style.display = 'none';
+          showNotification(`Fetched ${data.length} users from backend`, 'success');
+        })
+        .catch(error => {
+          console.error('Error fetching users:', error);
+          
+          // Clear existing data
+          allUsers = [];
+          filteredUsers = [];
+          
+          // Hide spinner
+          spinner.style.display = 'none';
+          
+          // Show error message
+          document.getElementById('users-no-data').style.display = 'flex';
+          document.getElementById('users-table').style.display = 'none';
+          
+          showNotification('Failed to connect to backend: ' + error.message, 'error');
+        });
+    }
+
+    // Navigation tab functionality
+    function showNavTab(tabName) {
+      // Remove active class from all nav items
+      document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.remove('active');
+      });
+      
+      // Add active class to clicked nav item
+      const activeTab = document.querySelector(`.nav-item[onclick="showNavTab('${tabName}')"]`);
+      if (activeTab) {
+        activeTab.classList.add('active');
+      }
+      
+      // Show notification for demonstration
+      showNotification(`Redirecting to ${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`, 'info');
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      // Fetch users on initial load
+      fetchUsers();
+      
+      // Logout button functionality
+      document.querySelector('.logout-btn').addEventListener('click', function() {
+        showNotification('Logging out... Redirecting to login page.', 'info');
+        setTimeout(() => {
+          // In a real app, this would redirect to the login page
+          alert('You have been logged out');
+        }, 1500);
+      });
+      
+      // Users sidebar navigation
+      const usersOptions = document.querySelectorAll('.users-option');
+      const usersPanels = document.querySelectorAll('.users-panel');
+      
+      usersOptions.forEach(option => {
+        option.addEventListener('click', function() {
+          // Remove active class from all options and panels
+          usersOptions.forEach(opt => opt.classList.remove('active'));
+          usersPanels.forEach(panel => panel.classList.remove('active'));
+          
+          // Add active class to clicked option
+          this.classList.add('active');
+          
+          // Show corresponding panel
+          const panelId = this.getAttribute('data-panel');
+          document.getElementById(panelId).classList.add('active');
+        });
+      });
+      
+      // Search functionality
+      document.getElementById('search-users-btn').addEventListener('click', function() {
+        searchTerm = document.getElementById('users-search').value.toLowerCase();
+        currentPage = 1;
+        renderUsersTable();
+      });
+      
+      // Enable search on pressing Enter
+      document.getElementById('users-search').addEventListener('keyup', function(event) {
+        if (event.key === 'Enter') {
+          searchTerm = this.value.toLowerCase();
+          currentPage = 1;
+          renderUsersTable();
+        }
+      });
+      
+      // Entries per page change
+      document.getElementById('entries-per-page').addEventListener('change', function() {
+        entriesPerPage = parseInt(this.value);
+        currentPage = 1; // Reset to first page when changing entries per page
+        renderUsersTable();
+      });
+      
+      // Previous page button
+      document.getElementById('prev-page').addEventListener('click', function() {
+        if (currentPage > 1) {
+          currentPage--;
+          renderUsersTable();
+        }
+      });
+      
+      // Next page button
+      document.getElementById('next-page').addEventListener('click', function() {
+        const totalPages = Math.ceil(filteredUsers.length / entriesPerPage);
+        if (currentPage < totalPages) {
+          currentPage++;
+          renderUsersTable();
+        }
+      });
+      
+      // Refresh button
+      document.getElementById('refresh-users-btn').addEventListener('click', fetchUsers);
+      
+      // Retry button
+      document.getElementById('retry-btn').addEventListener('click', fetchUsers);
+    });
+  </script>
+  <script src="chat-bot.js"></script>
+</body>
+</html>

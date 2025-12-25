@@ -1,0 +1,1918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script src="server-url.js"></script>
+  <script>
+    const page = 'all-complaints';
+  </script>
+  <script src="verification.js"></script>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="logo.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MES CMS - Complaint Details</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style> 
+ 
+    
+    /* Notification Styles */
+    .notification-area {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1100;
+      max-width: 350px;
+      width: 100%;
+    }
+
+    .notification {
+      padding: 15px 20px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+      animation: slideIn 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+    }
+
+    .notification::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 4px;
+      width: 100%;
+      background: rgba(255,255,255,0.5);
+      animation: progress 3s linear;
+    }
+
+    .notification.success {
+      background: #4CAF50;
+    }
+
+    .notification.error {
+      background: #F44336;
+    }
+
+    .notification.warning {
+      background: #FF9800;
+    }
+
+    .notification.info {
+      background: #2196F3;
+    }
+
+    @keyframes progress {
+      from { width: 100%; }
+      to { width: 0%; }
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    /* Complaint Details Layout */
+    .complaint-details-container {
+      display: flex;
+      gap: 30px;
+      min-height: 600px;
+    }
+    
+    .left-panel {
+      flex: 0 0 300px;
+      background: var(--card-bg);
+      border-radius: 18px;
+      padding: 25px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+    
+    .right-panel {
+      flex: 1;
+      background: var(--card-bg);
+      border-radius: 18px;
+      padding: 30px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .detail-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+    }
+    
+    
+    .detail-icon i {
+      color: white;
+      font-size: 15px;
+    }
+    
+    .detail-content {
+      flex: 1;
+    }
+    
+    .detail-label {
+      font-size: 15px;
+      color: var(--gray);
+      margin-bottom: 3px;
+    }
+    
+    .detail-value {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--dark);
+    }
+    
+    /* Right Panel Styles */
+    .complaint-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+    }
+    
+    .complaint-id {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    
+    .priority-badge {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-weight: 700;
+      /* Changed from 24px to 18px */
+      font-size: 18px;
+    }
+    
+    .priority-immediate {
+      background-color: #e53935;
+      color: white;
+    }
+    
+    .priority-urgent {
+      background-color: #ff9800;
+      color: white;
+    }
+    
+    .priority-routine {
+      background-color: #2196f3;
+      color: white;
+    }
+    
+    .priority-deferred {
+      background-color: #757575;
+      color: white;
+    }
+    
+    .address-section {
+      margin-bottom: 20px;
+    }
+    
+    .address-text {
+      font-size: 16px;
+      margin-bottom: 8px;
+      color: var(--dark);
+    }
+    
+    .status-badge {
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      display: inline-block;
+    }
+    
+    .status-in-progress {
+      background: #2196F3;
+      color: white;
+    }
+    
+    .status-completed {
+      background: #4CAF50;
+      color: white;
+    }
+    
+    .status-deferred {
+      background: #0f0f0f;
+      color: white;
+    }
+    
+    .status-un-assigned {
+      background: #F44336;
+      color: white;
+    }
+
+    .status-sna {
+      background: #ffa600;
+      color: white;
+    }
+    
+    .contact-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+    }
+    
+    .contact-info {
+      font-size: 16px;
+      color: var(--dark);
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .whatsapp-btn, .print-btn {
+      padding: 8px 15px;
+      border-radius: 6px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      border: none;
+      transition: all 0.3s;
+    }
+    
+    .whatsapp-btn {
+      background-color: #25D366;
+      color: white;
+    }
+    
+    .whatsapp-btn:hover {
+      background-color: #128C7E;
+    }
+    
+    .print-btn {
+      background-color: var(--primary);
+      color: white;
+    }
+    
+    .print-btn:hover {
+      background-color: var(--secondary);
+    }
+    
+    /* Navigation Tabs */
+    .detail-tabs {
+      display: flex;
+      border-bottom: 1px solid rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    
+    .tab {
+      padding: 12px 20px;
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--gray);
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s;
+    }
+    
+    .tab.active {
+      color: var(--primary);
+      border-bottom: 3px solid var(--primary);
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.4s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Form Styles */
+    .form-group {
+      margin-bottom: 20px;
+      overflow-x: auto;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--dark);
+    }
+    
+    .form-control {
+      width: 100%;
+      padding: 14px 18px;
+      border-radius: 12px;
+      border: 1px solid rgba(0,0,0,0.1);
+      background: rgba(248, 249, 250, 0.5);
+      font-size: 16px;
+      transition: all 0.3s;
+    }
+    
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(136, 28, 28, 0.2);
+    }
+    
+    textarea.form-control {
+      min-height: 120px;
+      resize: vertical;
+    }
+    
+    .checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .checkbox-item input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--primary);
+    }
+    
+    .btn {
+      padding: 14px 28px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 6px 18px rgba(136, 28, 28, 0.2);
+    }
+    
+    .btn-primary:hover {
+      background: #a33a3a;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 22px rgba(136, 28, 28, 0.3);
+    }
+    
+    .btn-secondary {
+      background: var(--secondary);
+      color: white;
+      box-shadow: 0 6px 18px rgba(140, 47, 47, 0.2);
+    }
+    
+    .btn-secondary:hover {
+      background: #7a2525;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 22px rgba(140, 47, 47, 0.3);
+    }
+    
+    .btn-warning {
+      background: var(--warning);
+      color: white;
+      box-shadow: 0 6px 18px rgba(255, 152, 0, 0.2);
+    }
+    
+    .btn-warning:hover {
+      background: #e68900;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 22px rgba(255, 152, 0, 0.3);
+    }
+    
+    .btn-primary:disabled {
+      background: var(--gray);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    
+    /* Mark Complaint Section */
+    .mark-complaint-section {
+      text-align: center;
+      padding: 30px;
+      background-color: #f8f9fa;
+      border-radius: 12px;
+    }
+    
+    .mark-title {
+      font-size: 20px;
+      margin-bottom: 15px;
+      color: var(--primary);
+    }
+    
+    .mark-description {
+      margin-bottom: 25px;
+      color: var(--gray);
+    }
+    
+    .mark-buttons {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    
+    /* Table Styles */
+    .complaints-table {
+      width: 100%;
+      border-collapse: collapse;
+      /*border-radius: var(--border-radius);*/
+      overflow: auto;
+      background: white;
+    }
+
+    .complaints-table th {
+      background: rgba(136, 28, 28, 0.1);
+      color: var(--primary);
+      font-weight: 600;
+      padding: 12px;
+      text-align: left;
+      border: 1px solid #ffc4c4; /* vertical line color */
+      font-size: 16px;
+    }
+
+    .complaints-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(0,0,0,0.1);
+      height: 40px;
+      border: 1px solid #f3f3f3; /* vertical line color */
+      font-size: 14px;
+    }
+
+    /*
+    .complaints-table tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    */
+
+    .complaints-table tr:hover {
+      background-color: rgba(136, 28, 28, 0.05);
+    }
+
+    
+    /* New styles for Helper table */
+
+  /* Updated Helper table styles to match complaints table */
+  /* Updated Helper table styles to match complaints table with horizontal scroll */
+  .Helpers {
+    overflow-x: auto;
+    margin-bottom: 20px;
+  }
+  
+  .helper-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    min-width: 800px; /* Ensure table has minimum width to trigger scroll if needed */
+  }
+
+  .helper-table th {
+    background: rgba(136, 28, 28, 0.1);
+    color: var(--primary);
+    font-weight: 600;
+    padding: 12px;
+    text-align: left;
+    border: 1px solid #ffc4c4; /* Match vertical line color */
+    font-size: 16px;
+    white-space: nowrap; /* Prevent header text from wrapping */
+  }
+
+  .helper-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    height: 40px;
+    border: 1px solid #f3f3f3; /* Match vertical line color */
+    font-size: 14px;
+    white-space: nowrap; /* Prevent cell content from wrapping */
+  }
+
+  .helper-table tr:hover {
+    background-color: rgba(136, 28, 28, 0.05);
+  }
+  
+  /* Custom scrollbar styling to match the site theme */
+  .Helpers::-webkit-scrollbar {
+    height: 8px;
+  }
+  
+  .Helpers::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+  }
+  
+  .Helpers::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+  }
+  
+  .Helpers::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+    
+    .helper-status {
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-block;
+    }
+    
+    
+    .status-active {
+      background: #4CAF50;
+      color: white;
+    }
+    
+    .status-inprogress {
+      background: #F44336;
+      color: white;
+    }
+    
+    .status-inactive {
+      background: #9E9E9E;
+      color: white;
+    }
+    
+    .helper-section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .helper-search {
+      padding: 10px 15px;
+      border-radius: 6px;
+      border: 1px solid rgba(0,0,0,0.1);
+      width: 250px;
+    }
+    
+    /* Responsive Styles */
+    @media (max-width: 992px) {
+      .complaint-details-container {
+        flex-direction: column;
+      }
+      
+      .left-panel {
+        flex: 1;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .contact-section {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+      }
+      
+      .action-buttons {
+        width: 100%;
+        justify-content: space-between;
+      }
+      
+      .whatsapp-btn, .print-btn {
+        flex: 1;
+        justify-content: center;
+      }
+      
+      .mark-buttons {
+        flex-direction: column;
+      }
+      
+      .mark-buttons .btn {
+        width: 100%;
+      }
+
+      .complaints-table th, .complaints-table td {
+        font-size: 12px;
+        padding: 8px 10px;
+      }
+    }
+    
+    @media (max-width: 576px) {
+      .detail-tabs {
+        flex-direction: column;
+      }
+      
+      .tab {
+        width: 100%;
+        text-align: center;
+      }
+    }
+
+
+
+
+
+/* Styles for enhanced Mark Complaint section */
+.assignment-section, .update-assignment-section, .status-update-section {
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+}
+
+.assignment-section h4, .update-assignment-section h4, .status-update-section h4 {
+  color: var(--primary);
+  margin-bottom: 15px;
+  font-size: 18px;
+}
+
+.current-assignment {
+  background-color: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+.assignment-item {
+  display: flex;
+  margin-bottom: 10px;
+}
+
+.assignment-item label {
+  font-weight: 600;
+  min-width: 150px;
+  color: var(--dark);
+}
+
+.assignment-item span {
+  color: var(--gray);
+}
+
+.form-hint {
+  font-size: 12px;
+  color: var(--gray);
+  margin-top: 5px;
+  font-style: italic;
+}
+
+select[multiple] {
+  min-height: 100px;
+}
+
+.status-dependent-fields {
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  margin-top: 15px;
+}
+
+
+    @media (max-width: 450px) {
+      .logo {
+        flex-direction: column;
+      }
+    }
+ 
+
+
+    .complaint-link {
+      color:#212529;
+      font-weight: bold;
+    }
+
+    .side-icons {
+      height: 30px;
+      width: 30px;
+      margin-right: 10px;
+    }
+  </style>
+  <link rel="stylesheet" href="common-styles.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Notification Container (place this in your HTML) -->
+  <div class="notification-area" id="notification-area"></div>
+
+  <header>
+    <div class="logo">
+      <div class="logo-image">
+        <img src="logo.jpg" alt="logo image">
+      </div>
+      <h2>MES CMS</h2>
+    </div>
+
+    <div class="user">
+      <h2 id="user-id">Unknown</h2>
+      <button class="logout-btn" id="logout-btn">Logout</button>
+      <div class="hamburger">
+        <i class="fas fa-bars" id="hamburger-btn"></i>
+        <div class="navigation-block">
+          <a href="dashboard" class="navi-block-items">Dashboard</a>
+          <a href="complaints" class="navi-block-items active">Complaints</a>
+          <a href="users" class="navi-block-items">Users</a>
+          <a href="reporting" class="navi-block-items">Reporting</a>
+          <a href="admin" class="navi-block-items">Admin</a>
+        </div>
+        </div>
+      </div>
+  </header>
+
+  <div class="nav-bar">
+    <div class="nav-container">
+      <a href="dashboard" class="nav-item">
+        <i class="fas fa-chart-line"></i>
+        Dashboard
+      </a>
+      <a href="complaints" class="nav-item">
+        <i class="fas fa-ticket-alt"></i>
+        Complaints
+      </a>
+      <a href="users" class="nav-item">
+        <i class="fas fa-users"></i>
+        Users
+      </a>
+      <a href="reporting" class="nav-item">
+        <i class="fas fa-file-alt"></i>
+        Reporting
+      </a>
+      <a href="admin" class="nav-item">
+        <i class="fas fa-user-tie"></i>
+        Admin
+      </a>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="complaint-details-container">
+      <!-- Left Panel -->
+      <div class="left-panel">
+        <div class="detail-item">
+          <div class="detail-icon">
+            <img src="profile.png" alt="profile icon" class="side-icons">
+          </div>
+          <div class="detail-content">
+            <div class="detail-label">Occupant</div>
+            <div class="detail-value" id="customer-name">N/A</div>
+          </div>
+        </div>
+        
+        <div class="detail-item">
+          <div class="detail-icon">
+            <img src="skillman.png" alt="skillman icon" class="side-icons">
+          </div>
+          <div class="detail-content">
+            <div class="detail-label">Skill Man</div>
+            <!--div class="detail-value" id="skillman-detail">John Doe (0333-1234567)</div-->
+            <div class="detail-value" id="skillman-detail">N/A</div>
+          </div>
+        </div>
+        
+        <div class="detail-item">
+          <div class="detail-icon">
+            <img src="launch.png" alt="rocket icon" class="side-icons">
+          </div>
+          <div class="detail-content">
+            <div class="detail-label">Launched By</div>
+            <div class="detail-value" id="reciever-name">N/A</div>
+          </div>
+        </div>
+        
+        <div class="detail-item">
+          <div class="detail-icon">
+            <img src="time.png" alt="time icon" class="side-icons">
+          </div>
+          <div class="detail-content">
+            <div class="detail-label">Initiate Time</div>
+            <div class="detail-value" id="initiate-time">N/A</div>
+          </div>
+        </div>
+        
+        <div class="detail-item">
+          <div class="detail-icon">
+            <img src="assign-time.png" alt="assign time icon" class="side-icons">
+          </div>
+          <div class="detail-content">
+            <div class="detail-label">Assign Time</div>
+            <div class="detail-value" id="assign-time">N/A</div>
+          </div>
+        </div>
+        
+        <div class="detail-item">
+          <div class="detail-icon">
+            <img src="check.png" alt="check icon" class="side-icons">
+          </div>
+          <div class="detail-content">
+            <div class="detail-label">Completion Time</div>
+            <div class="detail-value" id="completion-time">N/A</div>
+          </div>
+        </div>
+        
+        <div class="detail-item">
+          <div class="detail-icon">
+            <img src="rating.png" alt="rating icon" class="side-icons">
+          </div>
+          <div class="detail-content">
+            <div class="detail-label">Rating</div>
+            <div class="detail-value" id="rating-value">
+              <i class="fas fa-star" style="color: gold;"></i>
+              <i class="fas fa-star" style="color: gold;"></i>
+              <i class="fas fa-star" style="color: gold;"></i>
+              <i class="fas fa-star" style="color: gold;"></i>
+              <i class="fas fa-star-half-alt" style="color: gold;"></i>
+              4.5(N/A)
+            </div>
+          </div>
+        </div>
+        
+        
+        <div class="detail-item">
+          <div class="detail-icon">
+            <img src="reviews.png" alt="review icon" class="side-icons">
+          </div>
+          <div class="detail-content">
+            <div class="detail-label">Review</div>
+            <div class="detail-value" id="review">N/A</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Right Panel -->
+      <div class="right-panel">
+        <div class="complaint-header">
+          <h1 class="complaint-id" id="complaint-id-header">N/A</h1>
+          <span class="priority-badge priority-urgent" id="complaint-priority">N/A</span>
+        </div>
+        
+        <div class="address-section">
+          <!--p class="address-text" id="location">GE DP -> Tanveer Naqvi -> Apartment 1, Type Sldrs Qtrs, Building S-III/54</p-->
+          <p class="address-text" id="location">N/A</p>
+          <span class="status-badge status-in-progress" id="complaint-status">Ongoing</span>
+        </div>
+
+        <div id="complaint-type">N/A</div>
+        
+        <div class="contact-section">
+          <div class="contact-info" id="customer-contact">Contact : N/A</div>
+          <div class="action-buttons">
+            <button class="whatsapp-btn" id="whatsapp-btn">
+              <i class="fab fa-whatsapp"></i> Whatsapp
+            </button>
+            <!--button class="print-btn" id="print-btn">
+              <i class="fas fa-print"></i> Print
+            </button-->
+          </div>
+        </div>
+        
+        <div class="detail-tabs">
+          <div class="tab active" data-tab="complaint-detail">History</div>
+          <div class="tab" data-tab="mark-complaint">Helper Skillmen</div>
+        </div>
+        
+        <div class="tab-content active" id="complaint-detail">
+          <h3>Complaint's History</h3>
+          
+          <div class="form-group">
+
+            <table class="complaints-table">
+              <thead>
+                <tr>
+                  <th>ID </th>
+                  <th>Date </th>
+                  <th>Location </th>
+                  <th>Nature </th>
+                  <th>Nature Type </th>
+                  <th>Skillman </th>
+                  <th>Status </th>
+                </tr>
+              </thead>
+              <tbody>
+                <!--Will be populated dynamically-->
+              </tbody>
+            </table>
+
+          </div>
+        </div>
+        
+        <div class="tab-content" id="mark-complaint">
+
+            <div class="helper-section-header">
+              <h3>Helper Skillmen</h3>
+            </div>
+          <div class="Helpers">
+            
+            <table class="helper-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Name</th>
+                  <th>Phone Number</th>
+                  <th>Designation</th>
+                  <th>Subdivision</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="helpers-table-body">
+                <!-- Will be populated dynamically -->
+                <tr>
+                  <td colspan="6" style="text-align: center; padding: 20px;">
+                    <i class="fas fa-spinner fa-spin"></i> Loading helpers data...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+<script>
+  const hamburgerBtn = document.getElementById("hamburger-btn");
+  const navBlock = document.querySelector(".navigation-block");
+
+  // Toggle navigation on hamburger click
+  hamburgerBtn.addEventListener("click", (e) => {
+    e.stopPropagation(); // Prevent click from bubbling to document
+    navBlock.classList.toggle("active");
+  });
+
+  // Close navigation when clicking outside
+  document.addEventListener("click", (e) => {
+    // Check if click is outside the navigation block and hamburger button
+    if (!navBlock.contains(e.target) && e.target !== hamburgerBtn) {
+      navBlock.classList.remove("active");
+    }
+  });
+
+  // Optional: Prevent clicks inside navigation from closing it
+  navBlock.addEventListener("click", (e) => {
+    e.stopPropagation();
+  });
+</script>
+
+
+<script>
+// Add this script to control navigation visibility based on backend permissions
+document.addEventListener('DOMContentLoaded', async function() {
+    try {
+        const authToken = localStorage.getItem('authToken');
+        if (!authToken) {
+            console.error('No authentication token found');
+            return;
+        }
+
+        // Fetch allowed pages from backend
+        const response = await fetch(`${SERVER_URL}/api/allowed-pages`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${authToken}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch allowed pages');
+        }
+
+        const data = await response.json();
+        
+        if (data.success) {
+            // Process navigation items based on allowed pages
+            processNavigationItems(data.allowedPages, data.navigationItems);
+        }
+    } catch (error) {
+        console.error('Error fetching allowed pages:', error);
+        // In case of error, you might want to show a default set of navigation items
+        // or handle it according to your application's requirements
+    }
+});
+
+function processNavigationItems(allowedPages, navigationItems) {
+    // Process header navigation items
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+        const href = item.getAttribute('href');
+        if (href) {
+            const pageName = href; // Get the page name without extension
+            
+            // Check if this category has an accessible page
+            if (navigationItems[pageName]) {
+                // Set the href to the first accessible page in this category
+                item.setAttribute('href', `${navigationItems[pageName]}.html`);
+                item.style.display = 'flex';
+            } else {
+                item.style.display = 'none';
+            }
+        }
+    });
+    
+    // Process hamburger menu navigation items
+    const hamburgerItems = document.querySelectorAll('.navi-block-items');
+    hamburgerItems.forEach(item => {
+        const href = item.getAttribute('href');
+        if (href) {
+            const pageName = href; // Get the page name without extension
+            
+            // Check if this category has an accessible page
+            if (navigationItems[pageName]) {
+                // Set the href to the first accessible page in this category
+                item.setAttribute('href', `${navigationItems[pageName]}.html`);
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        }
+    });
+    
+    // Process sidebar navigation items (use the allowedPages array)
+    const sidebarItems = document.querySelectorAll('.complaints-option');
+    sidebarItems.forEach(item => {
+        const href = item.getAttribute('href');
+        if (href) {
+            const pageName = getPageNameFromHref(href);
+            if (allowedPages.includes(pageName) || item.classList.contains('active')) {
+                item.style.display = 'flex';
+            } else {
+                item.style.display = 'none';
+            }
+        }
+    });
+}
+
+function getPageNameFromHref(href) {
+    if (!href) return '';
+    
+    // Extract page name from href (e.g., "dashboard.html" -> "dashboard")
+    const pageWithExtension = href.split('/').pop();
+    return pageWithExtension.split('.')[0];
+}
+</script>
+
+
+<script>
+  
+  let USER_ID = localStorage.getItem('UserId');
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById("user-id").textContent = USER_ID;
+      localStorage.removeItem('UserId');
+    });
+
+
+//show Notification
+function showNotification(message, type = 'success', duration = 3000) {
+  const notificationArea = document.getElementById('notification-area');
+  
+  // Create notification element
+  const notification = document.createElement('div');
+  notification.className = `notification ${type}`;
+  
+  // Set icon based on type
+  let icon;
+  switch(type) {
+    case 'success': icon = 'fa-check-circle'; break;
+    case 'error': icon = 'fa-exclamation-circle'; break;
+    case 'warning': icon = 'fa-exclamation-triangle'; break;
+    default: icon = 'fa-info-circle';
+  }
+  
+  notification.innerHTML = `
+    <i class="fas ${icon}"></i>
+    ${message}
+  `;
+  
+  // Add to notification area
+  notificationArea.appendChild(notification);
+  
+  // Auto-remove after duration
+  setTimeout(() => {
+    notification.style.opacity = '0';
+    setTimeout(() => notification.remove(), 300);
+  }, duration);
+}
+
+
+
+
+  document.addEventListener('DOMContentLoaded', function() {
+
+    // DOM Elements
+    const logoutBtn = document.getElementById('logout-btn');
+    
+    logoutBtn.addEventListener('click', async () => {
+      try {
+        const authToken = localStorage.getItem('authToken');
+        const response = await fetch(SERVER_URL+'/logout', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${authToken}`,'Content-Type': 'application/json' }
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          console.log('Logout success:', data);
+          //alert('Logged out successfully!');
+          // 👇 you can add more procedural lines here
+          // e.g., redirect:
+          showNotification('Logging out');
+          localStorage.removeItem('authToken');
+          setTimeout(() => {
+            window.location.href = 'login.html';
+          }, 1000); // 1000 ms = 1 sec
+        } else {
+          console.error('Logout failed:', data);
+          alert('Logout failed!');
+        }
+
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Something went wrong!');
+      }
+    });
+    
+  });
+
+
+
+
+
+// Global variables
+let tempComplaintId = null;
+let complaintData = [];
+
+// Main function to handle the process
+document.addEventListener('DOMContentLoaded', function() {
+    // Extract encrypted ID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const encryptedId = urlParams.toString();
+
+    if (encryptedId) {
+        console.log('Encrypted ID from URL:', encryptedId);
+        
+        // Try to decrypt with your backend API
+        const API_URL = SERVER_URL;
+        decryptId(encryptedId, API_URL);
+    } else {
+        console.error('No encrypted ID found in URL');
+        // Go back to previous page if no encrypted ID
+        setTimeout(() => {
+            location.href = 'all-complaints.html';
+        }, 500);
+    }
+
+    // Set up print button
+    document.getElementById('print-btn').addEventListener('click', function() {
+        window.print();
+    });
+
+    // Set up tab functionality
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+            // Remove active class from all tabs and content
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            // Add active class to clicked tab
+            this.classList.add('active');
+            
+            // Show corresponding content
+            const tabName = this.getAttribute('data-tab');
+            document.getElementById(tabName).classList.add('active');
+        });
+    });
+});
+
+// Function to decrypt the complaint ID
+async function decryptId(encryptedId, baseUrl) {
+    try {
+        console.log(`Calling API: ${baseUrl}/api/decrypt-id`);
+        const authToken = localStorage.getItem('authToken');
+        const response = await fetch(`${baseUrl}/api/decrypt-id`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${authToken}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ encrypted_id: encryptedId })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Server returned ${response.status} ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            console.log('Decrypted ID:', data.decrypted_id);
+            tempComplaintId = data.decrypted_id;
+            
+            // After successful decryption, fetch the complaint data
+            await fetchComplaintData();
+        } else {
+            console.error('Decryption failed:', data.message);
+            // Go back to previous page if decryption failed
+            setTimeout(() => {
+              location.href = 'all-complaints.html';
+            }, 500);
+        }
+    } catch (error) {
+        console.error('Request failed:', error);
+        
+        // Show error message to user
+        const errorDiv = document.createElement('div');
+        errorDiv.style.cssText = 'position:fixed; top:10px; left:50%; transform:translateX(-50%); background:red; color:white; padding:15px; z-index:10000; border-radius:5px; text-align:center;';
+        errorDiv.innerHTML = 'Error loading complaint details.<br>Redirecting back...';
+        document.body.appendChild(errorDiv);
+        
+        // Go back to previous page after a short delay
+        setTimeout(() => {
+            
+            location.href = 'all-complaints.html';
+        }, 500);
+    }
+}
+
+// Function to fetch complaint data
+// Function to fetch complaint data
+async function fetchComplaintData() {
+    try {
+        const authToken = localStorage.getItem('authToken');
+        const response = await fetch(SERVER_URL+`/data?complaintId=${tempComplaintId}`, {
+          method: 'GET',
+          headers: { 'Authorization': `Bearer ${authToken}`,'Content-Type': 'application/json' }
+        });
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const rawData = await response.json();
+
+        // Ensure the data matches required structure
+        complaintData = rawData.map(item => ({
+            customerId: item.customerId,
+            customerName: item.customerName,
+            customerPhone: item.customerPhone,
+            skillmanId: item.skillmanId,
+            skillmanName: item.skillmanName,
+            skillmanContact: item.skillmanContact,
+            userId: item.userId,
+            userAccount: item.userAccount,
+            userName: item.userName,
+            initiateTime: item.initiateTime,
+            assignTime: item.assignTime,
+            completionTime: item.completionTime,
+            rating: item.rating,
+            review: item.review,
+            location: item.location,
+            natureType: item.natureType, // Add this line
+            status: item.status,
+            priority: item.priority
+        }));
+
+        console.log("Formatted Data:", complaintData);
+        showNotification('Complaint data loaded successfully', 'success');
+        
+        // Now you can use the complaintData array globally
+        displayComplaintData();
+
+        await populateComplaintsTable(tempComplaintId);
+        
+        return complaintData;
+    } catch (error) {
+        console.error("Error fetching customer data:", error);
+        showNotification('Error fetching complaint data. Please try again later.', 'error');
+        return [];
+    }
+}
+
+// Function to display the complaint data in the UI
+function displayComplaintData() {
+    if (complaintData.length > 0) {
+        const data = complaintData[0];
+        console.log("Complaint data ready to use:", data);
+        
+        // Update occupant/customer information
+        document.getElementById('customer-name').textContent = data.customerName || 'N/A';
+        document.getElementById('customer-contact').textContent = `Contact: ${data.customerPhone || 'N/A'}`;
+        // Update nature type information
+        document.getElementById('complaint-type').textContent = data.natureType || 'N/A'; // Add this line
+        
+        // Update skillman information
+        if (data.skillmanName) {
+            const skillmanDetail = `${data.skillmanName} (${data.skillmanContact || 'No contact'})`;
+            document.getElementById('skillman-detail').textContent = skillmanDetail;
+        } else {
+            document.getElementById('skillman-detail').textContent = 'Not assigned';
+        }
+        
+        // Update receiver/launcher information
+        if (data.userName) {
+            document.getElementById('reciever-name').textContent = `${data.userName} (${data.userAccount})`;
+        } else {
+            document.getElementById('reciever-name').textContent = data.userAccount || 'N/A';
+        }
+        
+        // Update timestamps
+        document.getElementById('initiate-time').textContent = formatDateTime(data.initiateTime);
+        document.getElementById('assign-time').textContent = data.assignTime ? formatDateTime(data.assignTime) : 'Not assigned';
+        document.getElementById('completion-time').textContent = data.completionTime ? formatDateTime(data.completionTime) : 'Not completed';
+        
+        // Update rating
+        updateRatingDisplay(data.rating);
+        
+        // Update review
+        document.getElementById('review').textContent = data.review || 'No review available';
+        
+        // Update complaint header
+        document.getElementById('complaint-id-header').textContent = tempComplaintId || 'N/A';
+        
+        // Update priority badge
+        updatePriorityBadge(data.priority);
+        
+        // Update location
+        document.getElementById('location').textContent = data.location || 'N/A';
+        
+        // Update status badge
+        updateStatusBadge(data.status);
+        
+        // Set up WhatsApp button
+        setupWhatsAppButton(data.customerPhone);
+    } else {
+        console.error("No complaint data available to display");
+        showNotification('No complaint data available to display', 'warning');
+    }
+}
+
+// Helper function to format date/time
+function formatDateTime(dateTimeString) {
+    if (!dateTimeString) return 'N/A';
+    
+    try {
+        const date = new Date(dateTimeString);
+        return date.toLocaleString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    } catch (e) {
+        console.error("Error formatting date:", e);
+        showNotification('Error formatting date', 'error');
+        return dateTimeString;
+    }
+}
+
+// Function to update rating display
+function updateRatingDisplay(rating) {
+    const ratingElement = document.getElementById('rating-value');
+    
+    if (rating !== null && rating !== undefined) {
+        // Clear existing content
+        ratingElement.innerHTML = '';
+        
+        // Add star icons based on rating
+        const fullStars = Math.floor(rating);
+        const hasHalfStar = rating % 1 >= 0.5;
+        
+        // Add full stars
+        for (let i = 0; i < fullStars; i++) {
+            const star = document.createElement('i');
+            star.className = 'fas fa-star';
+            star.style.color = 'gold';
+            ratingElement.appendChild(star);
+        }
+        
+        // Add half star if needed
+        if (hasHalfStar) {
+            const halfStar = document.createElement('i');
+            halfStar.className = 'fas fa-star-half-alt';
+            halfStar.style.color = 'gold';
+            ratingElement.appendChild(halfStar);
+        }
+        
+        // Add empty stars for remaining
+        const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+        for (let i = 0; i < emptyStars; i++) {
+            const emptyStar = document.createElement('i');
+            emptyStar.className = 'far fa-star';
+            emptyStar.style.color = 'gold';
+            ratingElement.appendChild(emptyStar);
+        }
+        
+        // Add rating text
+        const ratingText = document.createTextNode(` ${rating.toFixed(1)}`);
+        ratingElement.appendChild(ratingText);
+    } else {
+        ratingElement.innerHTML = 'No rating available';
+    }
+}
+
+// Function to update priority badge
+function updatePriorityBadge(priority) {
+    const priorityElement = document.getElementById('complaint-priority');
+    
+    if (priority) {
+        priorityElement.textContent = priority;
+        
+        // Remove all existing priority classes
+        priorityElement.classList.remove('priority-immediate', 'priority-urgent', 'priority-routine', 'priority-deferred');
+        
+        // Add appropriate class based on priority
+        const priorityClass = getPriorityClass(priority);
+        priorityElement.classList.add(priorityClass);
+    } else {
+        priorityElement.textContent = 'N/A';
+        priorityElement.classList.remove('priority-immediate', 'priority-urgent', 'priority-routine', 'priority-deferred');
+    }
+}
+
+// Helper function to get priority CSS class
+function getPriorityClass(priority) {
+    if (!priority) return '';
+    
+    const priorityLower = priority.toLowerCase();
+    if (priorityLower.includes('immediate')) return 'priority-immediate';
+    if (priorityLower.includes('urgent')) return 'priority-urgent';
+    if (priorityLower.includes('routine')) return 'priority-routine';
+    if (priorityLower.includes('deferred')) return 'priority-deferred';
+    
+    return 'priority-medium'; // default
+}
+
+// Function to update status badge
+function updateStatusBadge(status) {
+    const statusElement = document.getElementById('complaint-status');
+    
+    if (status) {
+        statusElement.textContent = status;
+        
+        // Remove all existing status classes
+        statusElement.classList.remove(
+            'status-in-progress', 
+            'status-completed', 
+            'status-deferred', 
+            'status-unassigned'
+        );
+        
+        // Add appropriate class based on status
+        const statusClass = getStatusClass(status);
+        statusElement.classList.add(statusClass);
+    } else {
+        statusElement.textContent = 'N/A';
+        statusElement.classList.remove(
+            'status-in-progress', 
+            'status-completed', 
+            'status-deferred', 
+            'status-unassigned'
+        );
+    }
+}
+
+// Helper function to get status CSS class
+function getStatusClass(status) {
+    if (!status) return '';
+    
+    const statusLower = status.toLowerCase();
+    if (statusLower.includes('progress')) return 'status-in-progress';
+    if (statusLower.includes('complete')) return 'status-completed';
+    if (statusLower.includes('deffer')) return 'status-deferred';
+    if (statusLower.includes('un-assign')) return 'status-unassigned';
+    
+    return 'status-in-progress'; // default
+}
+
+// Function to set up WhatsApp button
+function setupWhatsAppButton(phoneNumber) {
+    const whatsappBtn = document.getElementById('whatsapp-btn');
+    
+    if (phoneNumber) {
+        // Clean the phone number (remove any non-digit characters)
+        const cleanPhone = phoneNumber.replace(/\D/g, '');
+        
+        // Set up click event
+        whatsappBtn.onclick = async function() {
+            try {
+              const authToken = localStorage.getItem('authToken');
+                // Call the API at port 3000
+                const response = await fetch(SERVER_URL+'/api/send-reviewing-request', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        phoneNumber: cleanPhone,
+                        complaintId: tempComplaintId
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`API returned ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                // Print the response message to console
+                console.log('WhatsApp API Response:', data.message);
+                showNotification('WhatsApp API Response: '+data.message, 'info');
+                
+                // Optionally show a success message to the user
+                //alert(`WhatsApp message initiated: ${data.message}`);
+                showNotification('WhatsApp message initiated successfully', 'success');
+                
+            } catch (error) {
+                console.error('Error calling WhatsApp API:', error);
+                //alert('Failed to initiate WhatsApp message. Please try again.');
+                showNotification('Failed to initiate WhatsApp message. Please try again.', 'error');
+            }
+        };
+        
+        // Enable the button
+        whatsappBtn.disabled = false;
+        whatsappBtn.style.opacity = '1';
+    } else {
+        // Disable the button if no phone number
+        whatsappBtn.disabled = true;
+        whatsappBtn.style.opacity = '0.6';
+    }
+}
+</script>
+
+
+
+<script>
+  // Function to populate complaints table with data from backend
+async function populateComplaintsTable(complaintId = null) {
+    try {
+        // Get reference to table body
+        const tableBody = document.querySelector('.complaints-table tbody');
+        
+        // Show loading state
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="7" style="text-align: center; padding: 20px;">
+                    <i class="fas fa-spinner fa-spin"></i> Loading complaints data...
+                </td>
+            </tr>
+        `;
+        
+        // Build API URL
+        let apiUrl = SERVER_URL+'/api/users-history';
+        if (tempComplaintId) {
+            apiUrl += `?complaintId=${encodeURIComponent(tempComplaintId)}`;
+        }
+        const authToken = localStorage.getItem('authToken');
+        // Fetch data from backend
+        const response = await fetch(apiUrl, {
+          method: 'GET',
+          headers: { 'Authorization': `Bearer ${authToken}`,'Content-Type': 'application/json' }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        
+        const complaintsData = await response.json();
+        
+        // Clear table
+        tableBody.innerHTML = '';
+        
+        // Check if data is empty
+        if (complaintsData.length === 0) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="7" style="text-align: center; padding: 20px;">
+                        No complaints found.
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+        
+        // Add rows to table
+        complaintsData.forEach(complaint => {
+            const row = document.createElement('tr');
+            
+            // Format date if available
+            const formattedDate = complaint.date ? formatDate(complaint.date) : 'N/A';
+            
+            // Determine status class
+            const statusClass = getStatusClass(complaint.status);
+            
+row.innerHTML = `
+    <td>
+        <a href="#" class="complaint-link" data-id="${complaint.id}">
+            ${complaint.id || 'N/A'}
+        </a>
+    </td>
+    <td>${formattedDate}</td>
+    <td>${complaint.location || 'N/A'}</td>
+    <td>${complaint.nature || 'N/A'}</td>
+    <td>${complaint.natureType || 'N/A'}</td>
+    <td>${complaint.skillman || 'Not Assigned'}</td>
+    <td><span class="status-badge ${statusClass}">${complaint.status || 'Unknown'}</span></td>
+`;
+            
+            // Make row clickable to view details
+            row.style.cursor = 'pointer';
+            row.addEventListener('click', () => {
+                // Here you would navigate to the complaint details page
+                // For example: window.location.href = `complaint-details.html?id=${complaint.id}`;
+                console.log(`Clicked on complaint: ${complaint.id}`);
+            });
+            
+            tableBody.appendChild(row);
+        });
+        
+    } catch (error) {
+        console.error('Error populating complaints table:', error);
+        showNotification('Error loading complaints data. Please try again later.', 'error');
+        
+        // Show error message in table
+        const tableBody = document.querySelector('.complaints-table tbody');
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="7" style="text-align: center; padding: 20px; color: #d32f2f;">
+                    <i class="fas fa-exclamation-circle"></i> Failed to load complaints data.
+                </td>
+            </tr>
+        `;
+    }
+}
+
+// Helper function to format date
+function formatDate(dateString) {
+    try {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        });
+    } catch (e) {
+        return dateString;
+    }
+}
+
+// Helper function to determine status CSS class
+function getStatusClass(status) {
+    if (!status) return 'status-unknown';
+    
+    const statusLower = status.toLowerCase();
+    if (statusLower.includes('complete')) return 'status-completed';
+    if (statusLower.includes('progress')) return 'status-in-progress';
+    if (statusLower.includes('unassign') || statusLower.includes('pending')) return 'status-un-assigned';
+    if (statusLower.includes('defer')) return 'status-deferred';
+    if (statusLower.includes('sna')) return 'status-sna';
+    
+    return 'status-unknown';
+}
+</script>
+
+
+
+  <script>
+      document.addEventListener('DOMContentLoaded', function() {
+          // Tab switching functionality
+          const tabs = document.querySelectorAll('.tab');
+          const tabContents = document.querySelectorAll('.tab-content');
+          
+          tabs.forEach(tab => {
+              tab.addEventListener('click', () => {
+              const tabId = tab.getAttribute('data-tab');
+              
+              // Remove active class from all tabs and contents
+              tabs.forEach(t => t.classList.remove('active'));
+              tabContents.forEach(c => c.classList.remove('active'));
+              
+              // Add active class to clicked tab and corresponding content
+              tab.classList.add('active');
+              document.getElementById(tabId).classList.add('active');
+              });
+          });
+          
+          // Print button functionality
+          document.querySelector('.print-btn').addEventListener('click', function() {
+              alert('Print functionality would be implemented here');
+          });
+          
+          // WhatsApp button functionality
+          document.querySelector('.whatsapp-btn').addEventListener('click', function() {
+              //alert('WhatsApp functionality would be implemented here');
+          });
+          
+          // Submit button functionality
+          document.querySelector('.btn-primary').addEventListener('click', function() {
+              alert('Complaint update submitted successfully');
+          });
+          
+          // Mark complaint buttons functionality
+          document.querySelectorAll('.mark-buttons .btn').forEach(button => {
+              button.addEventListener('click', function() {
+              const status = this.textContent.trim();
+              alert(`Complaint marked as: ${status}`);
+              });
+          });
+      });
+  </script>
+
+
+<script>
+  // Function to populate helpers table
+async function populateHelpersTable() {
+    try {
+        
+        const tableBody = document.getElementById('helpers-table-body');
+        if (!tableBody) {
+            console.error('Table body element not found!');
+            return;
+        }
+
+        // Show loading state
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="6" style="text-align: center; padding: 20px;">
+                    <i class="fas fa-spinner fa-spin"></i> Loading helpers data...
+                </td>
+            </tr>
+        `;
+
+        // Fetch data
+        const url = SERVER_URL + `/api/helpers?complaintId=${encodeURIComponent(tempComplaintId)}`;
+        const authToken = localStorage.getItem('authToken');
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: { 'Authorization': `Bearer ${authToken}`,'Content-Type': 'application/json' }
+        });
+
+        // Check content type
+        const contentType = response.headers.get('content-type');
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Response error text:', errorText);
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const helpersData = await response.json();
+
+        // Clear table
+        tableBody.innerHTML = '';
+
+        // Check if data is empty
+        if (helpersData.length === 0) {
+            console.log('No helpers data found');
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 20px;">
+                        No helpers found for this complaint.
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        // Add rows to table
+        helpersData.forEach((helper, index) => {
+            console.log('Processing helper:', helper);
+            
+            const row = document.createElement('tr');
+            
+            // Determine status class and text
+            let statusClass = '';
+            let statusText = '';
+            
+            switch(helper.status) {
+                case 'Active':
+                    statusClass = 'status-active';
+                    statusText = 'Active';
+                    break;
+                case 'In-Progress':
+                    statusClass = 'status-inprogress';
+                    statusText = 'In-Progress';
+                    break;
+                default:
+                    statusClass = 'status-inactive';
+                    statusText = 'Inactive';
+            }
+            
+            row.innerHTML = `
+                <td>${index + 1}</td>
+                <td>${helper.name || 'N/A'}</td>
+                <td>${helper.phone || 'N/A'}</td>
+                <td>${helper.designation || 'N/A'}</td>
+                <td>${helper.subdivision || 'N/A'}</td>
+                <td><span class="helper-status ${statusClass}">${statusText}</span></td>
+            `;
+            
+            // Make the row clickable
+            row.style.cursor = 'pointer';
+            row.addEventListener('click', () => {
+                console.log('Clicked helper:', helper.id, helper.name);
+                assignHelperToComplaint(helper.id, helper.name);
+            });
+            
+            tableBody.appendChild(row);
+        });
+
+
+    } catch (error) {
+        console.error('Error in populateHelpersTable:', error);
+        const tableBody = document.getElementById('helpers-table-body');
+        if (tableBody) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 20px; color: #d32f2f;">
+                        <i class="fas fa-exclamation-circle"></i> Failed to load helpers data: ${error.message}
+                    </td>
+                </tr>
+            `;
+        }
+    }
+}
+  
+  
+  // Call the function when the Mark Complaint tab is clicked
+  document.querySelector('[data-tab="mark-complaint"]').addEventListener('click', function() {
+    // Only load data if table is empty or showing loading/error
+    const tableBody = document.getElementById('helpers-table-body');
+    if (tableBody.innerHTML.includes('Loading') || tableBody.innerHTML.includes('Failed') || tableBody.innerHTML.includes('No helpers')) {
+      populateHelpersTable();
+    }
+  });
+
+document.addEventListener('click', (e) => {
+  const link = e.target.closest('.complaint-link');
+  if (!link) return;
+  e.preventDefault();
+  const complaintId = link.dataset.id;
+  handleComplaintClick(complaintId);
+});
+
+  
+async function handleComplaintClick(complaintId) {
+  try {
+    const authToken = localStorage.getItem('authToken');
+    
+    // Show loading state if needed
+    showNotification('Loading complaint details...', 'info', 2000);
+    
+    // Send complaint ID to encryption API
+    const response = await fetch(`${SERVER_URL}/api/encrypt-id`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${authToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ complaint_id: complaintId })
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to encrypt complaint ID');
+    }
+    
+    const data = await response.json();
+    
+    if (data.success && data.encrypted_id) {
+      // Redirect to complaint details page with encrypted ID
+      showNotification('Navigating to complaint details...', 'success', 2000);
+      window.location.href = `complaint-details.html?${data.encrypted_id}`;
+      console.log(`Redirecting to complaint-details?${data.encrypted_id}`);
+
+    } else {
+      throw new Error(data.message || 'Failed to encrypt ID');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    showNotification('Failed to open complaint details: ' + error.message, 'error', 3000);
+  }
+}
+</script>
+  <script src="chat-bot.js"></script>
+
+    
+</body>
+</html>

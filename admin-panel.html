@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+<script src="server-url.js"></script>
+  <script>
+    const page = 'admin-panel';
+  </script>
+  <script src="verification.js"></script>
+  <link rel="icon" type="image/png" href="logo.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MES CMS - Admin</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+      scroll-behavior: smooth;
+      user-select: none;
+      scrollbar-width: thin;
+      scrollbar-color: rgb(138, 119, 119) transparent;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    :root {
+      --primary: #8c1c1c;
+      --primary-light: #a83232;
+      --secondary: #6c757d;
+      --light: #f8f9fa;
+      --dark: #212529;
+      --gray: #e9ecef;
+      --border: #ced4da;
+      --error: #dc3545;
+      --success: #4caf50;
+      --warning: #ff9800;
+      --info: #2196F3;
+      --card-bg: rgba(255, 255, 255, 0.95);
+      --nav-active: rgba(136, 28, 28, 0.15);
+      --nav-hover: rgba(136, 28, 28, 0.08);
+    }
+
+    body {
+      display: none;
+      background-color: #eef2f5;
+      padding-bottom: 40px;
+      overflow-x: hidden;
+    }
+
+    /* Admin Panel Styles */
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .admin-title {
+      font-size: 24px;
+      color: var(--dark);
+    }
+
+    .add-user-btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .add-user-btn:hover {
+      background-color: var(--primary-light);
+    }
+
+    .users-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      border: 1px solid #ffc4c4; /* Add outer border instead of individual cell borders */
+    }
+
+    .users-table th,
+    .users-table td {
+      padding: 8px 15px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      font-size: 15px;
+      border: 1px solid #ffc4c4; /* vertical line color */
+    }
+
+    .users-table th {
+      background-color: var(--gray);
+      font-weight: bold;
+      color: var(--primary);
+      background: rgba(136, 28, 28, 0.1);
+    }
+
+    .users-table tr:hover {
+      background-color: rgba(0,0,0,0.02);
+    }
+
+    .action-btn {
+      padding: 6px 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-right: 5px;
+      font-size: 14px;
+    }
+
+    .edit-btn {
+      background-color: var(--info);
+      color: white;
+    }
+
+    .delete-btn {
+      background-color: var(--error);
+      color: white;
+    }
+
+    .role-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .admin-badge {
+      background-color: var(--primary);
+      color: white;
+    }
+
+    .user-badge {
+      background-color: var(--secondary);
+      color: white;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .active-badge {
+      background-color: var(--success);
+      color: white;
+    }
+
+    .inactive-badge {
+      background-color: var(--secondary);
+      color: white;
+    }
+
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      background-color: white;
+      padding: 25px;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      max-height: 95vh;
+      overflow-x: hidden;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modal-title {
+      font-size: 20px;
+      color: var(--dark);
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: var(--secondary);
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+      color: var(--dark);
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 16px;
+    }
+
+    .checkbox-group {
+      margin-top: 15px;
+      max-height: 200px;
+      overflow-y: auto;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 10px;
+    }
+
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .checkbox-item input {
+      margin-right: 10px;
+    }
+
+    .form-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .cancel-btn {
+      background-color: var(--secondary);
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .save-btn {
+      background-color: var(--success);
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .hamburger {
+      display: none;
+    }
+
+    /* Loading spinner */
+    .spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      border-left: 4px solid var(--primary);
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+      display: none;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .error-message {
+      color: var(--error);
+      text-align: center;
+      padding: 10px;
+      display: none;
+    }
+
+    .form-text {
+      font-size: 12px;
+      color: #6c757d;
+      margin-top: 5px;
+      display: block;
+    }
+
+    /* Notification Styles */
+    .notification-area {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1100;
+      max-width: 350px;
+      width: 100%;
+    }
+
+    .notification {
+      padding: 15px 20px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+      animation: slideIn 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+    }
+
+    .notification::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 4px;
+      width: 100%;
+      background: rgba(255,255,255,0.5);
+      animation: progress 3s linear;
+    }
+
+    .notification.success {
+      background: #4CAF50;
+    }
+
+    .notification.error {
+      background: #F44336;
+    }
+
+    .notification.warning {
+      background: #FF9800;
+    }
+
+    .notification.info {
+      background: #2196F3;
+    }
+
+    @keyframes progress {
+      from { width: 100%; }
+      to { width: 0%; }
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .nav-bar {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .content {
+        margin-top: 0px;
+      }
+      
+      .nav-item {
+        padding: 15px;
+        font-size: 15px;
+      }
+      
+      .logo h2 {
+        font-size: 16px;
+      }
+      
+      .nav-container {
+        margin-left: 0;
+        justify-content: center;
+        display: none;
+      }
+      
+      header {
+        flex-direction: row;
+        height: auto;
+        padding: 5px;
+        gap: 15px;
+        margin-top: 0px;
+      }
+      
+      .logo {
+        margin-bottom: 0px;
+      }
+
+      .logo .logo-image {
+        width: 60px;
+        height: auto;
+        margin-bottom: 0px;
+        padding: 2px;
+      }
+
+      .user h2 {
+        font-size: 14px;
+        margin: 0px;
+      }
+      
+      .logout-btn {
+        padding: 4px 8px;
+        font-size: 15px;
+        font-weight: 650;
+      }
+
+      .hamburger {
+        display: flex;
+        height: 35px;
+        width: 35px;
+        background-color: rgba(0,0,0,0.2);
+        cursor: pointer;
+        padding: 8px;
+        margin-right: 10px;
+        border-radius: 4px;
+      }
+
+      .hamburger i {
+        font-size: 20px;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+      }
+
+      .navigation-block {
+        position: fixed;
+        top: 60px;
+        right: -250px;
+        display: flex;
+        flex-direction: column;
+        background-color: var(--primary);
+        width: 220px;
+        border-radius: 8px;
+        padding: 10px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        z-index: 999;
+        transition: right 0.3s ease-in-out;
+        border: 2px solid rgba(0, 0, 0, 0.1);
+      }
+
+      .navigation-block .navi-block-items {
+        color: white;
+        padding: 12px;
+        font-size: 16px;
+        text-decoration: none;
+        transition: background 0.2s ease;
+        font-weight: 500;
+      }
+
+      .navigation-block .navi-block-items:hover {
+        background: rgba(255,255,255,0.1);
+        border-radius: 5px;
+      }
+
+      .navigation-block.active {
+        right: 10px;
+      }
+      
+      /* Responsive table */
+      .users-table {
+        display: block;
+        overflow-x: auto;
+      }
+      
+      .admin-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+      }
+      
+      .add-user-btn {
+        width: 100%;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="common-styles.css">
+</head>
+<body>
+
+  <!-- Notification Container -->
+  <div class="notification-area" id="notification-area"></div>
+
+  <!--Header Section-->
+  <header>
+    <div class="logo">
+      <div class="logo-image">
+        <img src="logo.jpg" alt="MES CMS Logo">
+      </div>
+      <h2>MES CMS</h2>
+    </div>
+
+    <div class="user">
+      <h2 id="user-id">Unknown</h2>
+      <button class="logout-btn" id="logout-btn">Logout</button>
+      <div class="hamburger">
+        <i class="fas fa-bars" id="hamburger-btn"></i>
+        <div class="navigation-block">
+          <a href="dashboard" class="navi-block-items">Dashboard</a>
+          <a href="complaints" class="navi-block-items">Complaints</a>
+          <a href="users" class="navi-block-items">Users</a>
+          <a href="reporting" class="navi-block-items">Reporting</a>
+          <div class="navi-block-items active">Admin</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="nav-bar">
+    <div class="nav-container">
+      <a href="dashboard" class="nav-item">
+        <i class="fas fa-chart-line"></i>
+        Dashboard
+      </a>
+      <a href="complaints" class="nav-item">
+        <i class="fas fa-ticket-alt"></i>
+        Complaints
+      </a>
+      <a href="users" class="nav-item">
+        <i class="fas fa-users"></i>
+        Users
+      </a>
+      <a href="reporting" class="nav-item">
+        <i class="fas fa-file-alt"></i>
+        Reporting
+      </a>
+      <div class="nav-item active">
+        <i class="fas fa-user-tie"></i>
+        Admin
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="admin-header">
+      <h2 class="admin-title">User Management</h2>
+      <button class="add-user-btn" id="add-user-btn">
+        <i class="fas fa-plus"></i> Add New User
+      </button>
+    </div>
+
+    <!-- Loading and error elements -->
+    <div class="spinner" id="loading-spinner"></div>
+    <div class="error-message" id="error-message"></div>
+
+    <table class="users-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Role</th>
+          <th>Username</th>
+          <th>Access Permissions</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="users-table-body">
+        <!-- Users will be populated here by JavaScript -->
+      </tbody>
+    </table>
+  </div>
+  
+  <!-- Add/Edit User Modal -->
+  <div class="modal" id="user-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-title">Add New User</h3>
+        <button class="close-btn">&times;</button>
+      </div>
+      <form id="user-form">
+        <!-- ID Field (visible only when adding new user) -->
+        <div class="form-group" id="id-field-group">
+          <label class="form-label" for="user-id-input">ID</label>
+          <input type="text" class="form-input" id="user-id-input" required>
+          <small class="form-text">Unique identifier for the user</small>
+        </div>
+        
+        <input type="hidden" id="user-id">
+        
+        <div class="form-group">
+          <label class="form-label" for="username">Role</label>
+          <input type="text" class="form-input" id="username" required>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="password">Password</label>
+          <input type="password" class="form-input" id="password">
+          <small class="form-text">Leave blank to keep current password</small>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="role">Username</label>
+          <input type="text" class="form-input" id="role" required placeholder="Enter role">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="status">Status</label>
+          <select class="form-input" id="status" required>
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Access Permissions</label>
+          <div class="checkbox-group" id="permissions-container">
+            <!-- Permissions will be populated dynamically -->
+          </div>
+        </div>
+        
+        <div class="form-buttons">
+          <button type="button" class="cancel-btn" id="cancel-btn">Cancel</button>
+          <button type="submit" class="save-btn">Save User</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+
+<script>
+  
+    
+    let USER_ID = localStorage.getItem('UserId');
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById("user-id").textContent = USER_ID;
+      localStorage.removeItem('UserId');
+    });
+// Add this script to control navigation visibility based on backend permissions
+document.addEventListener('DOMContentLoaded', async function() {
+    try {
+        const authToken = localStorage.getItem('authToken');
+        if (!authToken) {
+            console.error('No authentication token found');
+            return;
+        }
+
+        // Fetch allowed pages from backend
+        const response = await fetch(`${SERVER_URL}/api/allowed-pages`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${authToken}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch allowed pages');
+        }
+
+        const data = await response.json();
+        
+        if (data.success) {
+            // Process navigation items based on allowed pages
+            processNavigationItems(data.allowedPages, data.navigationItems);
+        }
+    } catch (error) {
+        console.error('Error fetching allowed pages:', error);
+        // In case of error, you might want to show a default set of navigation items
+        // or handle it according to your application's requirements
+    }
+});
+
+function processNavigationItems(allowedPages, navigationItems) {
+    // Process header navigation items
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+        const href = item.getAttribute('href');
+        if (href) {
+            const pageName = href; // Get the page name without extension
+            
+            // Check if this category has an accessible page
+            if (navigationItems[pageName]) {
+                // Set the href to the first accessible page in this category
+                item.setAttribute('href', `${navigationItems[pageName]}.html`);
+                item.style.display = 'flex';
+            } else {
+                item.style.display = 'none';
+            }
+        }
+    });
+    
+    // Process hamburger menu navigation items
+    const hamburgerItems = document.querySelectorAll('.navi-block-items');
+    hamburgerItems.forEach(item => {
+        const href = item.getAttribute('href');
+        if (href) {
+            const pageName = href; // Get the page name without extension
+            
+            // Check if this category has an accessible page
+            if (navigationItems[pageName]) {
+                // Set the href to the first accessible page in this category
+                item.setAttribute('href', `${navigationItems[pageName]}.html`);
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        }
+    });
+    
+    // Process sidebar navigation items (use the allowedPages array)
+    const sidebarItems = document.querySelectorAll('.complaints-option');
+    sidebarItems.forEach(item => {
+        const href = item.getAttribute('href');
+        if (href) {
+            const pageName = getPageNameFromHref(href);
+            if (allowedPages.includes(pageName) || item.classList.contains('active')) {
+                item.style.display = 'flex';
+            } else {
+                item.style.display = 'none';
+            }
+        }
+    });
+}
+
+function getPageNameFromHref(href) {
+    if (!href) return '';
+    
+    // Extract page name from href (e.g., "dashboard.html" -> "dashboard")
+    const pageWithExtension = href.split('/').pop();
+    return pageWithExtension.split('.')[0];
+}
+</script>
+
+
+  <script>
+
+// Notification function
+function showNotification(message, type = 'success', duration = 3000) {
+  const notificationArea = document.getElementById('notification-area');
+  
+  // Create notification element
+  const notification = document.createElement('div');
+  notification.className = `notification ${type}`;
+  
+  // Set icon based on type
+  let icon;
+  switch(type) {
+    case 'success': icon = 'fa-check-circle'; break;
+    case 'error': icon = 'fa-exclamation-circle'; break;
+    case 'warning': icon = 'fa-exclamation-triangle'; break;
+    default: icon = 'fa-info-circle';
+  }
+  
+  notification.innerHTML = `
+    <i class="fas ${icon}"></i>
+    ${message}
+  `;
+  
+  // Add to notification area
+  notificationArea.appendChild(notification);
+  
+  // Auto-remove after duration
+  setTimeout(() => {
+    notification.style.opacity = '0';
+    setTimeout(() => notification.remove(), 300);
+  }, duration);
+}
+
+// DOM elements
+const usersTableBody = document.getElementById('users-table-body');
+const addUserBtn = document.getElementById('add-user-btn');
+const userModal = document.getElementById('user-modal');
+const modalTitle = document.getElementById('modal-title');
+const userForm = document.getElementById('user-form');
+const userIdInput = document.getElementById('user-id');
+const userIdDisplayInput = document.getElementById('user-id-input');
+const idFieldGroup = document.getElementById('id-field-group');
+const usernameInput = document.getElementById('username');
+const passwordInput = document.getElementById('password');
+const roleInput = document.getElementById('role');
+const statusInput = document.getElementById('status');
+const permissionsContainer = document.getElementById('permissions-container');
+const closeBtn = document.querySelector('.close-btn');
+const cancelBtn = document.getElementById('cancel-btn');
+const hamburgerBtn = document.getElementById("hamburger-btn");
+const navBlock = document.querySelector(".navigation-block");
+const loadingSpinner = document.getElementById('loading-spinner');
+const errorMessage = document.getElementById('error-message');
+
+// Global variables
+let users = [];
+let pages = [];
+
+// Initialize the page
+async function init() {
+  await loadPages();
+  await loadUsers();
+  setupEventListeners();
+}
+
+// Load pages from backend
+async function loadPages() {
+  try {
+    const authToken = localStorage.getItem('authToken');
+    showLoading(true);
+    const response = await fetch(`${SERVER_URL}/api/pages`, {
+          method: 'GET',
+          headers: { 'Authorization': `Bearer ${authToken}`,'Content-Type': 'application/json' }
+        });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch pages: ${response.status}`);
+    }
+    
+    pages = await response.json();
+    renderPageCheckboxes();
+  } catch (error) {
+    showNotification(`Error loading pages: ${error.message}`, 'error');
+  } finally {
+    showLoading(false);
+  }
+}
+
+// Render page checkboxes
+function renderPageCheckboxes() {
+  permissionsContainer.innerHTML = '';
+  
+  pages.forEach(page => {
+    const checkboxItem = document.createElement('div');
+    checkboxItem.className = 'checkbox-item';
+    
+    checkboxItem.innerHTML = `
+      <input type="checkbox" id="page-${page.id}" value="${page.id}">
+      <label for="page-${page.id}">${page.name}</label>
+    `;
+    
+    permissionsContainer.appendChild(checkboxItem);
+  });
+}
+
+// Load users from backend
+async function loadUsers() {
+  try {
+    const authToken = localStorage.getItem('authToken')
+    showLoading(true);
+    const response = await fetch(`${SERVER_URL}/api/users`, {
+          method: 'GET',
+          headers: { 'Authorization': `Bearer ${authToken}`,'Content-Type': 'application/json' }
+        });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch users: ${response.status}`);
+    }
+    
+    users = await response.json();
+    
+    // Ensure all users have a status value, default to 'Active' if null/undefined
+    users = users.map(user => ({
+      ...user,
+      status: user.status || user.is_active || 'Active'
+    }));
+    
+    renderUsersTable();
+  } catch (error) {
+    showNotification(`Error loading users: ${error.message}`, 'error');
+  } finally {
+    showLoading(false);
+  }
+}
+
+// Render users table
+function renderUsersTable() {
+  usersTableBody.innerHTML = '';
+  
+  if (users.length === 0) {
+    usersTableBody.innerHTML = `
+      <tr>
+        <td colspan="6" style="text-align: center;">No users found</td>
+      </tr>
+    `;
+    return;
+  }
+  
+  users.forEach(user => {
+    const row = document.createElement('tr');
+    
+    // Format permissions for display
+    const permissionsText = user.accessPermissions && user.accessPermissions.length > 0 
+      ? user.accessPermissions.join(', ')
+      : 'No permissions';
+    
+    row.innerHTML = `
+      <td>${user.id}</td>
+      <td>${user.username}</td>
+      <td>${user.role || ''}</td>
+      <td>${permissionsText}</td>
+      <td><span class="status-badge ${user.status === 'Active' ? 'active-badge' : 'inactive-badge'}">${user.status}</span></td>
+      <td>
+        <button class="action-btn edit-btn" data-id="${user.id}">
+          <i class="fas fa-edit"></i> Edit
+        </button>
+        <button class="action-btn delete-btn" data-id="${user.id}">
+          <i class="fas fa-trash"></i> Delete
+        </button>
+      </td>
+    `;
+    
+    usersTableBody.appendChild(row);
+  });
+  
+  // Add event listeners to edit and delete buttons
+  document.querySelectorAll('.edit-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const userId = e.currentTarget.getAttribute('data-id');
+      editUser(userId);
+    });
+  });
+  
+  document.querySelectorAll('.delete-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const userId = e.currentTarget.getAttribute('data-id');
+      deleteUser(userId);
+    });
+  });
+}
+
+// Setup event listeners
+function setupEventListeners() {
+  addUserBtn.addEventListener('click', openAddUserModal);
+  closeBtn.addEventListener('click', closeModal);
+  cancelBtn.addEventListener('click', closeModal);
+  userForm.addEventListener('submit', handleFormSubmit);
+  
+  // Close modal when clicking outside
+  window.addEventListener('click', (e) => {
+    if (e.target === userModal) {
+      closeModal();
+    }
+  });
+  
+  // Hamburger menu functionality
+  hamburgerBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    navBlock.classList.toggle("active");
+  });
+
+  // Close navigation when clicking outside
+  document.addEventListener("click", (e) => {
+    if (!navBlock.contains(e.target) && e.target !== hamburgerBtn) {
+      navBlock.classList.remove("active");
+    }
+  });
+
+  // Prevent clicks inside navigation from closing it
+  navBlock.addEventListener("click", (e) => {
+    e.stopPropagation();
+  });
+
+  // Logout functionality
+
+    const logoutBtn = document.getElementById('logout-btn');
+    
+    logoutBtn.addEventListener('click', async () => {
+      try {
+        const authToken = localStorage.getItem('authToken');
+        const response = await fetch(SERVER_URL+'/logout', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${authToken}`,'Content-Type': 'application/json' }
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          document.getElementById('user-id').textContent = 'Unknown';
+          console.log('Logout success:', data);
+          //alert('Logged out successfully!');
+          // 👇 you can add more procedural lines here
+          // e.g., redirect:
+          showNotification('Logging out');
+          localStorage.removeItem('authToken');
+          setTimeout(() => {
+            window.location.href = 'login.html';
+          }, 500); // 1000 ms = 1 sec
+        } else {
+          console.error('Logout failed:', data);
+          alert('Logout failed!');
+        }
+
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Something went wrong!');
+      }
+    });
+}
+
+// Open modal for adding a new user
+// Open modal for adding a new user
+function openAddUserModal() {
+  modalTitle.textContent = 'Add New User';
+  userForm.reset();
+  userIdInput.value = '';
+  roleInput.value = '';
+  statusInput.value = 'Active';
+  
+  // Show ID field for new users and remove required attribute when not needed
+  idFieldGroup.style.display = 'block';
+  userIdDisplayInput.disabled = false;
+  userIdDisplayInput.setAttribute('required', 'true');
+  
+  // Uncheck all permission boxes for new users
+  document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+    checkbox.checked = false;
+  });
+  
+  userModal.style.display = 'flex';
+}
+
+// Open modal for editing an existing user
+async function editUser(userId) {
+  try {
+    const authToken = localStorage.getItem('authToken');
+    showLoading(true);
+    const response = await fetch(`${SERVER_URL}/api/users/${userId}`, {
+          method: 'GET',
+          headers: { 'Authorization': `Bearer ${authToken}`,'Content-Type': 'application/json' }
+        });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch user: ${response.status}`);
+    }
+    
+    let user = await response.json();
+    
+    // Ensure user has a status value, default to 'Active' if null/undefined
+    user.status = user.status || user.is_active || 'Active';
+    
+    if (user) {
+      modalTitle.textContent = 'Edit User';
+      userIdInput.value = user.id;
+      usernameInput.value = user.username;
+      roleInput.value = user.role || '';
+      statusInput.value = user.status;
+      passwordInput.value = '';
+      passwordInput.placeholder = 'Leave blank to keep current password';
+      
+      // Hide ID field for existing users and remove required attribute
+      idFieldGroup.style.display = 'none';
+      userIdDisplayInput.removeAttribute('required');
+      
+      // Set permission checkboxes based on user permissions
+      document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+        checkbox.checked = user.accessPermissions && user.accessPermissions.includes(checkbox.value);
+      });
+      
+      userModal.style.display = 'flex';
+    }
+  } catch (error) {
+    showNotification(`Error loading user: ${error.message}`, 'error');
+  } finally {
+    showLoading(false);
+  }
+}
+
+// Handle form submission
+async function handleFormSubmit(e) {
+  e.preventDefault();
+  
+  const userId = userIdInput.value;
+  const username = usernameInput.value;
+  const password = passwordInput.value;
+  const role = roleInput.value;
+  const status = statusInput.value;
+  
+  // For new users, get the ID from the input field
+  const newUserId = userId || userIdDisplayInput.value;
+  
+  // Manual validation instead of relying on HTML5 validation
+  if (idFieldGroup.style.display !== 'none' && !newUserId) {
+    showNotification('ID is required', 'error');
+    userIdDisplayInput.focus();
+    return;
+  }
+  
+  if (!username) {
+    showNotification('Username is required', 'error');
+    usernameInput.focus();
+    return;
+  }
+  
+  if (!role) {
+    showNotification('Role is required', 'error');
+    roleInput.focus();
+    return;
+  }
+  
+  if (!status) {
+    showNotification('Status is required', 'error');
+    statusInput.focus();
+    return;
+  }
+  
+  // Get selected permissions
+  const accessPermissions = [];
+  document.querySelectorAll('input[type="checkbox"]:checked').forEach(checkbox => {
+    accessPermissions.push(checkbox.value);
+  });
+  
+  const userData = {
+    id: newUserId,
+    username: username,
+    role: role,
+    status: status,
+    accessPermissions: accessPermissions
+  };
+  
+  // Only include password if provided
+  if (password) {
+    userData.password = password;
+  }
+  
+  try {
+    showLoading(true);
+    let response;
+    let url;
+    let method;
+    const authToken = localStorage.getItem('authToken');
+    
+    if (userId) {
+      // Update existing user
+      url = `${SERVER_URL}/api/users/${userId}`;
+      method = 'PUT';
+    } else {
+      // Create new user
+      url = `${SERVER_URL}/api/users`;
+      method = 'POST';
+    }
+    response = await fetch(url, {
+      method: method,
+      headers: {
+        'Authorization': `Bearer ${authToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(userData)
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `Server returned ${response.status}`);
+    }
+    
+    // Reload users
+    await loadUsers();
+    closeModal();
+    
+    showNotification('User saved successfully!', 'success');
+  } catch (error) {
+    showNotification(`Error saving user: ${error.message}`, 'error');
+  } finally {
+    showLoading(false);
+  }
+}
+
+// Also update the closeModal function to reset the required attribute:
+function closeModal() {
+  userModal.style.display = 'none';
+  // Reset the required attribute when closing modal
+  userIdDisplayInput.removeAttribute('required');
+}
+
+// Delete a user
+async function deleteUser(userId) {
+  if (!confirm('Are you sure you want to delete this user?')) {
+    return;
+  }
+  try {
+    const authToken = localStorage.getItem('authToken');
+    showLoading(true);
+    const response = await fetch(`${SERVER_URL}/api/users/${userId}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${authToken}`,'Content-Type': 'application/json' }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to delete user: ${response.status}`);
+    }
+    
+    // Reload users
+    await loadUsers();
+    showNotification('User deleted successfully!', 'success');
+  } catch (error) {
+    showNotification(`Error deleting user: ${error.message}`, 'error');
+  } finally {
+    showLoading(false);
+  }
+}
+
+
+// Show/hide loading spinner
+function showLoading(show) {
+  loadingSpinner.style.display = show ? 'block' : 'none';
+}
+
+// Show error message
+function showError(message) {
+  errorMessage.textContent = message;
+  errorMessage.style.display = 'block';
+  
+  // Hide error after 5 seconds
+  setTimeout(() => {
+    errorMessage.style.display = 'none';
+  }, 5000);
+}
+
+// Initialize the page when DOM is loaded
+document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
